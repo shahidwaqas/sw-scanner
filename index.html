@@ -5,55 +5,73 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <title>SW Scanner</title>
 <link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#1d4ed8">
+<meta name="theme-color" content="#0a1a5c">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="SW Scanner">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-180.png">
 <link rel="icon" href="icon-192.png">
 <style>
+:root{--o:#f97316;--bg:#eef2f8}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;height:100%;background:#f1f5f9;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#0f172a}
-.screen{position:fixed;inset:0;display:flex;flex-direction:column;background:#f1f5f9}
+html,body{margin:0;height:100%;background:var(--bg);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#0f172a}
+.screen{position:fixed;inset:0;display:flex;flex-direction:column;background:var(--bg)}
 .hidden{display:none!important}
-header{display:flex;align-items:center;gap:8px;padding:calc(env(safe-area-inset-top) + 10px) 12px 10px;background:#1d4ed8;color:#fff}
+header{position:relative;display:flex;align-items:center;gap:8px;padding:calc(env(safe-area-inset-top) + 10px) 12px 14px;background:linear-gradient(180deg,#2547b8,#0a1a5c);color:#fff;border-radius:0 0 24px 24px;box-shadow:0 6px 18px rgba(10,26,92,.35),inset 0 1px 0 rgba(255,255,255,.28)}
+header::after{content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(180deg,rgba(255,255,255,.17),rgba(255,255,255,0) 55%);pointer-events:none}
+header>*{position:relative;z-index:1}
 header h1{flex:1;margin:0;font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-button{font:inherit;border:0;border-radius:10px;padding:10px 14px;background:#e2e8f0;color:#0f172a;cursor:pointer}
-header button{background:rgba(255,255,255,.18);color:#fff;padding:8px 12px}
-.pri{background:#1d4ed8;color:#fff}
-.ok{background:#16a34a;color:#fff}
+button{font:inherit;border:0;border-radius:14px;padding:10px 14px;background:#e2e8f0;color:#0f172a;cursor:pointer}
+header button{background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.3);color:#fff;padding:8px 12px;backdrop-filter:blur(6px)}
+.pri{background:linear-gradient(180deg,#2f55c9,#12297d);color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 3px 8px rgba(18,41,125,.35)}
+.ok{background:linear-gradient(180deg,#fb923c,#ea580c);color:#fff;box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 3px 8px rgba(234,88,12,.35)}
 .dng{background:#dc2626;color:#fff}
-#status{font-size:12px;color:#475569;padding:6px 14px;min-height:26px}
+#status{font-size:12px;color:#475569;padding:8px 16px 4px;min-height:28px}
 .scroll{flex:1;overflow:auto;padding:0 12px 120px}
-.card{display:flex;gap:12px;align-items:center;background:#fff;border-radius:14px;padding:10px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
-.card img{width:56px;height:72px;object-fit:cover;border-radius:6px;background:#e2e8f0}
+.card{position:relative;overflow:hidden;display:flex;gap:12px;align-items:center;background:#fff;border-radius:20px;padding:12px 40px 12px 12px;margin-bottom:12px;box-shadow:0 2px 10px rgba(10,26,92,.10)}
+.card::after{content:'';position:absolute;top:0;right:0;width:30px;height:30px;background:linear-gradient(225deg,var(--bg) 50%,#cbd5e1 50%);border-bottom-left-radius:10px}
+.card img{width:56px;height:72px;object-fit:cover;border-radius:10px;background:#e2e8f0}
 .card b{display:block;font-size:15px}
 .card small{color:#64748b}
 .empty{text-align:center;color:#64748b;margin-top:60px}
-.fab{position:fixed;left:0;right:0;bottom:0;display:flex;gap:10px;padding:12px 12px calc(env(safe-area-inset-bottom) + 12px);background:linear-gradient(transparent,#f1f5f9 40%)}
-.fab button{flex:1;padding:14px;font-size:16px}
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-.grid div{position:relative;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.fab{position:fixed;left:0;right:0;bottom:0;display:flex;gap:10px;padding:12px 12px calc(env(safe-area-inset-bottom) + 12px);background:linear-gradient(transparent,var(--bg) 40%)}
+.fab button{flex:1;padding:15px;font-size:16px;border-radius:18px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.grid div{position:relative;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 2px 10px rgba(10,26,92,.12)}
 .grid img{width:100%;display:block}
-.grid span{position:absolute;left:6px;bottom:6px;background:rgba(0,0,0,.6);color:#fff;font-size:12px;border-radius:6px;padding:2px 7px}
-#crop,#edit,#viewer{background:#0b1220;color:#fff}
+.grid span{position:absolute;left:8px;bottom:8px;background:rgba(10,26,92,.75);color:#fff;font-size:12px;border-radius:8px;padding:2px 8px}
+#crop,#edit,#viewer{background:#070f2e;color:#fff}
 .stage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:8px}
 #cropCv{touch-action:none;display:block}
-#editCv{width:100%;height:100%;object-fit:contain;background:#fff}
-#viewImg{max-width:100%;max-height:100%;object-fit:contain}
+#editCv{width:100%;height:100%;object-fit:contain;background:#fff;border-radius:12px}
+#viewImg{max-width:100%;max-height:100%;object-fit:contain;border-radius:12px}
 .bar{display:flex;gap:8px;padding:10px 12px calc(env(safe-area-inset-bottom) + 10px);flex-wrap:wrap;justify-content:center}
 .bar button{flex:1;min-width:80px}
-.bar .on{background:#1d4ed8;color:#fff}
+.bar .on{background:linear-gradient(180deg,#fb923c,#ea580c);color:#fff}
 .hint{text-align:center;font-size:12px;color:#94a3b8;padding:4px}
-#toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#0f172a;color:#fff;padding:10px 16px;border-radius:20px;font-size:14px;max-width:90%;z-index:9;opacity:0;transition:.2s;pointer-events:none;text-align:center}
+#toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#0a1a5c;color:#fff;padding:10px 16px;border-radius:20px;font-size:14px;max-width:90%;z-index:9;opacity:0;transition:.2s;pointer-events:none;text-align:center}
 #toast.show{opacity:1}
+#login{align-items:center;justify-content:center;text-align:center;padding:24px;background:linear-gradient(160deg,#173098,#0a1a5c 55%,#060f38);color:#fff}
+#login img{width:min(62vw,270px);height:auto;filter:drop-shadow(0 14px 30px rgba(0,0,0,.45))}
+#login p{margin:22px 0 30px;color:#bfdbfe;font-size:15px}
+#btnLogin{display:flex;align-items:center;gap:12px;background:#fff;color:#0f172a;font-weight:600;font-size:16px;padding:14px 22px;border-radius:30px;box-shadow:0 4px 14px rgba(0,0,0,.3)}
+#btnLogin svg{width:22px;height:22px}
+#loginErr{margin-top:18px;color:#fecaca;font-size:13px;min-height:18px;max-width:320px}
+.hlogo{width:30px;height:30px;border-radius:8px}
 </style>
 </head>
 <body>
 
+<div id="login" class="screen hidden">
+  <img src="logo.png" alt="SW Scanner">
+  <p>Apne zaruri documents scan karen aur mehfooz rakhen</p>
+  <button id="btnLogin"><svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.6 5.9c4.4-4.1 7-10.1 7-17.6z"/><path fill="#FBBC05" d="M10.5 28.7a14.500 14.500 0 0 1 0-9.4l-7.9-6.1a24 24 0 0 0 0 21.6l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.900-2.100 15.900-5.800l-7.600-5.900c-2.100 1.400-4.900 2.300-8.300 2.300-6.300 0-11.600-4.100-13.500-9.800l-7.900 6.100C6.500 42.600 14.600 48 24 48z"/></svg>Google se login karen</button>
+  <div id="loginErr"></div>
+</div>
+
 <div id="home" class="screen">
-  <header><h1>📄 SW Scanner</h1><button id="btnSync">☁ Sync</button></header>
+  <header><img class="hlogo" src="mark.png" alt=""><h1>SW Scanner</h1><button id="btnSync">☁ Sync</button><button id="btnOut">Logout</button></header>
   <div id="status"></div>
   <div class="scroll" id="list"></div>
   <div class="fab"><button class="pri" id="btnScan">📷 Scan</button><button id="btnImport">🖼 Gallery</button></div>
@@ -370,10 +388,20 @@ async function sync(){
   finally{syncing=false;$('#btnSync').textContent='☁ Sync'}}
 function autoSync(){if(token&&Date.now()<tokenExp)sync()}
 $('#btnSync').onclick=sync;
+$('#btnLogin').onclick=async()=>{
+  $('#loginErr').textContent='';
+  try{await getToken();await renderHome();sync()}
+  catch(e){$('#loginErr').textContent=e.message}};
+$('#btnOut').onclick=()=>{
+  if(!confirm('Logout karen? Scan kiye hue documents is phone ma rahen ge.'))return;
+  try{if(token&&window.google)google.accounts.oauth2.revoke(token,()=>{})}catch(e){}
+  token=null;tokenExp=0;localStorage.removeItem('swSignedIn');localStorage.removeItem('swFolder');
+  $('#loginErr').textContent='';setStatus('');show('login')};
 
 /* ---------- start ---------- */
 (async()=>{
-  await openDB();await renderHome();
+  await openDB();
+  if(localStorage.getItem('swSignedIn'))await renderHome();else show('login');
   if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
   if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();
 })();
