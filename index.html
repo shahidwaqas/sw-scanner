@@ -79,6 +79,34 @@ h3{margin:14px 4px 8px;font-size:15px;color:#0a1a5c}
 .idbox{display:flex;align-items:center;gap:8px;background:#fff;border-radius:16px;padding:10px;margin-bottom:12px;flex-wrap:wrap}.idbox b{flex:1 0 100%}
 .card .tag{font-size:11px;background:#fed7aa;color:#9a3412;border-radius:6px;padding:1px 6px;margin-left:6px}
 .row{display:flex;justify-content:space-between;align-items:center;gap:8px}.row input[type=number],.row select{width:90px;padding:6px;border:1px solid #cbd5e1;border-radius:8px;font:inherit}
+
+:root{--bg:#fff}
+.ic{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:none;margin-right:6px;vertical-align:-4px}
+button{background:#f1f5f9}
+header{background:#fff;color:#0a1a5c;border-radius:0;box-shadow:none;border-bottom:1px solid #e6ebf5;padding-bottom:12px}
+header::after{display:none}
+header button{background:#f1f5f9;border:0;color:#0f172a;backdrop-filter:none;border-radius:12px}
+header button .ic,.ib .ic,.tools .ic,#nav .ic{margin:0}
+.pri{background:#12297d;color:#fff;box-shadow:none}
+.ok{background:#ea580c;color:#fff;box-shadow:none}
+.card{border:1px solid #e6ebf5;box-shadow:none;padding:12px;border-radius:16px}.card::after{display:none}
+.card>div:first-of-type{flex:1;min-width:0}.card b{word-break:break-word}
+.acts{display:flex;gap:6px}.ib{width:38px;height:38px;padding:0;border-radius:12px;display:grid;place-items:center;color:#334155}
+.big,.idbox,.grid div{box-shadow:none;border:1px solid #e6ebf5}
+.big{display:grid;grid-template-columns:28px 1fr;column-gap:12px;align-items:center}.big .ic{grid-row:1/3;margin:0;width:24px;height:24px}.big small{grid-column:2}
+#crop,#edit,#viewer{background:#fff;color:#0f172a}
+#crop .stage,#edit .stage,#viewer .stage{background:#f1f5f9}
+.hint{color:#64748b}
+.fab{background:linear-gradient(transparent,#fff 40%)}
+.chips button{background:#f1f5f9;color:#0f172a}.chips .on,.bar .on{background:#ea580c;color:#fff}
+.adj{color:#475569}
+.tools{display:flex;padding:6px 8px 0}.tools button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;background:none;font-size:12px;color:#334155;padding:6px 0}
+.tools button .ic{width:24px;height:24px}.tools .on{color:#ea580c}
+#login{background:#fff;color:#0f172a}#login p{color:#64748b}#login img{filter:none}#btnLogin{box-shadow:none;border:1px solid #dbe3f0}#loginErr{color:#dc2626}
+#nav{border-top:1px solid #e6ebf5;background:#fff}#nav button{background:none;font-size:11px;gap:2px;color:#64748b}
+#nav .ic{width:52px;height:32px;padding:4px 16px;border-radius:16px}#nav .on{color:#12297d;font-weight:600}#nav .on .ic{background:#e6ecfb}
+.seg{display:flex;gap:6px;background:#f1f5f9;padding:4px;border-radius:14px}.seg button{flex:1;background:none;padding:10px}.seg .on{background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.pgs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-height:34vh;overflow:auto}.th{position:relative;border:1px solid #e6ebf5;border-radius:10px;overflow:hidden}.th img{width:100%;display:block}.th input{position:absolute;top:6px;right:6px;width:20px;height:20px}
 </style>
 </head>
 <body>
@@ -91,26 +119,26 @@ h3{margin:14px 4px 8px;font-size:15px;color:#0a1a5c}
 </div>
 
 <div id="main" class="screen">
-  <header><img class="hlogo" src="mark.png" alt=""><h1>SW Scanner</h1><button id="btnSync">☁ Sync</button></header>
+  <header><img class="hlogo" src="mark.png" alt=""><h1>SW Scanner</h1><button id="btnSync">Sync</button></header>
   <div id="status"></div>
-  <div class="scroll tab" id="t-home"><div class="qa"><button class="pri" data-go="cam">📷 Scan document</button><button data-go="id">🪪 ID card</button></div><h3>Last 30 days</h3><div id="list"></div></div>
+  <div class="scroll tab" id="t-home"><div class="qa"><button class="pri" data-go="cam" data-ic="cam">Scan document</button><button data-go="id" data-ic="id">ID card</button></div><h3>Last 30 days</h3><div id="list"></div></div>
   <div class="scroll tab hidden" id="t-docs"><input id="q" class="inp" placeholder="Search documents"><div id="listAll"></div></div>
-  <div class="scroll tab hidden" id="t-import"><h3>Import</h3><button class="big" data-go="cam">📷 Camera<small>Take a photo of a document</small></button><button class="big" data-go="gal">🖼 Gallery<small>Choose one or more photos</small></button><button class="big" data-go="file">📁 Files<small>Pick an image from your files</small></button></div>
-  <div class="scroll tab hidden" id="t-tools"><h3>Tools</h3><button class="big" data-go="id">🪪 ID Card Scan<small>CNIC / licence, prints at real card size</small></button><button class="big" data-go="cam">📄 Scan Document<small>Auto-crop, filters, PDF</small></button><button class="big" data-go="sync">☁ Sync to Google Drive<small>Back up and sync your scans</small></button></div>
+  <div class="scroll tab hidden" id="t-import"><h3>Import</h3><button class="big" data-go="cam" data-ic="cam">Camera<small>Take a photo of a document</small></button><button class="big" data-go="gal" data-ic="img">Gallery<small>Choose one or more photos</small></button><button class="big" data-go="file" data-ic="folder">Files<small>Pick an image from your files</small></button></div>
+  <div class="scroll tab hidden" id="t-tools"><h3>Tools</h3><button class="big" data-go="id" data-ic="id">ID Card Scan<small>CNIC / licence, prints at real card size</small></button><button class="big" data-go="tab-import" data-ic="imp">Import<small>Camera, Gallery or Files</small></button><button class="big" data-go="sync" data-ic="sync">Sync to Google Drive<small>Back up and sync your scans</small></button></div>
   <div class="scroll tab hidden" id="t-me"><div class="me"><div class="av" id="av">?</div><div id="meStat"></div></div>
     <input class="inp" id="pn" placeholder="Your name"><input class="inp" id="pe" placeholder="Email" type="email"><input class="inp" id="pp" placeholder="Phone" type="tel">
-    <button class="big" id="btnBackup">💾 Backup<small>Save all documents to a file</small></button>
-    <button class="big" id="btnRestore">♻ Restore<small>Load documents from a backup file</small></button>
-    <button class="big" id="btnOut">Logout</button></div>
-  <nav id="nav"><button data-tab="home" class="on">🏠<span>Home</span></button><button data-tab="docs">🗂<span>All docs</span></button><button data-tab="import">⬇<span>Import</span></button><button data-tab="tools">🧰<span>Tools</span></button><button data-tab="me">👤<span>Me</span></button></nav>
+    <button class="big" id="btnBackup" data-ic="backup">Backup<small>Save all documents to a file</small></button>
+    <button class="big" id="btnRestore" data-ic="restore">Restore<small>Load documents from a backup file</small></button>
+    <button class="big" id="btnOut" data-ic="out">Logout</button></div>
+  <nav id="nav"><button data-tab="home" data-ic="home" class="on"><span>Home</span></button><button data-tab="docs" data-ic="docs"><span>All docs</span></button><button data-tab="import" data-ic="imp"><span>Import</span></button><button data-tab="tools" data-ic="tools"><span>Tools</span></button><button data-tab="me" data-ic="user"><span>Me</span></button></nav>
 </div>
 
 <div id="docv" class="screen hidden">
-  <header><button id="dBack">←</button><h1 id="dTitle"></h1><button id="dShare">Share</button><button id="dDel">🗑</button></header>
+  <header><button id="dBack">←</button><h1 id="dTitle"></h1><button id="dShare">Share</button><button id="dDel" data-ic="trash" aria-label="Delete"></button></header>
   <div class="scroll"><p class="hint">Tap the title to rename. Tap a page to open it.</p>
     <div id="idBox" class="idbox hidden"><b>Print size</b><button id="idM">−</button><span id="idV">100%</span><button id="idP">+</button><button id="idR">Actual size</button></div>
     <div class="grid" id="dGrid"></div></div>
-  <div class="fab" id="dFab"><button class="pri" id="dAdd">📷 Add page</button><button id="dAddG">🖼 Gallery</button></div>
+  <div class="fab" id="dFab"><button class="pri" id="dAdd" data-ic="cam">Add page</button><button id="dAddG" data-ic="img">Gallery</button></div>
 </div>
 
 <div id="crop" class="screen hidden">
@@ -121,20 +149,20 @@ h3{margin:14px 4px 8px;font-size:15px;color:#0a1a5c}
 </div>
 
 <div id="edit" class="screen hidden">
-  <header><button id="eBack">✕</button><h1>Edit page</h1><button id="eCrop">✂ Crop</button><button id="eRot">⟳</button></header>
+  <header><button id="eBack" aria-label="Cancel">✕</button><h1>Edit page</h1></header>
   <div class="stage"><canvas id="editCv"></canvas></div>
-  <div class="bar"><button id="pF" class="on">Filters</button><button id="pA">Adjust</button></div>
+  <div class="tools"><button id="eCrop" data-ic="crop">Adjust crop</button><button id="eRot" data-ic="rot">Rotate</button><button id="pF" class="on" data-ic="filt">Filters</button><button id="pA" data-ic="adj">Adjust</button></div>
   <div id="fBar" class="chips"></div>
   <div id="aBar" class="adj hidden"><label>Brightness<input type="range" id="sB" min="-100" max="100" value="0"></label><label>Contrast<input type="range" id="sC" min="-100" max="100" value="0"></label><label>Sharpness<input type="range" id="sS" min="0" max="100" value="0"></label><button id="aReset">Reset</button></div>
-  <div class="bar"><button id="eNext" class="pri">Add page</button><button id="eSave" class="ok">✔ Save</button></div>
+  <div class="bar"><button id="eNext" class="pri">Add page</button><button id="eSave" class="ok">Save</button></div>
 </div>
 
 <div id="viewer" class="screen hidden">
-  <header><button id="vBack">←</button><h1 id="vTitle"></h1><button id="vShare">Share</button><button id="vDel">🗑</button></header>
+  <header><button id="vBack">←</button><h1 id="vTitle"></h1><button id="vShare">Share</button><button id="vDel" data-ic="trash" aria-label="Delete"></button></header>
   <div class="stage"><img id="viewImg"></div>
 </div>
 
-<div id="src" class="sheet hidden"><div><b>Choose source</b><button data-s="cam" class="pri">📷 Camera</button><button data-s="gal">🖼 Gallery</button><button data-s="file">📁 Files</button><button data-s="x">Cancel</button></div></div>
+<div id="src" class="sheet hidden"><div><b>Choose source</b><button data-s="cam" class="pri">Camera</button><button data-s="gal">Gallery</button><button data-s="file">Files</button><button data-s="x">Cancel</button></div></div>
 <div id="shr" class="sheet hidden"><div><b>Share</b><button data-s="pdf" class="pri">Share as PDF</button><button data-s="img">Share as Image</button><button data-s="print">Print</button><button data-s="sheet" id="sSheet">A4 sheet of copies (front + back)</button><button data-s="x">Cancel</button></div></div>
 
 <div id="shs" class="sheet hidden"><div><b>A4 sheet of ID copies</b>
@@ -144,6 +172,7 @@ h3{margin:14px 4px 8px;font-size:15px;color:#0a1a5c}
 <label class="row">Back offset X / Y (mm)<span><input id="shX" type="number" step="0.5"> <input id="shY" type="number" step="0.5"></span></label>
 <label class="row">Cut marks<input type="checkbox" id="shM"></label>
 <button data-s="spdf" class="pri">Share PDF</button><button data-s="sprint" class="ok">Print</button><button data-s="x">Cancel</button></div></div>
+<div id="pk" class="sheet hidden"><div><b id="pkT">Share</b><div class="seg"><button data-f="img" class="on">Image</button><button data-f="pdf">PDF</button></div><div class="pgs" id="pkG"></div><button id="pkAll">Select all</button><button class="pri" id="pkGo">Send</button><button data-s="x">Cancel</button></div></div>
 <input type="file" id="inCam" accept="image/*" capture="environment" hidden>
 <input type="file" id="inGal" accept="image/*" multiple hidden>
 <input type="file" id="inFile" accept="image/*" multiple hidden>
@@ -299,6 +328,31 @@ async function wmBlob(b,t){const im=await loadImg(b),c=document.createElement('c
   return new Promise(r=>c.toBlob(r,'image/jpeg',.9))}
 async function wmDoc(d,t){if(!t)return d;return{...d,pages:await Promise.all(d.pages.map(async p=>({...p,blob:await wmBlob(p.blob,t)})))}}
 
+const ICO={home:'<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/>',docs:'<path d="M15 3H8a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V8z"/><path d="M15 3v5h5M4 7v13a2 2 0 0 0 2 2h9"/>',imp:'<path d="M12 3v12M7 10l5 5 5-5M4 19h16"/>',tools:'<rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/>',user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',cam:'<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',img:'<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="M21 16l-5-5-9 9"/>',folder:'<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',id:'<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2"/><path d="M6 16c.5-2 5.5-2 6 0M14 10h4M14 14h4"/>',share:'<circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.2 10.8l7.6-3.6M8.2 13.2l7.6 3.6"/>',edit:'<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/>',trash:'<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',rot:'<path d="M20 12a8 8 0 1 1-2.5-5.8"/><path d="M20 4v5h-5"/>',crop:'<path d="M7 3v14h14"/><path d="M3 7h14v14"/>',sync:'<path d="M7 18a4 4 0 0 1-.5-8A6 6 0 0 1 18 9a4.5 4.5 0 0 1 0 9z"/>',backup:'<path d="M12 4v11M7 11l5 5 5-5M5 20h14"/>',restore:'<path d="M12 16V5M7 9l5-5 5 5M5 20h14"/>',out:'<path d="M9 4H5v16h4M16 8l4 4-4 4M20 12H9"/>',filt:'<circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 0 0 16z"/>',adj:'<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>'};
+const ico=n=>`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${ICO[n]||''}</svg>`;
+document.querySelectorAll('[data-ic]').forEach(e=>e.insertAdjacentHTML('afterbegin',ico(e.dataset.ic)));
+async function renameDoc(d){const n=prompt('New name',d.name);if(!n||!n.trim())return;d.name=n.trim();d.nameDirty=true;await dbPut('docs',d);await renderHome();autoSync()}
+let PK={};
+function shareFlow(d){PK={d,f:'img',sel:new Set(d.pages.map((_,i)=>i)),u:[]};$('#pkT').textContent='Share · '+d.name;
+  document.querySelectorAll('#pk .seg button').forEach(b=>b.classList.toggle('on',b.dataset.f==='img'));
+  $('#pkG').innerHTML='';d.pages.forEach((p,i)=>{const u=URL.createObjectURL(p.blob);PK.u.push(u);const l=document.createElement('label');l.className='th';
+    l.innerHTML=`<img src="${u}"><input type="checkbox" checked>`;l.querySelector('input').onchange=e=>{e.target.checked?PK.sel.add(i):PK.sel.delete(i)};$('#pkG').appendChild(l)});
+  $('#pk').classList.remove('hidden')}
+const pkClose=()=>{$('#pk').classList.add('hidden');(PK.u||[]).forEach(u=>URL.revokeObjectURL(u));PK.u=[]};
+document.querySelectorAll('#pk .seg button').forEach(b=>b.onclick=()=>{PK.f=b.dataset.f;document.querySelectorAll('#pk .seg button').forEach(x=>x.classList.toggle('on',x===b))});
+$('#pkAll').onclick=()=>{const all=PK.sel.size===PK.d.pages.length;PK.sel=new Set(all?[]:PK.d.pages.map((_,i)=>i));document.querySelectorAll('#pkG input').forEach(c=>c.checked=!all);$('#pkAll').textContent=all?'Select all':'Clear all'};
+$('#pk').onclick=e=>{if(e.target.id==='pk'||e.target.dataset.s==='x')pkClose()};
+$('#pkGo').onclick=async()=>{const d=PK.d,pages=d.pages.filter((_,i)=>PK.sel.has(i));if(!pages.length){toast('Select at least one page');return}
+  let dd={...d,pages};if(d.kind==='id'){const t=askWm();if(t===null)return;dd=await wmDoc(dd,t)}
+  const f=PK.f;pkClose();if(f==='pdf')sharePDF(dd);else shareFiles(imgFiles(dd),d.name)};
+const NAMES=[[/national identity|cnic|nadra|identity card/,'CNIC'],[/driving licen[cs]e/,'Driving Licence'],[/passport/,'Passport'],[/invoice/,'Invoice'],[/receipt/,'Receipt'],[/quotation|estimate/,'Quotation'],[/challan/,'Challan'],[/certificate/,'Certificate'],[/agreement|contract/,'Agreement'],[/statement/,'Statement'],[/electricity|utility|\bbill\b/,'Bill'],[/application/,'Application']];
+async function autoName(id,def){try{if(!navigator.onLine)return;const d=await dbGet('docs',id);if(!d||d.name!==def)return;
+  if(!window.Tesseract)await new Promise((r,j)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';s.onload=r;s.onerror=j;document.head.appendChild(s)});
+  const im=await loadImg(d.pages[0].blob),k=Math.min(1,1600/Math.max(im.naturalWidth,im.naturalHeight)),c=document.createElement('canvas');c.width=im.naturalWidth*k|0;c.height=im.naturalHeight*k|0;c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+  const r=await Tesseract.recognize(c,'eng'),t=r.data.text.toLowerCase(),m=NAMES.find(n=>n[0].test(t));if(!m)return;
+  const d2=await dbGet('docs',id);if(!d2||d2.name!==def)return;d2.name=m[1]+' '+fmt(new Date(d2.created));d2.nameDirty=true;await dbPut('docs',d2);toast('Named: '+m[1]);
+  if(!$('#docv').classList.contains('hidden')&&cur&&cur.id===id)openDoc(id);else if(!$('#main').classList.contains('hidden'))renderHome();autoSync()}catch(e){}}
+
 /* ---------- tabs / lists ---------- */
 let urls=[];const mkUrl=b=>{const u=URL.createObjectURL(b);urls.push(u);return u};
 const clearUrls=()=>{urls.forEach(u=>URL.revokeObjectURL(u));urls=[]};
@@ -309,16 +363,16 @@ async function renderHome(){
   const q=$('#q').value.trim().toLowerCase(),lim=Date.now()-30*864e5;
   const fill=(el,arr,msg)=>{el.innerHTML='';if(!arr.length)el.innerHTML='<p class="empty">'+msg+'</p>';
     for(const d of arr){const c=document.createElement('div');c.className='card';const synced=d.pages.every(p=>p.driveId);
-      c.innerHTML=`<img src="${mkUrl(d.pages[0].blob)}"><div><b></b><small>${d.pages.length} page${d.pages.length>1?'s':''} · ${fmt(new Date(d.created))} · ${synced?'☁️':'⏳'}</small></div>`;
+      c.innerHTML=`<img src="${mkUrl(d.pages[0].blob)}"><div><b></b><small>${d.pages.length} page${d.pages.length>1?'s':''} · ${fmt(new Date(d.created))} · ${synced?'Synced':'Not synced'}</small></div><div class="acts"><button class="ib" data-a="s" aria-label="Share">${ico('share')}</button><button class="ib" data-a="r" aria-label="Rename">${ico('edit')}</button></div>`;
       c.querySelector('b').textContent=d.name;if(d.kind==='id')c.querySelector('b').insertAdjacentHTML('beforeend','<span class="tag">ID</span>');
-      c.onclick=()=>openDoc(d.id);el.appendChild(c)}};
+      c.onclick=e=>{const a=e.target.closest('[data-a]');if(!a)return openDoc(d.id);if(a.dataset.a==='s')shareFlow(d);else renameDoc(d)};el.appendChild(c)}};
   fill($('#list'),docs.filter(d=>d.created>=lim),'No documents in the last 30 days.<br>Tap Scan to start.');
   fill($('#listAll'),docs.filter(d=>!q||d.name.toLowerCase().includes(q)),'No documents found.');
   show('main');showTab(curTab)}
 $('#q').oninput=renderHome;
 document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
 document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(!g)return;const v=g.dataset.go;
-  if(v==='id')begin('id',null,null);else if(v==='sync')sync();else begin('new',null,v)});
+  if(v==='tab-import')showTab('import');else if(v==='id')begin('id',null,null);else if(v==='sync')sync();else begin('new',null,v)});
 const prof=()=>JSON.parse(localStorage.getItem('swProfile')||'{}');
 async function renderMe(){const p=prof(),docs=await dbAll('docs');
   $('#pn').value=p.n||'';$('#pe').value=p.e||'';$('#pp').value=p.p||'';$('#av').textContent=(p.n||'?')[0].toUpperCase();
@@ -492,7 +546,7 @@ async function saveDraft(){
   let d;if(ctx.mode==='add')d=await dbGet('docs',ctx.docId);
   if(!d){const id=ctx.mode==='id';d={id:uid(),name:(id?'ID Card ':'Scan ')+fmt(new Date()),created:Date.now(),pages:[]};if(id){d.kind='id';d.idScale=100}}
   d.pages.push(...ctx.draft);ctx.draft=[];
-  await dbPut('docs',d);toast('Saved ✓');openDoc(d.id);autoSync()}
+  await dbPut('docs',d);toast('Saved ✓');openDoc(d.id);autoSync();if(ctx.mode==='new')autoName(d.id,d.name)}
 
 /* ---------- Google Drive sync ---------- */
 let token=null,tokenExp=0,syncing=false;
@@ -532,7 +586,7 @@ async function upload(fid,d,p,idx){
 const JSONH={'Content-Type':'application/json'};
 function setStatus(s){$('#status').textContent=s}
 async function sync(){
-  if(syncing)return;syncing=true;$('#btnSync').textContent='⏳ Sync...';
+  if(syncing)return;syncing=true;$('#btnSync').textContent='Syncing...';
   try{
     await getToken();setStatus('Syncing...');
     const fid=await folderId();
@@ -572,7 +626,7 @@ async function sync(){
     if(!$('#main').classList.contains('hidden'))renderHome();
     else if(!$('#docv').classList.contains('hidden')&&cur)openDoc(cur.id);
   }catch(e){setStatus('Sync error: '+e.message);toast('Sync failed')}
-  finally{syncing=false;$('#btnSync').textContent='☁ Sync'}}
+  finally{syncing=false;$('#btnSync').textContent='Sync'}}
 function autoSync(){if(token&&Date.now()<tokenExp)sync()}
 $('#btnSync').onclick=sync;
 $('#btnLogin').onclick=async()=>{
