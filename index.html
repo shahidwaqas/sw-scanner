@@ -167,13 +167,53 @@ button{border-radius:18px}.sb{border-radius:16px}
 .a4{border-radius:12px;box-shadow:0 6px 20px rgba(10,26,92,.12)}
 #toast{border-radius:24px;box-shadow:0 8px 24px rgba(10,26,92,.25)}
 #status.err{color:#b91c1c;background:#fef2f2;border-radius:16px;margin:8px 12px 2px;padding:10px 14px;font-size:13px;cursor:pointer}
+
+#splash{background:radial-gradient(circle at 50% 40%,rgba(255,255,255,.93) 30%,rgba(238,242,248,.8) 100%),url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 120 120' fill='none' stroke='%232547b8' stroke-opacity='.11' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 14h18l8 8v24H20z'/%3E%3Cpath d='M38 14v8h8'/%3E%3Cpath d='M26 30h14M26 37h14'/%3E%3Cpath d='M78 74v-8h8M104 66h8v8M112 98v8h-8M86 106h-8v-8'/%3E%3Ccircle cx='96' cy='34' r='7'/%3E%3Cpath d='M96 27v-4M96 45v-4'/%3E%3C/svg%3E"),#f5f8fd!important}
+#splash{overflow:hidden}
+#splash::after{content:'';position:absolute;left:0;right:0;height:110px;top:-110px;background:linear-gradient(transparent,rgba(37,71,184,.11),transparent);animation:sl 3.4s ease-in-out infinite;pointer-events:none}
+@keyframes sl{to{top:100%}}
+#auth{display:none;flex-direction:column;gap:10px;width:min(86vw,340px);background:rgba(255,255,255,.93);border-radius:28px;padding:20px;box-shadow:0 12px 36px rgba(10,26,92,.14);z-index:2;position:relative}
+#auth h2{margin:0 0 4px;font-size:19px;color:#0a1a5c;text-align:center}#auth .inp{margin:0}
+#auE{color:#b91c1c;font-size:13px;min-height:16px;text-align:center}
+#auF{background:none!important;color:#475569;font-size:13px;padding:6px;box-shadow:none!important}
+.zc{position:absolute;right:12px;bottom:92px;display:flex;flex-direction:column;gap:8px;z-index:5}
+.zc button{width:46px;height:46px;padding:0;border-radius:50%;background:#fff;font-size:20px;font-weight:700;color:#0a1a5c;box-shadow:0 4px 14px rgba(10,26,92,.2)}
+
+/* original dark login look + moving documents */
+#login{overflow:hidden;background:radial-gradient(circle at 50% 36%,#2a4fd0 0,#173098 32%,#0a1a5c 68%,#060f38 100%)!important;color:#fff!important}
+#login p{color:#bfdbfe!important}#login img{filter:drop-shadow(0 14px 30px rgba(0,0,0,.45))!important}
+#btnLogin{box-shadow:0 4px 14px rgba(0,0,0,.3)!important;border:0!important}#loginErr{color:#fecaca!important}
+#login>*:not(.fx){position:relative;z-index:2}
+.fx{position:absolute;inset:0;pointer-events:none;z-index:1;overflow:hidden}
+.fx span{position:absolute;bottom:-70px;display:block;animation:fl linear infinite}
+.fx svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+@keyframes fl{0%{transform:translate(0,0) rotate(0);opacity:0}10%{opacity:var(--o,.3)}50%{transform:translate(var(--dx,30px),-55vh) rotate(var(--r,12deg))}90%{opacity:var(--o,.3)}100%{transform:translate(calc(var(--dx,30px)*-1),-115vh) rotate(calc(var(--r,12deg)*-1));opacity:0}}
+.scan{position:absolute;width:74px;height:96px;border:2px solid rgba(255,255,255,.35);border-radius:12px;overflow:hidden;animation:fl linear infinite}
+.scan::after{content:'';position:absolute;left:0;right:0;height:16px;background:linear-gradient(transparent,rgba(249,115,22,.75),transparent);animation:swp 1.6s ease-in-out infinite alternate}
+@keyframes swp{from{top:-16px}to{top:100%}}
+
+.dc{position:absolute;left:50%;top:50%;width:64px;height:84px;margin:-42px 0 0 -32px;background:rgba(255,255,255,.94);border-radius:9px;box-shadow:0 6px 18px rgba(0,0,0,.28);overflow:hidden;animation:arr 11s ease-in-out infinite both}
+.dc i,.dc b{position:absolute;left:0;right:0;top:12px;text-align:center;font-style:normal}
+.dc .hw{font:italic 600 15px 'Bradley Hand','Segoe Script','Comic Sans MS',cursive;color:#1e3a8a;animation:hws 11s ease-in-out infinite both;animation-delay:inherit}
+.dc .pr{font:800 13px system-ui,sans-serif;color:#0a1a5c;letter-spacing:.5px;opacity:0;animation:prs 11s ease-in-out infinite both;animation-delay:inherit}
+.dc u{position:absolute;left:8px;right:8px;height:3px;border-radius:2px;background:#cbd5e1;text-decoration:none}.dc u:nth-of-type(1){top:44px}.dc u:nth-of-type(2){top:54px;right:22px}
+.dc .sl{position:absolute;left:0;right:0;height:14px;top:-14px;background:linear-gradient(transparent,rgba(249,115,22,.85),transparent);opacity:0;animation:cs 11s linear infinite both;animation-delay:inherit}
+.dc .up{position:absolute;right:4px;bottom:4px;width:18px;height:18px;border-radius:50%;background:#ea580c;color:#fff;font:700 12px/18px system-ui,sans-serif;text-align:center;font-style:normal;opacity:0;animation:upb 11s linear infinite both;animation-delay:inherit}
+@keyframes arr{0%{transform:translate(var(--sx),var(--sy)) rotate(var(--sr)) scale(.9);opacity:0}8%{opacity:1}30%{transform:translate(calc(var(--sx)*.94),calc(var(--sy)*.94 - 10px)) rotate(calc(var(--sr)*1.08)) scale(.95)}52%,70%{transform:translate(var(--gx),var(--gy)) rotate(0) scale(1);opacity:1}86%{transform:translate(var(--gx),calc(var(--gy) - 38vh)) rotate(0);opacity:1}100%{transform:translate(var(--gx),calc(var(--gy) - 95vh)) rotate(0);opacity:0}}
+@keyframes hws{0%,30%{transform:rotate(var(--tr)) skewX(var(--sk));opacity:1}46%,100%{transform:rotate(0) skewX(0);opacity:0}}
+@keyframes prs{0%,36%{opacity:0}50%,100%{opacity:1}}
+@keyframes cs{0%,56%{top:-14px;opacity:0}58%{opacity:1}68%{top:100%;opacity:1}70%,100%{top:100%;opacity:0}}
+@keyframes upb{0%,72%{opacity:0}76%,88%{opacity:1}100%{opacity:0}}
+#prep{position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;background:radial-gradient(circle at 50% 40%,rgba(255,255,255,.97) 30%,rgba(238,242,248,.95) 100%)}
+#prep .spin2{width:56px;height:56px;border-radius:50%;background:conic-gradient(#ef4444,#f97316,#eab308,#22c55e,#06b6d4,#3b82f6,#8b5cf6,#ef4444);-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 7px),#000 calc(100% - 6px));mask:radial-gradient(farthest-side,transparent calc(100% - 7px),#000 calc(100% - 6px));animation:rot .9s linear infinite}
+#prepMsg{font-size:15px;font-weight:600;color:#475569}
 </style>
 </head>
 <body>
 
-<div id="splash"><img src="logo.png" alt=""><div class="spin"></div><div class="msg" id="splMsg">Loading your data…</div><div class="bar2"><i></i></div></div>
+<div id="splash"><img src="logo.png" alt=""><div class="spin"></div><div class="msg" id="splMsg">Loading your data…</div><div id="auth"><h2 id="auT"></h2><input class="inp" id="auU" placeholder="Username" autocomplete="username" autocapitalize="none"><input class="inp" id="auP" type="password" placeholder="Password" autocomplete="current-password"><input class="inp" id="auP2" type="password" placeholder="Confirm password" autocomplete="new-password"><div id="auE"></div><button class="pri" id="auGo"></button><button id="auF">Forgot password?</button></div><div class="bar2"><i></i></div></div>
 <div id="camv" class="screen hidden" style="background:#000"><video id="camVid" autoplay playsinline muted style="flex:1;min-height:0;width:100%;object-fit:cover"></video><div class="bar" style="background:#000;padding-top:14px;justify-content:space-around"><button id="camX">Close</button><button id="camSnap" class="ok" style="flex:2;padding:18px;font-size:17px">Capture</button></div></div>
-<div id="login" class="screen hidden">
+<div id="login" class="screen hidden"><div class="fx" aria-hidden="true"></div>
   <img src="logo.png" alt="SW Scanner">
   <p>Scan your important documents and keep them safe</p>
   <button id="btnLogin"><svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.6 5.9c4.4-4.1 7-10.1 7-17.6z"/><path fill="#FBBC05" d="M10.5 28.7a14.500 14.500 0 0 1 0-9.4l-7.9-6.1a24 24 0 0 0 0 21.6l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.900-2.100 15.900-5.800l-7.600-5.900c-2.100 1.400-4.900 2.300-8.300 2.300-6.300 0-11.600-4.100-13.500-9.800l-7.900 6.100C6.500 42.600 14.600 48 24 48z"/></svg>Sign in with Google</button>
@@ -189,6 +229,7 @@ button{border-radius:18px}.sb{border-radius:16px}
   <div class="scroll tab hidden" id="t-tools"><h3>Tools</h3><button class="big" data-go="id" data-ic="id">ID Card Scan<small>CNIC / licence, prints at real card size</small></button><button class="big" data-go="tab-import" data-ic="imp">Import<small>Camera, Gallery or Files</small></button><button class="big" data-go="sync" data-ic="sync">Sync to Google Drive<small>Back up and sync your scans</small></button><button class="big" data-go="bin" data-ic="trash">Recycle bin<small id="binN">Restore deleted documents</small></button></div>
   <div class="scroll tab hidden" id="t-me"><div class="me"><div class="av" id="av">?</div><div id="meStat"></div></div>
     <input class="inp" id="pn" placeholder="Your name"><input class="inp" id="pe" placeholder="Email" type="email"><input class="inp" id="pp" placeholder="Phone" type="tel"><button class="pri" id="pEdit" style="width:100%;margin-bottom:10px"></button>
+    <button class="big" id="btnDiag" data-ic="sync">Sync check<small>Find out why sync is failing</small></button>
     <button class="big" id="btnBackup" data-ic="backup">Backup<small>Save all documents to a file</small></button>
     <button class="big" id="btnRestore" data-ic="restore">Restore<small>Load documents from a backup file</small></button>
     <button class="big" id="btnOut" data-ic="out">Logout</button></div>
@@ -201,7 +242,7 @@ button{border-radius:18px}.sb{border-radius:16px}
   <div class="scroll"><div class="row"><p class="hint" style="flex:1;text-align:left">Tap the title to rename. Tap a page to open it.</p><button id="dSel" class="sb">Select</button></div>
     <div id="idBox" class="idbox hidden"><b>Print size</b><button id="idM">−</button><span id="idV">100%</span><button id="idP">+</button><button id="idR">Actual size</button><button id="idView" class="pri" style="flex:1 0 100%">View A4 copies sheet</button><button id="idSet" style="flex:1 0 100%">Sheet settings (copies, gap, flip)</button></div>
     <div class="grid" id="dGrid"></div></div>
-  <div class="fab" id="dFab"><button class="pri" id="dAdd" data-ic="cam">Add page</button><button id="dAddG" data-ic="img">Gallery</button></div>
+  <div class="fab" id="dFab"><button class="pri" id="dAdd" data-ic="cam">Add photo</button></div>
   <div id="pgBar" class="selbar hidden"><button id="pgCancel">Cancel</button><button id="pgAll">Select all</button><button class="rdb" id="pgDel">Delete (0)</button></div>
 </div>
 
@@ -243,10 +284,11 @@ button{border-radius:18px}.sb{border-radius:16px}
 <input type="file" id="inFile" accept="image/*,application/pdf,.pdf" multiple hidden>
 <input type="file" id="inRes" accept=".json,application/json" hidden>
 <div id="rev" class="screen hidden"><header><button id="rvBack">✕</button><h1 id="rvT">Review</h1></header><div id="rvPager"></div><div class="hint" id="rvHint"></div><div class="tools"><button id="rvEdit" data-ic="adj">Edit</button><button id="rvDel" data-ic="trash">Remove</button><button id="rvCam" data-ic="cam">Camera</button><button id="rvGal" data-ic="img">Gallery</button><button id="rvFile" data-ic="folder">Files</button></div><div class="bar"><button id="rvSave" class="ok">Save</button></div></div>
-<div id="prev" class="screen hidden"><header><button id="pvBack">←</button><h1 id="pvT"></h1></header><div class="scroll" id="pvBox" style="background:#e2e8f0;padding-top:12px"></div><div class="bar"><button id="pvPrint" class="pri">Print</button><button id="pvShare">Share PDF</button><button id="pvDl">Download</button></div></div>
+<div id="prev" class="screen hidden"><div class="zc"><button id="zIn" aria-label="Zoom in">+</button><button id="zOut" aria-label="Zoom out">−</button><button id="zFit" style="font-size:12px">Fit</button></div><header><button id="pvBack">←</button><h1 id="pvT"></h1></header><div class="scroll" id="pvBox" style="background:#e2e8f0;padding-top:12px"></div><div class="bar"><button id="pvPrint" class="pri">Print</button><button id="pvShare">Share PDF</button><button id="pvDl">Download</button></div></div>
 <div id="bin" class="screen hidden"><header><button id="bBack">←</button><h1>Recycle bin</h1><button id="bEmpty">Empty</button></header><div class="scroll"><p class="hint" id="binHint"></p><div id="binList"></div></div></div>
 <div id="dlg" class="sheet hidden"><div><b id="dlgT"></b><p id="dlgM"></p><button id="dlgOk" class="rdb">Delete</button><button id="dlgNo">Cancel</button></div></div>
 <div id="toast"></div>
+<div id="prep" class="hidden"><div class="spin2"></div><div id="prepMsg"></div></div>
 
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script>
@@ -525,7 +567,7 @@ function begin(mode,docId,src){ctx={mode,docId,draft:[],queue:[],side:0,ri:0,rep
 function openSrc(s){if(!s){$('#src').classList.remove('hidden');return}if(s==='cam'&&navigator.mediaDevices&&navigator.mediaDevices.getUserMedia){openCam();return}$({cam:'#inCam',gal:'#inGal',file:'#inFile'}[s]).click()}
 $('#src').onclick=e=>{const s=e.target.dataset.s;if(!s&&e.target.id!=='src')return;$('#src').classList.add('hidden');
   if(s&&s!=='x')openSrc(s)};
-$('#dAdd').onclick=()=>begin('add',cur.id,'cam');$('#dAddG').onclick=()=>begin('add',cur.id,'gal');
+$('#dAdd').onclick=()=>begin('add',cur.id,null);
 async function onFiles(e){
   let files=[...e.target.files];e.target.value='';if(!files.length)return;
   try{
@@ -747,7 +789,7 @@ async function openPrev(d,o){let dd=d;
   if(o){dd.pages.slice(0,2).forEach((p,k)=>{const u=mkUrl(p.blob),pg=document.createElement('div');pg.className='a4';
     pg.innerHTML=sheetPos(o,k).map(q=>`<img src="${u}" style="left:${q.x/2.1}%;top:${q.y/2.97}%;width:${85.6/2.1}%;height:${53.98/2.97}%">`+(k===0&&o.marks?ticks(q.x,q.y).map(t=>`<i style="left:${Math.min(t[0],t[2])/2.1}%;top:${Math.min(t[1],t[3])/2.97}%;width:${Math.max(.2,Math.abs(t[2]-t[0]))/2.1}%;height:${Math.max(.2,Math.abs(t[3]-t[1]))/2.97}%"></i>`).join(''):'')).join('');box.appendChild(pg)})}
   else dd.pages.forEach(p=>{const im=document.createElement('img');im.src=mkUrl(p.blob);im.className='pvi';box.appendChild(im)});
-  show('prev')}
+  PZ=1;show('prev')}
 async function pvPdf(share){const d=PV.d,o=PV.o;toast('Creating PDF...');
   const f=new File([await makePDF(d.pages,o?{...d,sheet:o}:d)],safe(d.name)+(o?'-sheet':'')+'.pdf',{type:'application/pdf'});share?shareFiles([f],d.name):dl(f)}
 $('#pvBack').onclick=()=>openDoc(cur.id);
@@ -756,7 +798,7 @@ $('#pvShare').onclick=()=>pvPdf(1);$('#pvDl').onclick=()=>pvPdf(0);
 
 /* ---------- Google Drive sync ---------- */
 let token=null,tokenExp=0,syncing=false,again=false;
-function getToken(){return new Promise((res,rej)=>{
+async function getToken(){if(!(token&&Date.now()<tokenExp))await gsiReady();return new Promise((res,rej)=>{
   if(token&&Date.now()<tokenExp)return res(token);
   if(!window.google||!google.accounts)return rej(new Error('Google script failed to load. Check your internet connection'));
   const tc=google.accounts.oauth2.initTokenClient({client_id:CLIENT_ID,scope:SCOPE,
@@ -765,7 +807,7 @@ function getToken(){return new Promise((res,rej)=>{
   tc.requestAccessToken({prompt:localStorage.getItem('swSignedIn')?'':'consent'})})}
 async function gfetch(url,opt={}){
   const t=await getToken();
-  const r=await fetch(url,{...opt,headers:{...(opt.headers||{}),Authorization:'Bearer '+t}});
+  let r;for(let i=0;;i++){try{r=await fetch(url,{...opt,headers:{...(opt.headers||{}),Authorization:'Bearer '+t}});break}catch(e){if(i>=2){const u=new URL(url);throw new Error('Network error reaching '+u.hostname+u.pathname.slice(0,40)+' ('+(e.message||e)+')')}await new Promise(k=>setTimeout(k,1200*(i+1)))}}
   if(!r.ok){if(r.status===401)token=null;throw new Error('Drive '+r.status+': '+(await r.text()).slice(0,160))}
   return r}
 const API='https://www.googleapis.com/drive/v3/files';
@@ -833,15 +875,15 @@ async function sync(){
     setStatus('Synced ✓ '+new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}));
     if(!$('#main').classList.contains('hidden'))renderHome();
     else if(!$('#docv').classList.contains('hidden')&&cur)openDoc(cur.id,true);
-  }catch(e){const m=e.message||String(e),f=/Failed to fetch|NetworkError|Load failed/i.test(m)?'No internet connection':/popup|cancel|blocked|access_denied|immediate_failed/i.test(m)?'Google login was blocked or cancelled. Tap here to retry':/Drive 40[13]/.test(m)?'Google Drive permission problem. Log out and log in again':m;
-    setStatus('⚠ Sync failed: '+f+(f===m?'':' ('+m.slice(0,80)+')'),1);toast('Sync failed: '+f)}
+  }catch(e){const m=e.message||String(e),f=/Network error reaching/.test(m)?(navigator.onLine===false?'No internet connection':'Could not reach Google Drive'):/popup|cancel|blocked|access_denied|immediate_failed/i.test(m)?'Google login was blocked or cancelled. Tap here to retry':/Drive 40[13]/.test(m)?'Google Drive permission problem. Log out and log in again':m;
+    setStatus('⚠ Sync failed: '+f+(f===m?'':' ('+m.slice(0,160)+')'),1);toast('Sync failed: '+f)}
   finally{syncing=false;$('#btnSync').textContent='Sync';if(again){again=false;setTimeout(sync,800)}}}
-function autoSync(){if(!localStorage.getItem('swSignedIn'))return;if(!navigator.onLine){setStatus('⚠ Offline: will sync when internet is back',1);return}sync()}
+function autoSync(){if($('#splash')||!localStorage.getItem('swSignedIn'))return;sync()}
 $('#btnSync').onclick=sync;
 $('#btnLogin').onclick=async()=>{
   $('#loginErr').textContent='';
-  try{await getToken();await renderHome();sync()}
-  catch(e){$('#loginErr').textContent=e.message}};
+  prepShow();try{await getToken();await renderHome();await sync();prepHide()}
+  catch(e){prepHide(1);$('#loginErr').textContent=e.message}};
 $('#btnOut').onclick=async()=>{
   if(!await askConfirm('Log out?','Scanned documents will stay on this phone.','Log out',false))return;
   try{if(token&&window.google)google.accounts.oauth2.revoke(token,()=>{})}catch(e){}
@@ -881,13 +923,65 @@ $('#camX').onclick=()=>{stopCam();camBack()};
 $('#camSnap').onclick=()=>{const v=$('#camVid');if(!v.videoWidth)return;const c=document.createElement('canvas');c.width=v.videoWidth;c.height=v.videoHeight;c.getContext('2d').drawImage(v,0,0);stopCam();
   c.toBlob(b=>{ctx.last='cam';onFiles({target:{files:[b],value:''}})},'image/jpeg',.95)};
 
+/* ---------- app login (username + password), preview zoom ---------- */
+const AUTH_KEY='swAuth';
+async function hp(u,p){const h=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('sw|'+u.toLowerCase()+'|'+p));return[...new Uint8Array(h)].map(x=>x.toString(16).padStart(2,'0')).join('')}
+const getAuth=()=>JSON.parse(localStorage.getItem(AUTH_KEY)||'null');
+function authShow(){const a=getAuth(),mk=!a;['.spin','.msg','.bar2'].forEach(c=>{const e=document.querySelector('#splash '+c);if(e)e.style.display='none'});
+  $('#auth').style.display='flex';$('#auT').textContent=mk?'Create your login':'Welcome back';$('#auP2').style.display=mk?'':'none';
+  $('#auGo').textContent=mk?'Create & continue':'Login';$('#auF').style.display=mk?'none':'';$('#auU').value=a?a.u:'';$('#auP').value='';$('#auP2').value='';$('#auE').textContent='';$(a?'#auP':'#auU').focus()}
+function authDone(){const sp=$('#splash');sp.classList.add('out');setTimeout(()=>{sp.remove();autoSync()},600)}
+$('#auGo').onclick=async()=>{const u=$('#auU').value.trim(),p=$('#auP').value,a=getAuth(),E=$('#auE');E.textContent='';
+  if(!u||!p){E.textContent='Enter username and password';return}
+  try{if(!a){if(p.length<4){E.textContent='Password must be at least 4 characters';return}if(p!==$('#auP2').value){E.textContent='Passwords do not match';return}
+      localStorage.setItem(AUTH_KEY,JSON.stringify({u:u.toLowerCase(),h:await hp(u,p)}))}
+    else if(a.u!==u.toLowerCase()||a.h!==await hp(u,p)){E.textContent='Wrong username or password';return}
+    authDone()}catch(e){E.textContent='Login error: '+(e.message||e)}};
+['auU','auP','auP2'].forEach(i=>$('#'+i).addEventListener('keydown',e=>{if(e.key==='Enter')$('#auGo').click()}));
+$('#auF').onclick=async()=>{if(!confirm('Google sign-in will be asked to confirm it is you, then you can set a new username and password. Your scans stay safe. Continue?'))return;
+  try{await getToken();localStorage.removeItem(AUTH_KEY);authShow()}catch(e){$('#auE').textContent='Google confirmation failed: '+(e.message||e)}};
+let PZ=1;
+function pvZoom(z){PZ=Math.max(1,Math.min(5,z));const b=$('#pvBox');b.querySelectorAll('.a4,.pvi').forEach(e=>e.style.width=(PZ*100)+'%')}
+$('#zIn').onclick=()=>pvZoom(PZ*1.4);$('#zOut').onclick=()=>pvZoom(PZ/1.4);$('#zFit').onclick=()=>pvZoom(1);
+(()=>{const b=$('#pvBox'),dist=e=>Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);let d0=0,z0=1;
+ b.addEventListener('touchstart',e=>{if(e.touches.length===2){d0=dist(e);z0=PZ}},{passive:true});
+ b.addEventListener('touchmove',e=>{if(e.touches.length===2&&d0){e.preventDefault();pvZoom(z0*dist(e)/d0)}},{passive:false});
+ b.addEventListener('touchend',()=>{d0=0})})();
+
+/* ---------- sync helpers ---------- */
+async function gsiReady(){for(let i=0;i<40;i++){if(window.google&&google.accounts)return;if(i===16){const e=document.createElement('script');e.src='https://accounts.google.com/gsi/client';document.head.appendChild(e)}await new Promise(k=>setTimeout(k,250))}}
+$('#btnDiag').onclick=async()=>{const L=[],t=async(n,f)=>{try{L.push('OK  '+n+': '+await f())}catch(e){L.push('FAIL '+n+': '+(e.message||e))}};
+  toast('Checking...');L.push('Browser online: '+navigator.onLine);
+  L.push('Service worker: '+(navigator.serviceWorker&&navigator.serviceWorker.controller?navigator.serviceWorker.controller.scriptURL.split('/').pop():'none'));
+  await t('Google reachable',async()=>(await fetch('https://www.googleapis.com/discovery/v1/apis/drive/v3/rest?fields=id')).status);
+  await t('Google login script',async()=>{await gsiReady();return window.google&&google.accounts?'loaded':'NOT loaded'});
+  await t('Sign-in token',async()=>{await getToken();return 'ok'});
+  await t('Drive access',async()=>(await gfetch(API+'?pageSize=1&fields=files(id)')).status);
+  alert(L.join('\n'))};
+
+/* ---------- login background animation ---------- */
+(()=>{const fx=$('#login .fx'),ic=['<path d="M15 3H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8z"/><path d="M15 3v5h5M9 13h6M9 17h6"/>','<path d="M7 18a4 4 0 0 1-.5-7.97A5.5 5.5 0 0 1 17 8.5 4.5 4.5 0 0 1 17 18"/><path d="M12 12v8M9 15l3-3 3 3"/>','<path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/><path d="M4 12h16"/>','<rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="9" cy="12" r="2"/><path d="M14 10h5M14 14h4"/>'];
+  for(let i=0;i<8;i++){const sp=document.createElement('span'),sz=28+Math.random()*30;
+    sp.style.cssText=`left:${Math.random()*92}%;width:${sz}px;height:${sz}px;animation-duration:${8+Math.random()*9}s;animation-delay:-${Math.random()*14}s;--dx:${(Math.random()*80-40)|0}px;--r:${(Math.random()*40-20)|0}deg;--o:${(.18+Math.random()*.25).toFixed(2)};color:${i%4===1?'#fdba74':'#fff'}`;
+    sp.innerHTML=`<svg viewBox="0 0 24 24">${ic[i%4]}</svg>`;fx.appendChild(sp)}
+  makeDocs(fx)})();
+
+/* ---------- login theme docs + sign-in preparing screen ---------- */
+function makeDocs(fx){const W=innerWidth,H=innerHeight,cw=Math.min(78,W/5),words=['Notes','Bill','CNIC','Fee','Rent','Deed','Slip','ID'],rnd=(a,b)=>a+Math.random()*(b-a);
+  words.forEach((w,i)=>{const col=i%4,row=i>>2,d=document.createElement('div');d.className='dc';
+    d.style.cssText=`--sx:${(rnd(-.42,.42)*W)|0}px;--sy:${(rnd(-.42,.42)*H)|0}px;--sr:${rnd(-30,30)|0}deg;--gx:${((col-1.5)*cw*1.12)|0}px;--gy:${((row?0.37:-0.37)*H)|0}px;animation-delay:${(i*.12).toFixed(2)}s`;
+    d.innerHTML=`<i class="hw" style="transform:rotate(${rnd(-14,14)|0}deg) skewX(${rnd(-14,14)|0}deg)">${w}</i><b class="pr">${w.toUpperCase()}</b><u></u><u></u><s class="sl"></s><em class="up">↑</em>`;fx.appendChild(d)})}
+let prepT,prepS=0;const PM=['Signing you in…','Preparing your workspace…','Syncing your documents…','Almost ready…'];
+function prepShow(){prepS=Date.now();let i=0;$('#prepMsg').textContent=PM[0];$('#prep').classList.remove('hidden');clearInterval(prepT);prepT=setInterval(()=>{$('#prepMsg').textContent=PM[Math.min(++i,PM.length-1)]},1100)}
+function prepHide(now){setTimeout(()=>{clearInterval(prepT);$('#prep').classList.add('hidden')},now?0:Math.max(0,2800-(Date.now()-prepS)))}
+
 /* ---------- start ---------- */
 (async()=>{
   const SM=['Loading your data…','Loading your files…','Checking your documents…','Preparing your workspace…','Almost ready…'];let smi=0;
   const smT=setInterval(()=>{const m=$('#splMsg');if(!m)return clearInterval(smT);m.style.opacity=0;setTimeout(()=>{m.textContent=SM[Math.min(++smi,SM.length-1)];m.style.opacity=1},200)},1000);
-  setTimeout(()=>{clearInterval(smT);$('#splash').classList.add('out');setTimeout(()=>$('#splash').remove(),600)},5000);
+  setTimeout(()=>{clearInterval(smT);authShow()},5000);
   await openDB();
-  if(localStorage.getItem('swSignedIn')){await renderHome();autoSync()}else show('login');
+  if(localStorage.getItem('swSignedIn')){await renderHome()}else show('login');
   if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
   if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();
 })();
