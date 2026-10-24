@@ -207,11 +207,44 @@ button{border-radius:18px}.sb{border-radius:16px}
 #prep{position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;background:radial-gradient(circle at 50% 40%,rgba(255,255,255,.97) 30%,rgba(238,242,248,.95) 100%)}
 #prep .spin2{width:56px;height:56px;border-radius:50%;background:conic-gradient(#ef4444,#f97316,#eab308,#22c55e,#06b6d4,#3b82f6,#8b5cf6,#ef4444);-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 7px),#000 calc(100% - 6px));mask:radial-gradient(farthest-side,transparent calc(100% - 7px),#000 calc(100% - 6px));animation:rot .9s linear infinite}
 #prepMsg{font-size:15px;font-weight:600;color:#475569}
+/* animated scanning-desk background for login (v2) */
+.bgfx{position:absolute;inset:0;overflow:hidden;z-index:0;pointer-events:none;--H:100vh}
+@supports(height:100dvh){.bgfx{--H:100dvh}}
+#splash>*:not(.bgfx){position:relative;z-index:2}
+#splash.au>img{display:none}
+.dd{--tx:min(34vw,140px);position:absolute;left:50%;top:0;width:var(--w,72.8px);height:var(--h,93.6px);margin-left:calc(var(--w,72.8px)/-2);background:#fff;border-radius:9.1px;box-shadow:0 7.8px 20.8px rgba(10,26,92,.16),0 0 0 1.3px rgba(10,26,92,.06);overflow:hidden;opacity:0;z-index:1;animation:dd 20s ease-in-out infinite both;animation-delay:calc(var(--i)*-2s)}
+.dd i{position:absolute;left:7.8px;top:6.5px;font:italic 700 19.5px 'Bradley Hand','Segoe Script','Comic Sans MS',cursive;color:#1e3a8a}
+.dd.note{--w:72.8px;--h:93.6px;background:repeating-linear-gradient(#fffef8 0 14.3px,#cfdcf5 14.3px 15.6px)}
+.dd.photo{--w:75.4px;--h:88.4px}
+.dd.photo::before{content:'';position:absolute;inset:6.5px 6.5px 19.5px;border-radius:3.9px;background:radial-gradient(circle at 70% 28%,#fbbf24 0 10.4px,transparent 11.7px),linear-gradient(165deg,transparent 56%,#16a34a 57%),linear-gradient(#7dd3fc,#e0f2fe)}
+.dd.id{--w:104px;--h:65px;background:linear-gradient(#12297d 0 14.3px,#fff 14.3px)}
+.dd.id::before{content:'';position:absolute;left:9.1px;top:22.1px;width:26px;height:31.2px;border-radius:6.5px;background:radial-gradient(circle at 50% 36%,#94a3b8 0 6.5px,transparent 7.8px),radial-gradient(ellipse at 50% 112%,#94a3b8 0 13px,transparent 14.3px),#e2e8f0}
+.dd.id::after{content:'';position:absolute;left:44.2px;right:9.1px;top:24.7px;height:3.9px;border-radius:2.6px;background:#cbd5e1;box-shadow:0 9.1px 0 #cbd5e1,0 18.2px 0 #e2e8f0}
+.dd.book{--w:72.8px;--h:93.6px;background:linear-gradient(90deg,#0a1a5c 0 10.4px,#2547b8 10.4px)}
+.dd.book::after{content:'';position:absolute;left:20.8px;right:10.4px;top:18.2px;height:7.8px;border-radius:2.6px;background:#f97316;box-shadow:0 14.3px 0 -1.3px #bfdbfe}
+.dd.rcp{--w:54.6px;--h:88.4px;background:repeating-linear-gradient(#fff 0 9.1px,#e2e8f0 9.1px 11.7px)}
+.dd.cert{--w:80.6px;--h:96.2px;background:#fffbeb;box-shadow:inset 0 0 0 3.9px #fbbf24,0 7.8px 20.8px rgba(10,26,92,.16)}
+.dd.cert i{left:15.6px;top:18.2px;font-size:18.2px}
+.dd.cert::after{content:'';position:absolute;left:50%;bottom:11.7px;width:20.8px;height:20.8px;margin-left:-10.4px;border-radius:50%;background:#ea580c}
+@keyframes dd{0%{transform:translate(var(--sx),var(--sy)) rotate(var(--sr));opacity:0}6%{opacity:.92}30%{transform:translate(calc(var(--sx)*.96),calc(var(--sy) - 14px)) rotate(calc(var(--sr)*1.15))}55%,65%{transform:translate(0,calc(var(--H) - 116px - var(--h,72px)/2)) rotate(0)}78%,94%{transform:translate(var(--tx),calc(var(--H) - 116px - var(--h,72px)/2 - var(--i)*4px)) rotate(0);opacity:.92}100%{transform:translate(var(--tx),calc(var(--H) - 116px - var(--h,72px)/2 - var(--i)*4px));opacity:0}}
+.sc{position:absolute;left:50%;bottom:16px;width:min(86vw,320px);height:170px;transform:translateX(-50%);border-radius:22px 22px 18px 18px;background:linear-gradient(#f6f8fb,#d3dae7);box-shadow:0 18px 36px rgba(10,26,92,.24),inset 0 0 0 1px #c3ccdd,inset 0 2px 0 #fff;z-index:3}
+.sc::before{content:'';position:absolute;inset:14px 14px 44px;border-radius:8px;background:linear-gradient(135deg,rgba(15,35,110,.30),rgba(37,71,184,.14) 55%,rgba(255,255,255,.2));box-shadow:inset 0 0 0 3px #e9edf5,inset 0 0 0 4px #9eabc6}
+.sc::after{content:'';position:absolute;left:20px;bottom:14px;width:15px;height:15px;border-radius:50%;background:radial-gradient(circle at 40% 35%,#5b82f0,#12297d);box-shadow:27px 0 0 -1px #cdd5e4,54px 0 0 -1px #cdd5e4,81px 0 0 -1px #cdd5e4}
+.sc .bd{position:absolute;right:50px;bottom:12px;width:20px;height:20px;border-radius:50%;background:radial-gradient(circle,#fff 0 4px,#1d4ed8 5px)}
+.sc .ld{position:absolute;right:22px;bottom:18px;width:9px;height:9px;border-radius:50%;background:#22c55e;box-shadow:0 0 8px #22c55e;animation:led 1s ease-in-out infinite alternate}
+@keyframes led{to{opacity:.3}}
+.sc .bm{position:absolute;top:14px;bottom:44px;left:18px;width:3px;border-radius:2px;background:linear-gradient(transparent,#ea580c,transparent);box-shadow:0 0 14px 4px rgba(234,88,12,.45);opacity:0;animation:bm 2s linear infinite;animation-delay:1s}
+@keyframes bm{0%{left:18px;opacity:0}5%{opacity:1}70%{left:calc(100% - 21px);opacity:1}75%,100%{left:calc(100% - 21px);opacity:0}}
+#auth{background:linear-gradient(160deg,#1c3aa8,#0a1a5c 72%)!important;border-radius:30px!important;padding:22px 22px 18px!important;box-shadow:0 18px 44px rgba(10,26,92,.45),0 0 0 1px rgba(255,255,255,.14)!important}
+#auth .aic{width:132px;height:132px;border-radius:30px;margin:-4px auto 2px;display:block;animation:none;box-shadow:0 10px 24px rgba(0,0,0,.35)}
+#auth h2{color:#fff}#auE{color:#fecaca}#auF{color:#bfdbfe}
+#auth #auGo{background:linear-gradient(180deg,#fb923c,#ea580c);box-shadow:0 6px 16px rgba(234,88,12,.4)!important}
+@media (prefers-reduced-motion:reduce){.bgfx .dd,.bgfx .bm{display:none}}
 </style>
 </head>
 <body>
 
-<div id="splash"><img src="logo.png" alt=""><div class="spin"></div><div class="msg" id="splMsg">Loading your data…</div><div id="auth"><h2 id="auT"></h2><input class="inp" id="auU" placeholder="Username" autocomplete="username" autocapitalize="none"><input class="inp" id="auP" type="password" placeholder="Password" autocomplete="current-password"><input class="inp" id="auP2" type="password" placeholder="Confirm password" autocomplete="new-password"><div id="auE"></div><button class="pri" id="auGo"></button><button id="auF">Forgot password?</button></div><div class="bar2"><i></i></div></div>
+<div id="splash"><img src="logo.png" alt=""><div class="spin"></div><div class="msg" id="splMsg">Loading your data…</div><div id="auth"><img class="aic" src="icon-180.png" alt="SW Scanner"><h2 id="auT"></h2><input class="inp" id="auU" placeholder="Username" autocomplete="username" autocapitalize="none"><input class="inp" id="auP" type="password" placeholder="Password" autocomplete="current-password"><input class="inp" id="auP2" type="password" placeholder="Confirm password" autocomplete="new-password"><div id="auE"></div><button class="pri" id="auGo"></button><button id="auF">Forgot password?</button></div><div class="bar2"><i></i></div></div>
 <div id="camv" class="screen hidden" style="background:#000"><video id="camVid" autoplay playsinline muted style="flex:1;min-height:0;width:100%;object-fit:cover"></video><div class="bar" style="background:#000;padding-top:14px;justify-content:space-around"><button id="camX">Close</button><button id="camSnap" class="ok" style="flex:2;padding:18px;font-size:17px">Capture</button></div></div>
 <div id="login" class="screen hidden"><div class="fx" aria-hidden="true"></div>
   <img src="logo.png" alt="SW Scanner">
@@ -928,7 +961,7 @@ const AUTH_KEY='swAuth';
 async function hp(u,p){const h=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('sw|'+u.toLowerCase()+'|'+p));return[...new Uint8Array(h)].map(x=>x.toString(16).padStart(2,'0')).join('')}
 const getAuth=()=>JSON.parse(localStorage.getItem(AUTH_KEY)||'null');
 function authShow(){const a=getAuth(),mk=!a;['.spin','.msg','.bar2'].forEach(c=>{const e=document.querySelector('#splash '+c);if(e)e.style.display='none'});
-  $('#auth').style.display='flex';$('#auT').textContent=mk?'Create your login':'Welcome back';$('#auP2').style.display=mk?'':'none';
+  $('#auth').style.display='flex';$('#splash').classList.add('au');$('#auT').textContent=mk?'Create your login':'Welcome back';$('#auP2').style.display=mk?'':'none';
   $('#auGo').textContent=mk?'Create & continue':'Login';$('#auF').style.display=mk?'none':'';$('#auU').value=a?a.u:'';$('#auP').value='';$('#auP2').value='';$('#auE').textContent='';$(a?'#auP':'#auU').focus()}
 function authDone(){const sp=$('#splash');sp.classList.add('out');setTimeout(()=>{sp.remove();autoSync()},600)}
 $('#auGo').onclick=async()=>{const u=$('#auU').value.trim(),p=$('#auP').value,a=getAuth(),E=$('#auE');E.textContent='';
@@ -985,6 +1018,11 @@ function prepHide(now){setTimeout(()=>{clearInterval(prepT);$('#prep').classList
   if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
   if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();
 })();
+/* ---------- animated login background ---------- */
+(()=>{const sp=document.getElementById('splash');if(!sp)return;const f=document.createElement('div');f.className='bgfx';f.setAttribute('aria-hidden','true');
+const D=[['note','Notes'],['photo',''],['id',''],['book',''],['rcp',''],['cert','Deed'],['note','Bill'],['id',''],['photo',''],['book','']],SX=['-34vw','30vw','-24vw','36vw','-10vw','16vw','-38vw','24vw','-18vw','8vw'],SY=['5vh','9vh','26vh','32vh','1vh','58vh','44vh','50vh','14vh','20vh'],SR=['-18deg','12deg','-9deg','16deg','-22deg','8deg','14deg','-14deg','20deg','-8deg'];
+f.innerHTML=D.map((d,i)=>`<div class="dd ${d[0]}" style="--i:${i};--sx:${SX[i]};--sy:${SY[i]};--sr:${SR[i]}">${d[1]?'<i>'+d[1]+'</i>':''}</div>`).join('')+'<div class="sc"><b class="bm"></b><b class="bd"></b><b class="ld"></b></div>';
+sp.insertBefore(f,sp.firstChild)})();
 </script>
 </body>
 </html>
