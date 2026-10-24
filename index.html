@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="ur">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<title>SW Scanner</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1d4ed8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="SW Scanner">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;height:100%;background:#f1f5f9;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;color:#0f172a}
+.screen{position:fixed;inset:0;display:flex;flex-direction:column;background:#f1f5f9}
+.hidden{display:none!important}
+header{display:flex;align-items:center;gap:8px;padding:calc(env(safe-area-inset-top) + 10px) 12px 10px;background:#1d4ed8;color:#fff}
+header h1{flex:1;margin:0;font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+button{font:inherit;border:0;border-radius:10px;padding:10px 14px;background:#e2e8f0;color:#0f172a;cursor:pointer}
+header button{background:rgba(255,255,255,.18);color:#fff;padding:8px 12px}
+.pri{background:#1d4ed8;color:#fff}
+.ok{background:#16a34a;color:#fff}
+.dng{background:#dc2626;color:#fff}
+#status{font-size:12px;color:#475569;padding:6px 14px;min-height:26px}
+.scroll{flex:1;overflow:auto;padding:0 12px 120px}
+.card{display:flex;gap:12px;align-items:center;background:#fff;border-radius:14px;padding:10px;margin-bottom:10px;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.card img{width:56px;height:72px;object-fit:cover;border-radius:6px;background:#e2e8f0}
+.card b{display:block;font-size:15px}
+.card small{color:#64748b}
+.empty{text-align:center;color:#64748b;margin-top:60px}
+.fab{position:fixed;left:0;right:0;bottom:0;display:flex;gap:10px;padding:12px 12px calc(env(safe-area-inset-bottom) + 12px);background:linear-gradient(transparent,#f1f5f9 40%)}
+.fab button{flex:1;padding:14px;font-size:16px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.grid div{position:relative;background:#fff;border-radius:10px;overflow:hidden;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.grid img{width:100%;display:block}
+.grid span{position:absolute;left:6px;bottom:6px;background:rgba(0,0,0,.6);color:#fff;font-size:12px;border-radius:6px;padding:2px 7px}
+#crop,#edit,#viewer{background:#0b1220;color:#fff}
+.stage{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:8px}
+#cropCv{touch-action:none;display:block}
+#editCv{width:100%;height:100%;object-fit:contain;background:#fff}
+#viewImg{max-width:100%;max-height:100%;object-fit:contain}
+.bar{display:flex;gap:8px;padding:10px 12px calc(env(safe-area-inset-bottom) + 10px);flex-wrap:wrap;justify-content:center}
+.bar button{flex:1;min-width:80px}
+.bar .on{background:#1d4ed8;color:#fff}
+.hint{text-align:center;font-size:12px;color:#94a3b8;padding:4px}
+#toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#0f172a;color:#fff;padding:10px 16px;border-radius:20px;font-size:14px;max-width:90%;z-index:9;opacity:0;transition:.2s;pointer-events:none;text-align:center}
+#toast.show{opacity:1}
+</style>
+</head>
+<body>
+
+<div id="home" class="screen">
+  <header><h1>📄 SW Scanner</h1><button id="btnSync">☁ Sync</button></header>
+  <div id="status"></div>
+  <div class="scroll" id="list"></div>
+  <div class="fab"><button class="pri" id="btnScan">📷 Scan</button><button id="btnImport">🖼 Gallery</button></div>
+</div>
+
+<div id="docv" class="screen hidden">
+  <header><button id="dBack">←</button><h1 id="dTitle"></h1><button id="dPdf">PDF</button><button id="dDel">🗑</button></header>
+  <div class="scroll"><p class="hint">Naam badalne ke liye title dabayen. Page kholne ke liye us pe dabayen.</p><div class="grid" id="dGrid"></div></div>
+  <div class="fab"><button class="pri" id="dAdd">📷 Page add</button><button id="dAddG">🖼 Gallery</button></div>
+</div>
+
+<div id="crop" class="screen hidden">
+  <header><button id="cCancel">✕</button><h1>Kinare theek karen</h1><button id="cNext">Agla →</button></header>
+  <div class="stage" id="cropBox"><canvas id="cropCv"></canvas></div>
+  <div class="hint">Charon kono ko drag karke document ke kinaron pe layen</div>
+</div>
+
+<div id="edit" class="screen hidden">
+  <header><button id="eBack">←</button><h1>Filter</h1><button id="eRot">⟳ Rotate</button></header>
+  <div class="stage"><canvas id="editCv"></canvas></div>
+  <div class="bar" id="fBar">
+    <button data-m="color">Original</button><button data-m="doc" class="on">Document</button><button data-m="gray">Gray</button><button data-m="bw">B&amp;W</button>
+  </div>
+  <div class="bar"><button id="eNext" class="pri">➕ Agli page</button><button id="eSave" class="ok">✔ Save</button></div>
+</div>
+
+<div id="viewer" class="screen hidden">
+  <header><button id="vBack">←</button><h1 id="vTitle"></h1><button id="vDel">🗑</button></header>
+  <div class="stage"><img id="viewImg"></div>
+</div>
+
+<input type="file" id="inCam" accept="image/*" capture="environment" hidden>
+<input type="file" id="inGal" accept="image/*" multiple hidden>
+<div id="toast"></div>
+
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script>
+const CLIENT_ID='682622042304-3iivfit3fccho5a7vpeu6jdj90kdkjl0.apps.googleusercontent.com';
+const SCOPE='https://www.googleapis.com/auth/drive.file';
+const $=s=>document.querySelector(s);
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+const fmt=d=>d.toLocaleDateString('en-GB')+' '+d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+let toastT;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2600)}
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('hidden',s.id!==id))}
+
+/* ---------- IndexedDB ---------- */
+let db;
+function openDB(){return new Promise((res,rej)=>{const r=indexedDB.open('swscanner',1);r.onupgradeneeded=()=>{const d=r.result;d.createObjectStore('docs',{keyPath:'id'});d.createObjectStore('tomb',{keyPath:'id'})};r.onsuccess=()=>{db=r.result;res()};r.onerror=()=>rej(r.error)})}
+const tx=(st,mode,fn)=>new Promise((res,rej)=>{const t=db.transaction(st,mode);const rq=fn(t.objectStore(st));t.oncomplete=()=>res(rq&&rq.result);t.onerror=()=>rej(t.error)});
+const dbAll=st=>tx(st,'readonly',s=>s.getAll());
+const dbGet=(st,k)=>tx(st,'readonly',s=>s.get(k));
+const dbPut=(st,v)=>tx(st,'readwrite',s=>s.put(v));
+const dbDel=(st,k)=>tx(st,'readwrite',s=>s.delete(k));
+const addTomb=ids=>ids.length?dbPut('tomb',{id:uid(),driveIds:ids}):Promise.resolve();
+
+/* ---------- image helpers ---------- */
+function loadImg(blob){return new Promise((res,rej)=>{const u=URL.createObjectURL(blob);const i=new Image();i.onload=()=>{res(i);setTimeout(()=>URL.revokeObjectURL(u),5000)};i.onerror=()=>rej(new Error('Image load nahi hui'));i.src=u})}
+function warp(src,q){
+  const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
+  let W=(dist(q[0],q[1])+dist(q[3],q[2]))/2,H=(dist(q[0],q[3])+dist(q[1],q[2]))/2;
+  const m=Math.min(1,2000/Math.max(W,H));W=Math.max(40,Math.round(W*m));H=Math.max(40,Math.round(H*m));
+  const sw=src.width,sh=src.height,sd=src.getContext('2d').getImageData(0,0,sw,sh).data;
+  const [p0,p1,p2,p3]=q;
+  const dx1=p1.x-p2.x,dx2=p3.x-p2.x,dx3=p0.x-p1.x+p2.x-p3.x,dy1=p1.y-p2.y,dy2=p3.y-p2.y,dy3=p0.y-p1.y+p2.y-p3.y;
+  let g=0,h=0;
+  if(Math.abs(dx3)>1e-9||Math.abs(dy3)>1e-9){const den=dx1*dy2-dy1*dx2;g=(dx3*dy2-dy3*dx2)/den;h=(dx1*dy3-dy1*dx3)/den}
+  const a=p1.x-p0.x+g*p1.x,b=p3.x-p0.x+h*p3.x,c=p0.x,d=p1.y-p0.y+g*p1.y,e=p3.y-p0.y+h*p3.y,f=p0.y;
+  const out=document.createElement('canvas');out.width=W;out.height=H;
+  const octx=out.getContext('2d'),im=octx.createImageData(W,H),od=im.data;
+  const mx=sw-1.001,my=sh-1.001;
+  for(let j=0;j<H;j++){const v=(j+.5)/H;
+    for(let i=0;i<W;i++){const u=(i+.5)/W,den=g*u+h*v+1;
+      let x=(a*u+b*v+c)/den-.5,y=(d*u+e*v+f)/den-.5;
+      x=x<0?0:x>mx?mx:x;y=y<0?0:y>my?my:y;
+      const x0=x|0,y0=y|0,fx=x-x0,fy=y-y0,i00=(y0*sw+x0)*4,i10=i00+4,i01=i00+sw*4,i11=i01+4,o=(j*W+i)*4;
+      for(let k=0;k<3;k++)od[o+k]=(sd[i00+k]*(1-fx)+sd[i10+k]*fx)*(1-fy)+(sd[i01+k]*(1-fx)+sd[i11+k]*fx)*fy;
+      od[o+3]=255}}
+  octx.putImageData(im,0,0);return out}
+function applyFilter(cv,mode){
+  if(mode==='color')return cv;
+  const c=document.createElement('canvas');c.width=cv.width;c.height=cv.height;
+  const x=c.getContext('2d');x.drawImage(cv,0,0);
+  const im=x.getImageData(0,0,c.width,c.height),d=im.data,n=d.length/4,hist=new Uint32Array(256);
+  for(let i=0;i<n;i++){const g=(d[i*4]*.299+d[i*4+1]*.587+d[i*4+2]*.114)|0;d[i*4]=g;hist[g]++}
+  let acc=0,lo=0,hi=255;
+  for(let v=0;v<256;v++){acc+=hist[v];if(acc>=n*.01){lo=v;break}}
+  acc=0;for(let v=0;v<256;v++){acc+=hist[v];if(acc>=n*.85){hi=v;break}}
+  if(hi-lo<30)hi=Math.min(255,lo+30);
+  const k=255/(hi-lo);
+  for(let i=0;i<n;i++){let v=d[i*4];
+    if(mode!=='gray'){v=(v-lo)*k;v=v<0?0:v>255?255:v;if(mode==='bw')v=v>160?255:0}
+    d[i*4]=d[i*4+1]=d[i*4+2]=v}
+  x.putImageData(im,0,0);return c}
+function rot90(cv){const c=document.createElement('canvas');c.width=cv.height;c.height=cv.width;const x=c.getContext('2d');x.translate(c.width,0);x.rotate(Math.PI/2);x.drawImage(cv,0,0);return c}
+
+/* ---------- PDF ---------- */
+async function makePDF(pages){
+  const enc=new TextEncoder(),parts=[],offs=[];let len=0;
+  const push=x=>{const b=typeof x==='string'?enc.encode(x):x;parts.push(b);len+=b.length};
+  const obj=(i,body)=>{offs[i]=len;push(`${i} 0 obj\n${body}\nendobj\n`)};
+  const imgs=[];
+  for(const p of pages){const bytes=new Uint8Array(await p.blob.arrayBuffer());const im=await loadImg(p.blob);imgs.push({bytes,w:im.naturalWidth,h:im.naturalHeight})}
+  const n=pages.length,N=2+3*n;
+  push('%PDF-1.4\n');
+  obj(1,'<</Type/Catalog/Pages 2 0 R>>');
+  obj(2,`<</Type/Pages/Kids[${imgs.map((_,i)=>`${3+3*i} 0 R`).join(' ')}]/Count ${n}>>`);
+  imgs.forEach((im,i)=>{
+    const pw=595,ph=Math.round(595*im.h/im.w),cs=`q ${pw} 0 0 ${ph} 0 0 cm /Im0 Do Q`;
+    obj(3+3*i,`<</Type/Page/Parent 2 0 R/MediaBox[0 0 ${pw} ${ph}]/Resources<</XObject<</Im0 ${5+3*i} 0 R>>>>/Contents ${4+3*i} 0 R>>`);
+    obj(4+3*i,`<</Length ${cs.length}>>\nstream\n${cs}\nendstream`);
+    offs[5+3*i]=len;
+    push(`${5+3*i} 0 obj\n<</Type/XObject/Subtype/Image/Width ${im.w}/Height ${im.h}/ColorSpace/DeviceRGB/BitsPerComponent 8/Filter/DCTDecode/Length ${im.bytes.length}>>\nstream\n`);
+    push(im.bytes);push('\nendstream\nendobj\n')});
+  const xs=len;
+  push(`xref\n0 ${N+1}\n0000000000 65535 f \n`);
+  for(let i=1;i<=N;i++)push(String(offs[i]).padStart(10,'0')+' 00000 n \n');
+  push(`trailer\n<</Size ${N+1}/Root 1 0 R>>\nstartxref\n${xs}\n%%EOF`);
+  return new Blob(parts,{type:'application/pdf'})}
+async function exportPDF(d){
+  toast('PDF ban rahi hai...');
+  const blob=await makePDF(d.pages);
+  const file=new File([blob],d.name.replace(/[\/\\:*?"<>|]/g,'-')+'.pdf',{type:'application/pdf'});
+  if(navigator.canShare&&navigator.canShare({files:[file]})){try{await navigator.share({files:[file],title:d.name});return}catch(e){if(e.name==='AbortError')return}}
+  const a=document.createElement('a');a.href=URL.createObjectURL(file);a.download=file.name;document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),15000)}
+
+/* ---------- UI: home / doc ---------- */
+let urls=[];const mkUrl=b=>{const u=URL.createObjectURL(b);urls.push(u);return u};
+const clearUrls=()=>{urls.forEach(u=>URL.revokeObjectURL(u));urls=[]};
+let cur=null;
+async function renderHome(){
+  const docs=(await dbAll('docs')).sort((a,b)=>b.created-a.created);
+  clearUrls();const list=$('#list');list.innerHTML='';
+  if(!docs.length)list.innerHTML='<p class="empty">Koi document nahi.<br>Neeche Scan dabayen.</p>';
+  for(const d of docs){
+    const el=document.createElement('div');el.className='card';
+    const synced=d.pages.every(p=>p.driveId);
+    el.innerHTML=`<img src="${mkUrl(d.pages[0].blob)}"><div><b></b><small>${d.pages.length} page · ${fmt(new Date(d.created))} · ${synced?'☁️':'⏳'}</small></div>`;
+    el.querySelector('b').textContent=d.name;
+    el.onclick=()=>openDoc(d.id);list.appendChild(el)}
+  show('home')}
+async function openDoc(id){
+  cur=await dbGet('docs',id);if(!cur){renderHome();return}
+  clearUrls();$('#dTitle').textContent=cur.name;
+  const g=$('#dGrid');g.innerHTML='';
+  cur.pages.forEach((p,i)=>{const w=document.createElement('div');w.innerHTML=`<img src="${mkUrl(p.blob)}"><span>${i+1}</span>`;w.onclick=()=>openPage(i);g.appendChild(w)});
+  show('docv')}
+let vi=0;
+function openPage(i){vi=i;$('#viewImg').src=mkUrl(cur.pages[i].blob);$('#vTitle').textContent=`${cur.name} · ${i+1}/${cur.pages.length}`;show('viewer')}
+$('#vBack').onclick=()=>openDoc(cur.id);
+$('#vDel').onclick=async()=>{
+  if(!confirm('Ye page delete karen?'))return;
+  const p=cur.pages.splice(vi,1)[0];if(p.driveId)await addTomb([p.driveId]);
+  if(cur.pages.length)await dbPut('docs',cur);else await dbDel('docs',cur.id);
+  toast('Delete ho gaya');autoSync();cur.pages.length?openDoc(cur.id):renderHome()};
+$('#dBack').onclick=renderHome;
+$('#dTitle').onclick=async()=>{const n=prompt('Naya naam',cur.name);if(!n||!n.trim())return;cur.name=n.trim();cur.nameDirty=true;await dbPut('docs',cur);openDoc(cur.id);autoSync()};
+$('#dPdf').onclick=()=>exportPDF(cur);
+$('#dDel').onclick=async()=>{
+  if(!confirm('Poora document delete karen?'))return;
+  await addTomb(cur.pages.map(p=>p.driveId).filter(Boolean));await dbDel('docs',cur.id);autoSync();renderHome()};
+
+/* ---------- scan flow ---------- */
+let ctx={mode:'new',docId:null,draft:[],queue:[]};
+function begin(mode,docId,gallery){ctx={mode,docId,draft:[],queue:[]};(gallery?$('#inGal'):$('#inCam')).click()}
+$('#btnScan').onclick=()=>begin('new',null,false);
+$('#btnImport').onclick=()=>begin('new',null,true);
+$('#dAdd').onclick=()=>begin('add',cur.id,false);
+$('#dAddG').onclick=()=>begin('add',cur.id,true);
+async function onFiles(e){
+  const files=[...e.target.files];e.target.value='';if(!files.length)return;
+  ctx.queue=files.slice(1);
+  try{await startCrop(files[0])}catch(err){toast(err.message)}}
+$('#inCam').onchange=onFiles;$('#inGal').onchange=onFiles;
+
+let S={};
+async function startCrop(file){
+  const img=await loadImg(file);
+  const m=Math.min(1,2400/Math.max(img.naturalWidth,img.naturalHeight));
+  const c=document.createElement('canvas');c.width=Math.round(img.naturalWidth*m);c.height=Math.round(img.naturalHeight*m);
+  c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+  const w=c.width,h=c.height,i=.06;
+  S={src:c,q:[{x:w*i,y:h*i},{x:w*(1-i),y:h*i},{x:w*(1-i),y:h*(1-i)},{x:w*i,y:h*(1-i)}],drag:-1,sc:1};
+  show('crop');requestAnimationFrame(layoutCrop)}
+function layoutCrop(){
+  const cv=$('#cropCv'),box=$('#cropBox'),aw=box.clientWidth-16,ah=box.clientHeight-16;
+  S.sc=Math.min(aw/S.src.width,ah/S.src.height);
+  cv.width=Math.round(S.src.width*S.sc);cv.height=Math.round(S.src.height*S.sc);
+  cv.style.width=cv.width+'px';cv.style.height=cv.height+'px';drawCrop()}
+function drawCrop(){
+  const cv=$('#cropCv'),x=cv.getContext('2d'),sc=S.sc;
+  x.drawImage(S.src,0,0,cv.width,cv.height);
+  x.beginPath();S.q.forEach((p,i)=>i?x.lineTo(p.x*sc,p.y*sc):x.moveTo(p.x*sc,p.y*sc));x.closePath();
+  x.fillStyle='rgba(34,211,238,.15)';x.fill();x.strokeStyle='#22d3ee';x.lineWidth=3;x.stroke();
+  S.q.forEach(p=>{x.beginPath();x.arc(p.x*sc,p.y*sc,14,0,7);x.fillStyle='#fff';x.fill();x.strokeStyle='#1d4ed8';x.lineWidth=3;x.stroke()})}
+(()=>{
+  const cv=$('#cropCv');
+  const pt=e=>{const r=cv.getBoundingClientRect();return{x:(e.clientX-r.left)*cv.width/r.width/S.sc,y:(e.clientY-r.top)*cv.height/r.height/S.sc}};
+  cv.addEventListener('pointerdown',e=>{const p=pt(e);let best=-1,bd=60/S.sc;
+    S.q.forEach((q,i)=>{const d=Math.hypot(q.x-p.x,q.y-p.y);if(d<bd){bd=d;best=i}});
+    S.drag=best;if(best>=0)cv.setPointerCapture(e.pointerId)});
+  cv.addEventListener('pointermove',e=>{if(S.drag<0)return;const p=pt(e);
+    S.q[S.drag]={x:Math.max(0,Math.min(S.src.width,p.x)),y:Math.max(0,Math.min(S.src.height,p.y))};drawCrop()});
+  const up=()=>{S.drag=-1};cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
+  window.addEventListener('resize',()=>{if(!$('#crop').classList.contains('hidden'))layoutCrop()});
+})();
+$('#cCancel').onclick=()=>{ctx.queue=[];ctx.draft.length?saveDraft():renderHome()};
+$('#cNext').onclick=()=>{toast('Processing...');setTimeout(()=>{E={base:warp(S.src,S.q),mode:'doc',blob:null};renderEdit();show('edit')},30)};
+
+let E={};
+function renderEdit(){
+  const out=applyFilter(E.base,E.mode),cv=$('#editCv');
+  cv.width=out.width;cv.height=out.height;cv.getContext('2d').drawImage(out,0,0);
+  E.blob=null;out.toBlob(b=>{E.blob=b},'image/jpeg',.85);
+  document.querySelectorAll('#fBar button').forEach(b=>b.classList.toggle('on',b.dataset.m===E.mode));
+  $('#eNext').textContent=ctx.queue.length?'➡ Agli photo':'➕ Agli page'}
+document.querySelectorAll('#fBar button').forEach(b=>b.onclick=()=>{E.mode=b.dataset.m;renderEdit()});
+$('#eRot').onclick=()=>{E.base=rot90(E.base);renderEdit()};
+$('#eBack').onclick=()=>show('crop');
+$('#eNext').onclick=()=>{
+  if(!E.blob){toast('Thora ruken, process ho raha hai');return}
+  ctx.draft.push({id:uid(),blob:E.blob});
+  if(ctx.queue.length)startCrop(ctx.queue.shift()).catch(e=>toast(e.message));
+  else $('#inCam').click()};
+$('#eSave').onclick=async()=>{
+  if(!E.blob){toast('Thora ruken, process ho raha hai');return}
+  ctx.draft.push({id:uid(),blob:E.blob});
+  ctx.queue=[];await saveDraft()};
+async function saveDraft(){
+  if(!ctx.draft.length){renderHome();return}
+  let d;
+  if(ctx.mode==='add')d=await dbGet('docs',ctx.docId);
+  if(!d)d={id:uid(),name:'Scan '+fmt(new Date()),created:Date.now(),pages:[]};
+  d.pages.push(...ctx.draft);ctx.draft=[];
+  await dbPut('docs',d);toast('Save ho gaya ✓');openDoc(d.id);autoSync()}
+
+/* ---------- Google Drive sync ---------- */
+let token=null,tokenExp=0,syncing=false;
+function getToken(){return new Promise((res,rej)=>{
+  if(token&&Date.now()<tokenExp)return res(token);
+  if(!window.google||!google.accounts)return rej(new Error('Google script load nahi hui, internet check karen'));
+  const tc=google.accounts.oauth2.initTokenClient({client_id:CLIENT_ID,scope:SCOPE,
+    callback:r=>{if(r.error)return rej(new Error(r.error));token=r.access_token;tokenExp=Date.now()+(r.expires_in-60)*1000;localStorage.setItem('swSignedIn','1');res(token)},
+    error_callback:e=>rej(new Error('Login nahi hua: '+(e.type||'cancel')))});
+  tc.requestAccessToken({prompt:localStorage.getItem('swSignedIn')?'':'consent'})})}
+async function gfetch(url,opt={}){
+  const t=await getToken();
+  const r=await fetch(url,{...opt,headers:{...(opt.headers||{}),Authorization:'Bearer '+t}});
+  if(!r.ok){if(r.status===401)token=null;throw new Error('Drive '+r.status+': '+(await r.text()).slice(0,160))}
+  return r}
+const API='https://www.googleapis.com/drive/v3/files';
+async function folderId(){
+  let id=localStorage.getItem('swFolder');if(id)return id;
+  const q=encodeURIComponent("name='SW Scanner' and mimeType='application/vnd.google-apps.folder' and trashed=false");
+  let j=await(await gfetch(`${API}?q=${q}&fields=files(id)`)).json();
+  if(j.files[0])id=j.files[0].id;
+  else{j=await(await gfetch(API+'?fields=id',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:'SW Scanner',mimeType:'application/vnd.google-apps.folder'})})).json();id=j.id}
+  localStorage.setItem('swFolder',id);return id}
+async function listRemote(fid){
+  let out=[],pt='';
+  do{const q=encodeURIComponent(`'${fid}' in parents and trashed=false`);
+    const j=await(await gfetch(`${API}?q=${q}&pageSize=200&fields=nextPageToken,files(id,appProperties)${pt?'&pageToken='+pt:''}`)).json();
+    out=out.concat(j.files);pt=j.nextPageToken}while(pt);
+  return out}
+async function upload(fid,d,p,idx){
+  const meta={name:`${d.name}_${idx+1}.jpg`.replace(/[\/\\]/g,'-'),parents:[fid],mimeType:'image/jpeg',
+    appProperties:{docId:d.id,pageId:p.id,idx:String(idx),docName:d.name.slice(0,50),created:String(d.created)}};
+  const b='swb'+uid();
+  const body=new Blob([`--${b}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify(meta)}\r\n--${b}\r\nContent-Type: image/jpeg\r\n\r\n`,p.blob,`\r\n--${b}--`]);
+  const j=await(await gfetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id',{method:'POST',headers:{'Content-Type':'multipart/related; boundary='+b},body})).json();
+  return j.id}
+const JSONH={'Content-Type':'application/json'};
+function setStatus(s){$('#status').textContent=s}
+async function sync(){
+  if(syncing)return;syncing=true;$('#btnSync').textContent='⏳ Sync...';
+  try{
+    await getToken();setStatus('Sync ho raha hai...');
+    const fid=await folderId();
+    for(const t of await dbAll('tomb')){
+      for(const id of t.driveIds){try{await gfetch(`${API}/${id}`,{method:'PATCH',headers:JSONH,body:'{"trashed":true}'})}catch(e){if(!/ 404/.test(e.message))throw e}}
+      await dbDel('tomb',t.id)}
+    const remote=await listRemote(fid),rIds=new Set(remote.map(f=>f.id));
+    let docs=await dbAll('docs');
+    for(const d of docs){
+      const n=d.pages.length;d.pages=d.pages.filter(p=>!p.driveId||rIds.has(p.driveId));
+      if(d.pages.length!==n){d.pages.length?await dbPut('docs',d):await dbDel('docs',d.id)}}
+    docs=(await dbAll('docs'));
+    const byDoc={},byPage={};
+    docs.forEach(d=>{byDoc[d.id]=d;d.pages.forEach(p=>byPage[p.id]=p)});
+    const fresh=[];
+    for(const f of remote){const ap=f.appProperties;if(!ap||!ap.docId)continue;
+      const lp=byPage[ap.pageId];
+      if(lp){if(!lp.driveId){lp.driveId=f.id;}}
+      else fresh.push(f)}
+    fresh.sort((a,b)=>(+a.appProperties.idx)-(+b.appProperties.idx));
+    const touched=new Set();
+    for(const f of fresh){const ap=f.appProperties;
+      const blob=await(await gfetch(`${API}/${f.id}?alt=media`)).blob();
+      let d=byDoc[ap.docId];
+      if(!d){d={id:ap.docId,name:ap.docName||'Scan',created:+ap.created||Date.now(),pages:[]};byDoc[d.id]=d;docs.push(d)}
+      d.pages.push({id:ap.pageId,blob,driveId:f.id});byPage[ap.pageId]=d.pages[d.pages.length-1];touched.add(d.id)}
+    for(const f of remote){const ap=f.appProperties;if(!ap||!ap.docId)continue;const d=byDoc[ap.docId];
+      if(d&&!d.nameDirty&&ap.docName&&ap.docName!==d.name.slice(0,50)){d.name=ap.docName;touched.add(d.id)}}
+    for(const d of docs){
+      let ch=touched.has(d.id);
+      for(let i=0;i<d.pages.length;i++){const p=d.pages[i];
+        if(!p.driveId){p.driveId=await upload(fid,d,p,i);ch=true;await dbPut('docs',d)}}
+      if(d.nameDirty){for(const p of d.pages)await gfetch(`${API}/${p.driveId}`,{method:'PATCH',headers:JSONH,body:JSON.stringify({appProperties:{docName:d.name.slice(0,50)}})});d.nameDirty=false;ch=true}
+      if(ch)await dbPut('docs',d)}
+    setStatus('Sync ho gaya ✓ '+new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}));
+    if(!$('#home').classList.contains('hidden'))renderHome();
+    else if(!$('#docv').classList.contains('hidden')&&cur)openDoc(cur.id);
+  }catch(e){setStatus('Sync error: '+e.message);toast('Sync nahi hua')}
+  finally{syncing=false;$('#btnSync').textContent='☁ Sync'}}
+function autoSync(){if(token&&Date.now()<tokenExp)sync()}
+$('#btnSync').onclick=sync;
+
+/* ---------- start ---------- */
+(async()=>{
+  await openDB();await renderHome();
+  if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+  if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();
+})();
+</script>
+</body>
+</html>
