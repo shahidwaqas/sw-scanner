@@ -142,11 +142,37 @@ header button{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255
 #splash .bar2 i{display:block;height:100%;width:0;background:linear-gradient(90deg,#2547b8,#ea580c);animation:ld 5s linear forwards}
 @keyframes ld{to{width:100%}}@keyframes sp{from{transform:scale(.96);opacity:.85}to{transform:scale(1);opacity:1}}
 #viewer .stage{touch-action:none;overflow:hidden}#viewImg{transform-origin:center;will-change:transform;user-select:none;-webkit-user-drag:none}
+
+#splash .spin{width:56px;height:56px;border-radius:50%;background:conic-gradient(#ef4444,#f97316,#eab308,#22c55e,#06b6d4,#3b82f6,#8b5cf6,#ef4444);-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 7px),#000 calc(100% - 6px));mask:radial-gradient(farthest-side,transparent calc(100% - 7px),#000 calc(100% - 6px));animation:rot .9s linear infinite}
+@keyframes rot{to{transform:rotate(360deg)}}
+#splash .msg{font-size:14px;font-weight:600;color:#475569;min-height:20px;transition:opacity .25s}
+/* soft theme */
+.screen{background:#f5f8fd}
+header{padding:calc(env(safe-area-inset-top) + 38px) 16px 24px!important;border-radius:0 0 34px 34px!important;box-shadow:0 10px 28px rgba(10,26,92,.25)!important;gap:12px!important}
+header h1{font-size:22px!important;letter-spacing:.2px}.hlogo{width:40px!important;height:40px!important;border-radius:12px!important}
+header button{border-radius:16px!important;padding:10px 16px!important}
+button{border-radius:18px}.sb{border-radius:16px}
+.pri,.ok,.rdb{box-shadow:0 6px 16px rgba(10,26,92,.18)!important}
+.card,.big,.idbox,.grid div,.th{border:0!important;border-radius:22px!important;box-shadow:0 4px 18px rgba(10,26,92,.07)!important}
+.card.sel{box-shadow:0 0 0 2px #ea580c,0 4px 18px rgba(234,88,12,.15)!important}
+.card img{border-radius:16px}.grid img,.th img{border-radius:inherit}
+.inp,.row input[type=number],.row select{border:1px solid #e3e9f4!important;border-radius:16px!important;background:#fff;box-shadow:0 2px 8px rgba(10,26,92,.04)}
+.seg{border-radius:20px}.seg button{border-radius:16px}
+#nav{border:0!important;border-radius:28px 28px 0 0;box-shadow:0 -6px 22px rgba(10,26,92,.08);background:#fff}
+.selbar{border:0!important;border-radius:28px 28px 0 0;box-shadow:0 -6px 22px rgba(10,26,92,.1)}
+.fab{background:linear-gradient(transparent,#f5f8fd 45%)}.fab button,.bar button{border-radius:20px}
+.sheet>div{border-radius:32px 32px 0 0!important}#dlg>div{border-radius:28px!important}
+#crop .stage,#edit .stage,#viewer .stage{background:#eaf0f9;border-radius:28px;margin:10px 10px 0}
+#editCv,#viewImg,#rvPager img,.pvi{border-radius:18px}#rvPager{background:#eaf0f9}
+.a4{border-radius:12px;box-shadow:0 6px 20px rgba(10,26,92,.12)}
+#toast{border-radius:24px;box-shadow:0 8px 24px rgba(10,26,92,.25)}
+#status.err{color:#b91c1c;background:#fef2f2;border-radius:16px;margin:8px 12px 2px;padding:10px 14px;font-size:13px;cursor:pointer}
 </style>
 </head>
 <body>
 
-<div id="splash"><img src="logo.png" alt=""><div class="bar2"><i></i></div></div>
+<div id="splash"><img src="logo.png" alt=""><div class="spin"></div><div class="msg" id="splMsg">Loading your data…</div><div class="bar2"><i></i></div></div>
+<div id="camv" class="screen hidden" style="background:#000"><video id="camVid" autoplay playsinline muted style="flex:1;min-height:0;width:100%;object-fit:cover"></video><div class="bar" style="background:#000;padding-top:14px;justify-content:space-around"><button id="camX">Close</button><button id="camSnap" class="ok" style="flex:2;padding:18px;font-size:17px">Capture</button></div></div>
 <div id="login" class="screen hidden">
   <img src="logo.png" alt="SW Scanner">
   <p>Scan your important documents and keep them safe</p>
@@ -173,7 +199,7 @@ header button{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255
 <div id="docv" class="screen hidden">
   <header><button id="dBack">←</button><h1 id="dTitle"></h1><button id="dShare">Share</button><button id="dDel" data-ic="trash" aria-label="Delete"></button></header>
   <div class="scroll"><div class="row"><p class="hint" style="flex:1;text-align:left">Tap the title to rename. Tap a page to open it.</p><button id="dSel" class="sb">Select</button></div>
-    <div id="idBox" class="idbox hidden"><b>Print size</b><button id="idM">−</button><span id="idV">100%</span><button id="idP">+</button><button id="idR">Actual size</button></div>
+    <div id="idBox" class="idbox hidden"><b>Print size</b><button id="idM">−</button><span id="idV">100%</span><button id="idP">+</button><button id="idR">Actual size</button><button id="idView" class="pri" style="flex:1 0 100%">View A4 copies sheet</button><button id="idSet" style="flex:1 0 100%">Sheet settings (copies, gap, flip)</button></div>
     <div class="grid" id="dGrid"></div></div>
   <div class="fab" id="dFab"><button class="pri" id="dAdd" data-ic="cam">Add page</button><button id="dAddG" data-ic="img">Gallery</button></div>
   <div id="pgBar" class="selbar hidden"><button id="pgCancel">Cancel</button><button id="pgAll">Select all</button><button class="rdb" id="pgDel">Delete (0)</button></div>
@@ -397,8 +423,9 @@ async function autoName(id,def){try{if(!navigator.onLine)return;const d=await db
   if(!$('#docv').classList.contains('hidden')&&cur&&cur.id===id)openDoc(id);else if(!$('#main').classList.contains('hidden'))renderHome();autoSync()}catch(e){}}
 
 /* ---------- tabs / lists ---------- */
-let urls=[];const mkUrl=b=>{const u=URL.createObjectURL(b);urls.push(u);return u};
-const clearUrls=()=>{urls.forEach(u=>URL.revokeObjectURL(u));urls=[]};
+let urls=[];const urlBlob=new Map();const mkUrl=bl=>{const u=URL.createObjectURL(bl);urls.push(u);urlBlob.set(u,bl);return u};
+const clearUrls=()=>{const o=urls;urls=[];setTimeout(()=>o.forEach(u=>{URL.revokeObjectURL(u);urlBlob.delete(u)}),30000)};
+document.addEventListener('error',e=>{const i=e.target;if(!i||i.tagName!=='IMG'||i.dataset.re)return;const bl=urlBlob.get(i.src);if(!bl)return;i.dataset.re=1;const f=new FileReader();f.onload=()=>{i.src=f.result};f.readAsDataURL(bl)},true);
 let cur=null,curTab='home';
 function showTab(t){curTab=t;document.querySelectorAll('.tab').forEach(e=>e.classList.toggle('hidden',e.id!=='t-'+t));document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));if(t==='me')renderMe()}
 let selMode=false,sel=new Set(),visIds=[];
@@ -488,12 +515,14 @@ $('#shs').onclick=async e=>{const s=e.target.dataset.s;if(!s&&e.target.id!=='shs
 const setScale=async v=>{cur.idScale=Math.max(50,Math.min(200,v));cur.nameDirty=true;await dbPut('docs',cur);$('#idV').textContent=cur.idScale+'%';autoSync()};
 $('#idM').onclick=()=>setScale((cur.idScale||100)-10);$('#idP').onclick=()=>setScale((cur.idScale||100)+10);$('#idR').onclick=()=>setScale(100);
 $('#dDel').onclick=()=>delDocs([cur]);
+$('#idView').onclick=()=>{if(cur.pages.length<2)return toast('Add the back side first');openPrev(cur,SH())};
+$('#idSet').onclick=()=>{const o=SH();$('#shN').value=o.n;$('#shG').value=o.gap;$('#shF').value=o.flip;$('#shX').value=o.ox;$('#shY').value=o.oy;$('#shM').checked=!!o.marks;$('#shs').classList.remove('hidden')};
 
 /* ---------- scan flow ---------- */
 let ctx={mode:'new',docId:null,draft:[],queue:[],side:0};
 const ID_W=1280,ID_H=Math.round(1280*53.98/85.6);
 function begin(mode,docId,src){ctx={mode,docId,draft:[],queue:[],side:0,ri:0,replace:null};openSrc(src)}
-function openSrc(s){if(!s){$('#src').classList.remove('hidden');return}$({cam:'#inCam',gal:'#inGal',file:'#inFile'}[s]).click()}
+function openSrc(s){if(!s){$('#src').classList.remove('hidden');return}if(s==='cam'&&navigator.mediaDevices&&navigator.mediaDevices.getUserMedia){openCam();return}$({cam:'#inCam',gal:'#inGal',file:'#inFile'}[s]).click()}
 $('#src').onclick=e=>{const s=e.target.dataset.s;if(!s&&e.target.id!=='src')return;$('#src').classList.add('hidden');
   if(s&&s!=='x')openSrc(s)};
 $('#dAdd').onclick=()=>begin('add',cur.id,'cam');$('#dAddG').onclick=()=>begin('add',cur.id,'gal');
@@ -726,7 +755,7 @@ $('#pvPrint').onclick=()=>PV.o?printSheet(PV.d,PV.o):printDoc(PV.d);
 $('#pvShare').onclick=()=>pvPdf(1);$('#pvDl').onclick=()=>pvPdf(0);
 
 /* ---------- Google Drive sync ---------- */
-let token=null,tokenExp=0,syncing=false;
+let token=null,tokenExp=0,syncing=false,again=false;
 function getToken(){return new Promise((res,rej)=>{
   if(token&&Date.now()<tokenExp)return res(token);
   if(!window.google||!google.accounts)return rej(new Error('Google script failed to load. Check your internet connection'));
@@ -761,9 +790,9 @@ async function upload(fid,d,p,idx){
   const j=await(await gfetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id',{method:'POST',headers:{'Content-Type':'multipart/related; boundary='+b},body})).json();
   return j.id}
 const JSONH={'Content-Type':'application/json'};
-function setStatus(s){$('#status').textContent=s}
+function setStatus(s,err){const e=$('#status');e.textContent=s;e.classList.toggle('err',!!err)}
 async function sync(){
-  if(syncing)return;syncing=true;$('#btnSync').textContent='Syncing...';
+  if(syncing){again=true;return}syncing=true;$('#btnSync').textContent='Syncing...';
   try{
     await getToken();setStatus('Syncing...');
     const fid=await folderId();
@@ -804,9 +833,10 @@ async function sync(){
     setStatus('Synced ✓ '+new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}));
     if(!$('#main').classList.contains('hidden'))renderHome();
     else if(!$('#docv').classList.contains('hidden')&&cur)openDoc(cur.id,true);
-  }catch(e){setStatus('Sync error: '+e.message);toast('Sync failed')}
-  finally{syncing=false;$('#btnSync').textContent='Sync'}}
-function autoSync(){if(token&&Date.now()<tokenExp)sync()}
+  }catch(e){const m=e.message||String(e),f=/Failed to fetch|NetworkError|Load failed/i.test(m)?'No internet connection':/popup|cancel|blocked|access_denied|immediate_failed/i.test(m)?'Google login was blocked or cancelled. Tap here to retry':/Drive 40[13]/.test(m)?'Google Drive permission problem. Log out and log in again':m;
+    setStatus('⚠ Sync failed: '+f+(f===m?'':' ('+m.slice(0,80)+')'),1);toast('Sync failed: '+f)}
+  finally{syncing=false;$('#btnSync').textContent='Sync';if(again){again=false;setTimeout(sync,800)}}}
+function autoSync(){if(!localStorage.getItem('swSignedIn'))return;if(!navigator.onLine){setStatus('⚠ Offline: will sync when internet is back',1);return}sync()}
 $('#btnSync').onclick=sync;
 $('#btnLogin').onclick=async()=>{
   $('#loginErr').textContent='';
@@ -838,11 +868,26 @@ function zr(){Z.s=1;Z.x=Z.y=0;Z.p.clear();zap()}
   if(Z.s===1)Z.x=Z.y=0;zap()});
  const up=e=>Z.p.delete(e.pointerId);st.addEventListener('pointerup',up);st.addEventListener('pointercancel',up)})();
 
+/* ---------- auto sync triggers + HD camera ---------- */
+window.addEventListener('online',autoSync);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)autoSync()});
+setInterval(()=>{if(!document.hidden&&token&&Date.now()<tokenExp)sync()},180000);
+$('#status').onclick=()=>{if($('#status').classList.contains('err'))sync()};
+function stopCam(){const v=$('#camVid');if(v.srcObject){v.srcObject.getTracks().forEach(t=>t.stop());v.srcObject=null}}
+const camBack=()=>ctx.draft.length?openRev():(ctx.mode==='add'||ctx.mode==='edit')?openDoc(ctx.docId):renderHome();
+async function openCam(){try{const st=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:4096},height:{ideal:2160}},audio:false});$('#camVid').srcObject=st;show('camv')}
+  catch(e){toast('In-app camera not available, using phone camera');$('#inCam').click()}}
+$('#camX').onclick=()=>{stopCam();camBack()};
+$('#camSnap').onclick=()=>{const v=$('#camVid');if(!v.videoWidth)return;const c=document.createElement('canvas');c.width=v.videoWidth;c.height=v.videoHeight;c.getContext('2d').drawImage(v,0,0);stopCam();
+  c.toBlob(b=>{ctx.last='cam';onFiles({target:{files:[b],value:''}})},'image/jpeg',.95)};
+
 /* ---------- start ---------- */
 (async()=>{
-  setTimeout(()=>{$('#splash').classList.add('out');setTimeout(()=>$('#splash').remove(),600)},5000);
+  const SM=['Loading your data…','Loading your files…','Checking your documents…','Preparing your workspace…','Almost ready…'];let smi=0;
+  const smT=setInterval(()=>{const m=$('#splMsg');if(!m)return clearInterval(smT);m.style.opacity=0;setTimeout(()=>{m.textContent=SM[Math.min(++smi,SM.length-1)];m.style.opacity=1},200)},1000);
+  setTimeout(()=>{clearInterval(smT);$('#splash').classList.add('out');setTimeout(()=>$('#splash').remove(),600)},5000);
   await openDB();
-  if(localStorage.getItem('swSignedIn'))await renderHome();else show('login');
+  if(localStorage.getItem('swSignedIn')){await renderHome();autoSync()}else show('login');
   if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
   if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();
 })();
