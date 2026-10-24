@@ -107,6 +107,28 @@ header button .ic,.ib .ic,.tools .ic,#nav .ic{margin:0}
 #nav .ic{width:52px;height:32px;padding:4px 16px;border-radius:16px}#nav .on{color:#12297d;font-weight:600}#nav .on .ic{background:#e6ecfb}
 .seg{display:flex;gap:6px;background:#f1f5f9;padding:4px;border-radius:14px}.seg button{flex:1;background:none;padding:10px}.seg .on{background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.12)}
 .pgs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;max-height:34vh;overflow:auto}.th{position:relative;border:1px solid #e6ebf5;border-radius:10px;overflow:hidden}.th img{width:100%;display:block}.th input{position:absolute;top:6px;right:6px;width:20px;height:20px}
+
+header{background:linear-gradient(180deg,#2547b8,#0a1a5c);color:#fff;border:0;border-radius:0 0 22px 22px;padding:calc(env(safe-area-inset-top) + 26px) 12px 16px}
+header h1{color:#fff}
+header button{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);color:#fff}
+.hlogo{background:#fff;padding:3px}
+.pri{background:linear-gradient(180deg,#1e3a9e,#0a1a5c);color:#fff}
+#nav button{color:#64748b}#nav .on{color:#0f172a;font-weight:700}#nav .on .ic{background:none}
+.rdb{background:#dc2626;color:#fff}
+.sb{padding:6px 12px;font-size:13px;background:#f1f5f9;color:#0f172a}
+.card .ck{width:22px;height:22px;flex:none;accent-color:#ea580c}
+.card.sel{border-color:#ea580c;background:#fff7ed}
+.grid .ck{position:absolute;top:8px;left:8px;width:22px;height:22px;accent-color:#ea580c}
+.grid div.sel{outline:2px solid #ea580c;outline-offset:-2px}
+.selbar{position:fixed;left:0;right:0;bottom:0;display:flex;gap:10px;padding:12px 12px calc(env(safe-area-inset-bottom) + 12px);background:#fff;border-top:1px solid #e6ebf5;z-index:15}
+.selbar button{flex:1;padding:14px}
+#main.selmode .scroll{padding-bottom:90px}
+#dlg{align-items:center;justify-content:center;padding:24px;z-index:40}
+#dlg>div{border-radius:20px;max-width:340px;margin:0 auto}
+#dlg p{margin:0;color:#475569;font-size:14px}
+.a4{position:relative;width:100%;aspect-ratio:210/297;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.2);margin-bottom:12px;overflow:hidden}
+.a4 img{position:absolute}.a4 i{position:absolute;background:#666}
+.pvi{display:block;width:100%;margin-bottom:12px;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.2)}
 </style>
 </head>
 <body>
@@ -121,24 +143,26 @@ header button .ic,.ib .ic,.tools .ic,#nav .ic{margin:0}
 <div id="main" class="screen">
   <header><img class="hlogo" src="mark.png" alt=""><h1>SW Scanner</h1><button id="btnSync">Sync</button></header>
   <div id="status"></div>
-  <div class="scroll tab" id="t-home"><div class="qa"><button class="pri" data-go="cam" data-ic="cam">Scan document</button><button data-go="id" data-ic="id">ID card</button></div><h3>Last 30 days</h3><div id="list"></div></div>
-  <div class="scroll tab hidden" id="t-docs"><input id="q" class="inp" placeholder="Search documents"><div id="listAll"></div></div>
+  <div class="scroll tab" id="t-home"><div class="qa"><button class="pri" data-go="scan" data-ic="cam">Scan document</button><button data-go="id" data-ic="id">ID card</button></div><div class="row"><h3>Last 30 days</h3><button class="sb" data-sel>Select</button></div><div id="list"></div></div>
+  <div class="scroll tab hidden" id="t-docs"><input id="q" class="inp" placeholder="Search documents"><div class="row"><h3>All documents</h3><button class="sb" data-sel>Select</button></div><div id="listAll"></div></div>
   <div class="scroll tab hidden" id="t-import"><h3>Import</h3><button class="big" data-go="cam" data-ic="cam">Camera<small>Take a photo of a document</small></button><button class="big" data-go="gal" data-ic="img">Gallery<small>Choose one or more photos</small></button><button class="big" data-go="file" data-ic="folder">Files<small>Pick an image from your files</small></button></div>
-  <div class="scroll tab hidden" id="t-tools"><h3>Tools</h3><button class="big" data-go="id" data-ic="id">ID Card Scan<small>CNIC / licence, prints at real card size</small></button><button class="big" data-go="tab-import" data-ic="imp">Import<small>Camera, Gallery or Files</small></button><button class="big" data-go="sync" data-ic="sync">Sync to Google Drive<small>Back up and sync your scans</small></button></div>
+  <div class="scroll tab hidden" id="t-tools"><h3>Tools</h3><button class="big" data-go="id" data-ic="id">ID Card Scan<small>CNIC / licence, prints at real card size</small></button><button class="big" data-go="tab-import" data-ic="imp">Import<small>Camera, Gallery or Files</small></button><button class="big" data-go="sync" data-ic="sync">Sync to Google Drive<small>Back up and sync your scans</small></button><button class="big" data-go="bin" data-ic="trash">Recycle bin<small id="binN">Restore deleted documents</small></button></div>
   <div class="scroll tab hidden" id="t-me"><div class="me"><div class="av" id="av">?</div><div id="meStat"></div></div>
     <input class="inp" id="pn" placeholder="Your name"><input class="inp" id="pe" placeholder="Email" type="email"><input class="inp" id="pp" placeholder="Phone" type="tel">
     <button class="big" id="btnBackup" data-ic="backup">Backup<small>Save all documents to a file</small></button>
     <button class="big" id="btnRestore" data-ic="restore">Restore<small>Load documents from a backup file</small></button>
     <button class="big" id="btnOut" data-ic="out">Logout</button></div>
+  <div id="selBar" class="selbar hidden"><button id="selCancel">Cancel</button><button id="selAll">Select all</button><button class="rdb" id="selDel">Delete (0)</button></div>
   <nav id="nav"><button data-tab="home" data-ic="home" class="on"><span>Home</span></button><button data-tab="docs" data-ic="docs"><span>All docs</span></button><button data-tab="import" data-ic="imp"><span>Import</span></button><button data-tab="tools" data-ic="tools"><span>Tools</span></button><button data-tab="me" data-ic="user"><span>Me</span></button></nav>
 </div>
 
 <div id="docv" class="screen hidden">
   <header><button id="dBack">←</button><h1 id="dTitle"></h1><button id="dShare">Share</button><button id="dDel" data-ic="trash" aria-label="Delete"></button></header>
-  <div class="scroll"><p class="hint">Tap the title to rename. Tap a page to open it.</p>
+  <div class="scroll"><div class="row"><p class="hint" style="flex:1;text-align:left">Tap the title to rename. Tap a page to open it.</p><button id="dSel" class="sb">Select</button></div>
     <div id="idBox" class="idbox hidden"><b>Print size</b><button id="idM">−</button><span id="idV">100%</span><button id="idP">+</button><button id="idR">Actual size</button></div>
     <div class="grid" id="dGrid"></div></div>
   <div class="fab" id="dFab"><button class="pri" id="dAdd" data-ic="cam">Add page</button><button id="dAddG" data-ic="img">Gallery</button></div>
+  <div id="pgBar" class="selbar hidden"><button id="pgCancel">Cancel</button><button id="pgAll">Select all</button><button class="rdb" id="pgDel">Delete (0)</button></div>
 </div>
 
 <div id="crop" class="screen hidden">
@@ -151,7 +175,7 @@ header button .ic,.ib .ic,.tools .ic,#nav .ic{margin:0}
 <div id="edit" class="screen hidden">
   <header><button id="eBack" aria-label="Cancel">✕</button><h1>Edit page</h1></header>
   <div class="stage"><canvas id="editCv"></canvas></div>
-  <div class="tools"><button id="eCrop" data-ic="crop">Adjust crop</button><button id="eRot" data-ic="rot">Rotate</button><button id="pF" class="on" data-ic="filt">Filters</button><button id="pA" data-ic="adj">Adjust</button></div>
+  <div class="tools"><button id="eCrop" data-ic="crop">Adjust crop</button><button id="eRot" data-ic="rot">Rotate</button><button id="eRetake" data-ic="retake">Retake</button><button id="pF" class="on" data-ic="filt">Filters</button><button id="pA" data-ic="adj">Adjust</button></div>
   <div id="fBar" class="chips"></div>
   <div id="aBar" class="adj hidden"><label>Brightness<input type="range" id="sB" min="-100" max="100" value="0"></label><label>Contrast<input type="range" id="sC" min="-100" max="100" value="0"></label><label>Sharpness<input type="range" id="sS" min="0" max="100" value="0"></label><button id="aReset">Reset</button></div>
   <div class="bar"><button id="eNext" class="pri">Add page</button><button id="eSave" class="ok">Save</button></div>
@@ -160,10 +184,11 @@ header button .ic,.ib .ic,.tools .ic,#nav .ic{margin:0}
 <div id="viewer" class="screen hidden">
   <header><button id="vBack">←</button><h1 id="vTitle"></h1><button id="vShare">Share</button><button id="vDel" data-ic="trash" aria-label="Delete"></button></header>
   <div class="stage"><img id="viewImg"></div>
+  <div class="bar"><button id="vEdit" data-ic="adj">Edit</button><button id="vRetake" data-ic="retake">Retake</button></div>
 </div>
 
 <div id="src" class="sheet hidden"><div><b>Choose source</b><button data-s="cam" class="pri">Camera</button><button data-s="gal">Gallery</button><button data-s="file">Files</button><button data-s="x">Cancel</button></div></div>
-<div id="shr" class="sheet hidden"><div><b>Share</b><button data-s="pdf" class="pri">Share as PDF</button><button data-s="img">Share as Image</button><button data-s="print">Print</button><button data-s="sheet" id="sSheet">A4 sheet of copies (front + back)</button><button data-s="x">Cancel</button></div></div>
+<div id="shr" class="sheet hidden"><div><b>Share</b><button data-s="view" class="pri">View</button><button data-s="pdf">Share as PDF</button><button data-s="dl">Download PDF</button><button data-s="img">Share as Image</button><button data-s="print">Print</button><button data-s="sheet" id="sSheet">A4 sheet of copies (front + back)</button><button data-s="x">Cancel</button></div></div>
 
 <div id="shs" class="sheet hidden"><div><b>A4 sheet of ID copies</b>
 <label class="row">Copies per page<select id="shN"><option>8</option><option>10</option></select></label>
@@ -171,12 +196,15 @@ header button .ic,.ib .ic,.tools .ic,#nav .ic{margin:0}
 <label class="row">Flip paper on<select id="shF"><option value="long">Long edge</option><option value="short">Short edge</option></select></label>
 <label class="row">Back offset X / Y (mm)<span><input id="shX" type="number" step="0.5"> <input id="shY" type="number" step="0.5"></span></label>
 <label class="row">Cut marks<input type="checkbox" id="shM"></label>
-<button data-s="spdf" class="pri">Share PDF</button><button data-s="sprint" class="ok">Print</button><button data-s="x">Cancel</button></div></div>
+<button data-s="prev" class="pri">Preview</button><button data-s="spdf">Share PDF</button><button data-s="sprint" class="ok">Print</button><button data-s="x">Cancel</button></div></div>
 <div id="pk" class="sheet hidden"><div><b id="pkT">Share</b><div class="seg"><button data-f="img" class="on">Image</button><button data-f="pdf">PDF</button></div><div class="pgs" id="pkG"></div><button id="pkAll">Select all</button><button class="pri" id="pkGo">Send</button><button data-s="x">Cancel</button></div></div>
 <input type="file" id="inCam" accept="image/*" capture="environment" hidden>
 <input type="file" id="inGal" accept="image/*" multiple hidden>
 <input type="file" id="inFile" accept="image/*" multiple hidden>
 <input type="file" id="inRes" accept=".json,application/json" hidden>
+<div id="prev" class="screen hidden"><header><button id="pvBack">←</button><h1 id="pvT"></h1></header><div class="scroll" id="pvBox" style="background:#e2e8f0;padding-top:12px"></div><div class="bar"><button id="pvPrint" class="pri">Print</button><button id="pvShare">Share PDF</button><button id="pvDl">Download</button></div></div>
+<div id="bin" class="screen hidden"><header><button id="bBack">←</button><h1>Recycle bin</h1><button id="bEmpty">Empty</button></header><div class="scroll"><p class="hint" id="binHint"></p><div id="binList"></div></div></div>
+<div id="dlg" class="sheet hidden"><div><b id="dlgT"></b><p id="dlgM"></p><button id="dlgOk" class="rdb">Delete</button><button id="dlgNo">Cancel</button></div></div>
 <div id="toast"></div>
 
 <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -328,7 +356,7 @@ async function wmBlob(b,t){const im=await loadImg(b),c=document.createElement('c
   return new Promise(r=>c.toBlob(r,'image/jpeg',.9))}
 async function wmDoc(d,t){if(!t)return d;return{...d,pages:await Promise.all(d.pages.map(async p=>({...p,blob:await wmBlob(p.blob,t)})))}}
 
-const ICO={home:'<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/>',docs:'<path d="M15 3H8a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V8z"/><path d="M15 3v5h5M4 7v13a2 2 0 0 0 2 2h9"/>',imp:'<path d="M12 3v12M7 10l5 5 5-5M4 19h16"/>',tools:'<rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/>',user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',cam:'<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',img:'<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="M21 16l-5-5-9 9"/>',folder:'<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',id:'<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2"/><path d="M6 16c.5-2 5.5-2 6 0M14 10h4M14 14h4"/>',share:'<circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.2 10.8l7.6-3.6M8.2 13.2l7.6 3.6"/>',edit:'<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/>',trash:'<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',rot:'<path d="M20 12a8 8 0 1 1-2.5-5.8"/><path d="M20 4v5h-5"/>',crop:'<path d="M7 3v14h14"/><path d="M3 7h14v14"/>',sync:'<path d="M7 18a4 4 0 0 1-.5-8A6 6 0 0 1 18 9a4.5 4.5 0 0 1 0 9z"/>',backup:'<path d="M12 4v11M7 11l5 5 5-5M5 20h14"/>',restore:'<path d="M12 16V5M7 9l5-5 5 5M5 20h14"/>',out:'<path d="M9 4H5v16h4M16 8l4 4-4 4M20 12H9"/>',filt:'<circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 0 0 16z"/>',adj:'<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>'};
+const ICO={home:'<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/>',docs:'<path d="M15 3H8a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V8z"/><path d="M15 3v5h5M4 7v13a2 2 0 0 0 2 2h9"/>',imp:'<path d="M12 3v12M7 10l5 5 5-5M4 19h16"/>',tools:'<rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/>',user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',cam:'<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',img:'<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="M21 16l-5-5-9 9"/>',folder:'<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',id:'<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2"/><path d="M6 16c.5-2 5.5-2 6 0M14 10h4M14 14h4"/>',share:'<circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.2 10.8l7.6-3.6M8.2 13.2l7.6 3.6"/>',edit:'<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/>',trash:'<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',rot:'<path d="M20 12a8 8 0 1 1-2.5-5.8"/><path d="M20 4v5h-5"/>',crop:'<path d="M7 3v14h14"/><path d="M3 7h14v14"/>',sync:'<path d="M7 18a4 4 0 0 1-.5-8A6 6 0 0 1 18 9a4.5 4.5 0 0 1 0 9z"/>',backup:'<path d="M12 4v11M7 11l5 5 5-5M5 20h14"/>',restore:'<path d="M12 16V5M7 9l5-5 5 5M5 20h14"/>',out:'<path d="M9 4H5v16h4M16 8l4 4-4 4M20 12H9"/>',filt:'<circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 0 0 16z"/>',adj:'<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>',retake:'<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><path d="M14.5 12.5a2.7 2.7 0 1 0-.6 2.2"/><path d="M14.8 10.6v2h-2"/>'};
 const ico=n=>`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${ICO[n]||''}</svg>`;
 document.querySelectorAll('[data-ic]').forEach(e=>e.insertAdjacentHTML('afterbegin',ico(e.dataset.ic)));
 async function renameDoc(d){const n=prompt('New name',d.name);if(!n||!n.trim())return;d.name=n.trim();d.nameDirty=true;await dbPut('docs',d);await renderHome();autoSync()}
@@ -358,77 +386,90 @@ let urls=[];const mkUrl=b=>{const u=URL.createObjectURL(b);urls.push(u);return u
 const clearUrls=()=>{urls.forEach(u=>URL.revokeObjectURL(u));urls=[]};
 let cur=null,curTab='home';
 function showTab(t){curTab=t;document.querySelectorAll('.tab').forEach(e=>e.classList.toggle('hidden',e.id!=='t-'+t));document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));if(t==='me')renderMe()}
+let selMode=false,sel=new Set(),visIds=[];
 async function renderHome(){
-  const docs=(await dbAll('docs')).sort((a,b)=>b.created-a.created);clearUrls();
+  let all=await dbAll('docs');const old=all.filter(d=>d.deleted&&Date.now()-d.deleted>BIN_DAYS*864e5);
+  if(old.length){await purge(old);all=all.filter(d=>!old.includes(d))}
+  const nb=all.filter(d=>d.deleted).length;$('#binN').textContent=nb?nb+' in bin':'Restore deleted documents';
+  const docs=all.filter(d=>!d.deleted).sort((a,b)=>b.created-a.created);clearUrls();
   const q=$('#q').value.trim().toLowerCase(),lim=Date.now()-30*864e5;
   const fill=(el,arr,msg)=>{el.innerHTML='';if(!arr.length)el.innerHTML='<p class="empty">'+msg+'</p>';
-    for(const d of arr){const c=document.createElement('div');c.className='card';const synced=d.pages.every(p=>p.driveId);
-      c.innerHTML=`<img src="${mkUrl(d.pages[0].blob)}"><div><b></b><small>${d.pages.length} page${d.pages.length>1?'s':''} · ${fmt(new Date(d.created))} · ${synced?'Synced':'Not synced'}</small></div><div class="acts"><button class="ib" data-a="s" aria-label="Share">${ico('share')}</button><button class="ib" data-a="r" aria-label="Rename">${ico('edit')}</button></div>`;
+    for(const d of arr){const c=document.createElement('div');c.className='card'+(selMode&&sel.has(d.id)?' sel':'');const synced=d.pages.every(p=>p.driveId);
+      c.innerHTML=(selMode?`<input type="checkbox" class="ck" ${sel.has(d.id)?'checked':''}>`:'')+`<img src="${mkUrl(d.pages[0].blob)}"><div><b></b><small>${d.pages.length} page${d.pages.length>1?'s':''} · ${fmt(new Date(d.created))} · ${synced?'Synced':'Not synced'}</small></div>`+(selMode?'':`<div class="acts"><button class="ib" data-a="s" aria-label="Share">${ico('share')}</button><button class="ib" data-a="r" aria-label="Rename">${ico('edit')}</button><button class="ib" data-a="d" aria-label="Delete" style="color:#dc2626">${ico('trash')}</button></div>`);
       c.querySelector('b').textContent=d.name;if(d.kind==='id')c.querySelector('b').insertAdjacentHTML('beforeend','<span class="tag">ID</span>');
-      c.onclick=e=>{const a=e.target.closest('[data-a]');if(!a)return openDoc(d.id);if(a.dataset.a==='s')shareFlow(d);else renameDoc(d)};el.appendChild(c)}};
-  fill($('#list'),docs.filter(d=>d.created>=lim),'No documents in the last 30 days.<br>Tap Scan to start.');
-  fill($('#listAll'),docs.filter(d=>!q||d.name.toLowerCase().includes(q)),'No documents found.');
+      c.onclick=e=>{if(selMode){toggleSel(d.id);return}const a=e.target.closest('[data-a]');if(!a)return openDoc(d.id);const k=a.dataset.a;if(k==='s')shareFlow(d);else if(k==='r')renameDoc(d);else delDocs([d])};el.appendChild(c)}
+    return arr.map(d=>d.id)};
+  const ra=fill($('#list'),docs.filter(d=>d.created>=lim),'No documents in the last 30 days.<br>Tap Scan to start.');
+  const rb=fill($('#listAll'),docs.filter(d=>!q||d.name.toLowerCase().includes(q)),'No documents found.');
+  visIds=curTab==='docs'?rb:ra;
+  $('#main').classList.toggle('selmode',selMode);$('#selBar').classList.toggle('hidden',!selMode);$('#nav').classList.toggle('hidden',selMode);
+  $('#selDel').textContent=`Delete (${sel.size})`;document.querySelectorAll('[data-sel]').forEach(b=>b.classList.toggle('hidden',selMode));
   show('main');showTab(curTab)}
 $('#q').oninput=renderHome;
 document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
 document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(!g)return;const v=g.dataset.go;
-  if(v==='tab-import')showTab('import');else if(v==='id')begin('id',null,null);else if(v==='sync')sync();else begin('new',null,v)});
+  if(v==='tab-import')showTab('import');else if(v==='id')begin('id',null,null);else if(v==='sync')sync();else if(v==='bin')openBin();else begin('new',null,v==='scan'?null:v)});
 const prof=()=>JSON.parse(localStorage.getItem('swProfile')||'{}');
-async function renderMe(){const p=prof(),docs=await dbAll('docs');
+async function renderMe(){const p=prof(),docs=(await dbAll('docs')).filter(d=>!d.deleted);
   $('#pn').value=p.n||'';$('#pe').value=p.e||'';$('#pp').value=p.p||'';$('#av').textContent=(p.n||'?')[0].toUpperCase();
   $('#meStat').innerHTML=`<b>${p.n||'Your profile'}</b><br><small>${docs.length} documents · ${docs.reduce((s,d)=>s+d.pages.length,0)} pages</small>`}
 ['pn','pe','pp'].forEach(i=>$('#'+i).oninput=()=>{localStorage.setItem('swProfile',JSON.stringify({n:$('#pn').value.trim(),e:$('#pe').value.trim(),p:$('#pp').value.trim()}));$('#av').textContent=($('#pn').value.trim()||'?')[0].toUpperCase()});
 $('#btnBackup').onclick=async()=>{
-  toast('Creating backup...');const docs=await dbAll('docs');
+  toast('Creating backup...');const docs=(await dbAll('docs')).filter(d=>!d.deleted);
   const b64=b=>new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result);f.readAsDataURL(b)});
   const parts=['{"app":"swscanner","v":1,"profile":'+JSON.stringify(prof())+',"docs":['];
-  for(let i=0;i<docs.length;i++){const d=docs[i],pg=[];for(const p of d.pages)pg.push({id:p.id,img:await b64(p.blob)});
+  for(let i=0;i<docs.length;i++){const d=docs[i],pg=[];for(const p of d.pages)pg.push({id:p.id,img:await b64(p.blob),orig:p.orig?await b64(p.orig):undefined,opts:p.opts});
     parts.push((i?',':'')+JSON.stringify({id:d.id,name:d.name,created:d.created,kind:d.kind,idScale:d.idScale,pages:pg}))}
   parts.push(']}');dl(new File(parts,'SW-Scanner-backup-'+new Date().toISOString().slice(0,10)+'.json',{type:'application/json'}));toast('Backup saved')};
 $('#btnRestore').onclick=()=>$('#inRes').click();
 $('#inRes').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f)return;
   try{const j=JSON.parse(await f.text());if(j.app!=='swscanner')throw new Error('Not a SW Scanner backup');let a=0,s=0;
     for(const d of j.docs){if(await dbGet('docs',d.id)){s++;continue}
-      d.pages=await Promise.all(d.pages.map(async p=>({id:p.id,blob:await(await fetch(p.img)).blob()})));await dbPut('docs',d);a++}
+      d.pages=await Promise.all(d.pages.map(async p=>({id:p.id,blob:await(await fetch(p.img)).blob(),orig:p.orig?await(await fetch(p.orig)).blob():undefined,opts:p.opts})));await dbPut('docs',d);a++}
     if(j.profile&&!localStorage.getItem('swProfile'))localStorage.setItem('swProfile',JSON.stringify(j.profile));
     await renderHome();toast(`Restored ${a} document(s), ${s} already existed`);autoSync()}
   catch(er){toast('Restore failed: '+er.message)}};
 
 /* ---------- document view ---------- */
-async function openDoc(id){
-  cur=await dbGet('docs',id);if(!cur){renderHome();return}
-  clearUrls();$('#dTitle').textContent=cur.name;const idd=cur.kind==='id';
-  $('#idBox').classList.toggle('hidden',!idd);$('#dFab').classList.toggle('hidden',idd);$('#idV').textContent=(cur.idScale||100)+'%';
+let pSel=null;
+async function openDoc(id,keep){
+  cur=await dbGet('docs',id);if(!cur||cur.deleted){renderHome();return}
+  if(!keep)pSel=null;
+  clearUrls();$('#dTitle').textContent=cur.name;const idd=cur.kind==='id';if(idd)pSel=null;
+  $('#idBox').classList.toggle('hidden',!idd);$('#dFab').classList.toggle('hidden',idd||!!pSel);$('#dSel').classList.toggle('hidden',idd||!!pSel);$('#pgBar').classList.toggle('hidden',!pSel);
+  if(pSel)$('#pgDel').textContent=`Delete (${pSel.size})`;
+  $('#idV').textContent=(cur.idScale||100)+'%';
   const g=$('#dGrid');g.innerHTML='';
-  cur.pages.forEach((p,i)=>{const w=document.createElement('div');w.innerHTML=`<img src="${mkUrl(p.blob)}"><span>${idd?(i?'Back':'Front'):i+1}</span>`;w.onclick=()=>openPage(i);g.appendChild(w)});
+  cur.pages.forEach((p,i)=>{const w=document.createElement('div'),on=pSel&&pSel.has(i);
+    w.innerHTML=(pSel?`<input type="checkbox" class="ck" ${on?'checked':''}>`:'')+`<img src="${mkUrl(p.blob)}"><span>${idd?(i?'Back':'Front'):i+1}</span>`;
+    if(on)w.classList.add('sel');
+    w.onclick=()=>{if(pSel){on?pSel.delete(i):pSel.add(i);openDoc(cur.id,true)}else openPage(i)};g.appendChild(w)});
   show('docv')}
 let vi=0;
 function openPage(i){vi=i;$('#viewImg').src=mkUrl(cur.pages[i].blob);$('#vTitle').textContent=`${cur.name} · ${i+1}/${cur.pages.length}`;show('viewer')}
 $('#vBack').onclick=()=>openDoc(cur.id);
 $('#vShare').onclick=async()=>{let d=cur;if(cur.kind==='id'){const t=askWm();if(t===null)return;d=await wmDoc(cur,t)}shareFiles([imgFiles(d)[vi]],cur.name)};
 $('#vDel').onclick=async()=>{
-  if(!confirm('Delete this page?'))return;
+  if(cur.pages.length===1)return delDocs([cur]);if(!await askConfirm('Delete this page?',"This can't be undone. It will also be removed from Google Drive."))return;
   const p=cur.pages.splice(vi,1)[0];if(p.driveId)await addTomb([p.driveId]);
   if(cur.pages.length)await dbPut('docs',cur);else await dbDel('docs',cur.id);
   toast('Deleted');autoSync();cur.pages.length?openDoc(cur.id):renderHome()};
 $('#dBack').onclick=renderHome;
 $('#dTitle').onclick=async()=>{const n=prompt('New name',cur.name);if(!n||!n.trim())return;cur.name=n.trim();cur.nameDirty=true;await dbPut('docs',cur);openDoc(cur.id);autoSync()};
 $('#dShare').onclick=()=>{$('#sSheet').classList.toggle('hidden',cur.kind!=='id');$('#shr').classList.remove('hidden')};
-$('#shr').onclick=async e=>{const s=e.target.dataset.s;if(!s&&e.target.id!=='shr')return;$('#shr').classList.add('hidden');if(!s||s==='x')return;
+$('#shr').onclick=async e=>{const s=e.target.dataset.s;if(!s&&e.target.id!=='shr')return;$('#shr').classList.add('hidden');if(!s||s==='x')return;if(s==='view'){openPrev(cur,null);return}
   if(s==='sheet'){const o=SH();$('#shN').value=o.n;$('#shG').value=o.gap;$('#shF').value=o.flip;$('#shX').value=o.ox;$('#shY').value=o.oy;$('#shM').checked=!!o.marks;$('#shs').classList.remove('hidden');return}
   let d=cur;if(cur.kind==='id'){const t=askWm();if(t===null)return;d=await wmDoc(cur,t)}
-  if(s==='pdf')sharePDF(d);else if(s==='img')shareFiles(imgFiles(d),cur.name);else if(s==='print')printDoc(d)};
+  if(s==='pdf')sharePDF(d);else if(s==='img')shareFiles(imgFiles(d),cur.name);else if(s==='print')printDoc(d);else if(s==='dl'){toast('Creating PDF...');dl(new File([await makePDF(d.pages,d)],safe(cur.name)+'.pdf',{type:'application/pdf'}))}};
 $('#shs').onclick=async e=>{const s=e.target.dataset.s;if(!s&&e.target.id!=='shs')return;if(!s||s==='x'){$('#shs').classList.add('hidden');return}
   const o={n:+$('#shN').value,gap:+$('#shG').value||5,flip:$('#shF').value,ox:+$('#shX').value||0,oy:+$('#shY').value||0,marks:$('#shM').checked?1:0};
-  localStorage.setItem('swSheet',JSON.stringify(o));$('#shs').classList.add('hidden');
+  localStorage.setItem('swSheet',JSON.stringify(o));$('#shs').classList.add('hidden');if(s==='prev'){openPrev(cur,o);return}
   const t=askWm();if(t===null)return;const d=await wmDoc(cur,t);
   if(s==='spdf'){toast('Creating PDF...');const b=await makePDF(d.pages,{...d,sheet:o});shareFiles([new File([b],safe(cur.name)+'-sheet.pdf',{type:'application/pdf'})],cur.name)}
   else printSheet(d,o)};
 const setScale=async v=>{cur.idScale=Math.max(50,Math.min(200,v));cur.nameDirty=true;await dbPut('docs',cur);$('#idV').textContent=cur.idScale+'%';autoSync()};
 $('#idM').onclick=()=>setScale((cur.idScale||100)-10);$('#idP').onclick=()=>setScale((cur.idScale||100)+10);$('#idR').onclick=()=>setScale(100);
-$('#dDel').onclick=async()=>{
-  if(!confirm('Delete the whole document?'))return;
-  await addTomb(cur.pages.map(p=>p.driveId).filter(Boolean));await dbDel('docs',cur.id);autoSync();renderHome()};
+$('#dDel').onclick=()=>delDocs([cur]);
 
 /* ---------- scan flow ---------- */
 let ctx={mode:'new',docId:null,draft:[],queue:[],side:0};
@@ -440,10 +481,10 @@ $('#src').onclick=e=>{const s=e.target.dataset.s;if(!s&&e.target.id!=='src')retu
 $('#dAdd').onclick=()=>begin('add',cur.id,'cam');$('#dAddG').onclick=()=>begin('add',cur.id,'gal');
 async function onFiles(e){
   let files=[...e.target.files];e.target.value='';if(!files.length)return;
-  if(ctx.mode==='id')files=files.slice(0,1);
-  ctx.queue=files.slice(1);
+  if(ctx.mode==='id'||ctx.mode==='edit')files=files.slice(0,1);
+  if(ctx.retake){ctx.retake=false;ctx.queue=files.slice(1).concat(ctx.queue)}else ctx.queue=files.slice(1);
   try{await startCrop(files[0])}catch(err){toast(err.message)}}
-['#inCam','#inGal','#inFile'].forEach(s=>$(s).onchange=onFiles);
+[['#inCam','cam'],['#inGal','gal'],['#inFile','file']].forEach(([s,k])=>$(s).onchange=e=>{ctx.last=k;onFiles(e)});
 
 function autoQuad(c){const sc=Math.min(1,320/Math.max(c.width,c.height)),w=Math.round(c.width*sc),h=Math.round(c.height*sc),t=document.createElement('canvas');t.width=w;t.height=h;
   const x=t.getContext('2d');x.drawImage(c,0,0,w,h);const d=x.getImageData(0,0,w,h).data,g=new Uint8Array(w*h);
@@ -484,14 +525,14 @@ function drawCrop(){
 })();
 $('#cAuto').onclick=()=>{const q=autoQuad(S.src);if(q){S.q=q;drawCrop()}else toast('Could not find edges, drag the corners')};
 $('#cFull').onclick=()=>{S.q=defQuad(S.src.width,S.src.height,0);drawCrop()};
-$('#cCancel').onclick=()=>{ctx.queue=[];ctx.draft.length?saveDraft():renderHome()};
+$('#cCancel').onclick=async()=>{ctx.queue=[];if(ctx.mode==='edit'){await openDoc(ctx.docId);openPage(ctx.pi)}else ctx.draft.length?saveDraft():renderHome()};
 $('#eBack').onclick=$('#cCancel').onclick;
 $('#eCrop').onclick=()=>{show('crop');requestAnimationFrame(layoutCrop)};
 $('#cNext').onclick=()=>goEdit();
 function idOrient(q){const d=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);return d(q[0],q[1])>=d(q[1],q[2])?q:[q[1],q[2],q[3],q[0]]}
 function shrink(cv,m){const k=Math.min(1,m/Math.max(cv.width,cv.height)),c=document.createElement('canvas');c.width=Math.round(cv.width*k);c.height=Math.round(cv.height*k);c.getContext('2d').drawImage(cv,0,0,c.width,c.height);return c}
 function goEdit(){toast('Processing...');return new Promise(r=>setTimeout(()=>{
-  const base=ctx.mode==='id'?warp(S.src,idOrient(S.q),ID_W,ID_H):warp(S.src,S.q);
+  const base=isIdCtx()?warp(S.src,idOrient(S.q),ID_W,ID_H):warp(S.src,S.q);
   E={base,small:shrink(base,900),o:{mode:'doc',b:0,c:0,s:0},pushed:false};
   ['sB','sC','sS'].forEach(i=>$('#'+i).value=0);renderEdit();show('edit');r()},30))}
 
@@ -525,7 +566,7 @@ let rq=0;
 function renderEdit(){
   if(!rq)rq=requestAnimationFrame(()=>{rq=0;const out=proc(E.small,E.o),cv=$('#editCv');cv.width=out.width;cv.height=out.height;cv.getContext('2d').drawImage(out,0,0)});
   document.querySelectorAll('#fBar button').forEach(b=>b.classList.toggle('on',b.dataset.m===E.o.mode));
-  const id=ctx.mode==='id';$('#eNext').classList.toggle('hidden',id&&ctx.side===1);
+  const id=ctx.mode==='id';$('#eNext').classList.toggle('hidden',ctx.mode==='edit'||(id&&ctx.side===1));
   $('#eNext').textContent=id?'Add back side':ctx.queue.length?'Next photo':'Add page'}
 $('#fBar').innerHTML=FILTERS.map(f=>`<button data-m="${f[0]}">${f[1]}</button>`).join('');
 document.querySelectorAll('#fBar button').forEach(b=>b.onclick=()=>{E.o.mode=b.dataset.m;renderEdit()});
@@ -533,9 +574,10 @@ document.querySelectorAll('#fBar button').forEach(b=>b.onclick=()=>{E.o.mode=b.d
 $('#aReset').onclick=()=>{E.o.b=E.o.c=E.o.s=0;['sB','sC','sS'].forEach(i=>$('#'+i).value=0);renderEdit()};
 $('#pF').onclick=()=>{$('#fBar').classList.remove('hidden');$('#aBar').classList.add('hidden');$('#pF').classList.add('on');$('#pA').classList.remove('on')};
 $('#pA').onclick=()=>{$('#aBar').classList.remove('hidden');$('#fBar').classList.add('hidden');$('#pA').classList.add('on');$('#pF').classList.remove('on')};
-$('#eRot').onclick=()=>{const d=ctx.mode==='id'?180:90;E.base=rotC(E.base,d);E.small=rotC(E.small,d);renderEdit()};
+$('#eRot').onclick=()=>{const d=isIdCtx()?180:90;E.base=rotC(E.base,d);E.small=rotC(E.small,d);renderEdit()};
 async function commit(){if(E.pushed)return;toast('Processing...');
-  const b=await new Promise(r=>proc(E.base,E.o).toBlob(r,'image/jpeg',.88));ctx.draft.push({id:uid(),blob:b});E.pushed=true}
+  const b=await new Promise(r=>proc(E.base,E.o).toBlob(r,'image/jpeg',.88)),ob=await new Promise(r=>E.base.toBlob(r,'image/jpeg',.92));
+  ctx.retake=false;ctx.draft.push({id:uid(),blob:b,orig:ob,opts:{...E.o}});E.pushed=true}
 $('#eNext').onclick=async()=>{await commit();
   if(ctx.mode==='id'){ctx.side=1;openSrc(null)}
   else if(ctx.queue.length)startCrop(ctx.queue.shift()).catch(e=>toast(e.message));
@@ -543,10 +585,74 @@ $('#eNext').onclick=async()=>{await commit();
 $('#eSave').onclick=async()=>{await commit();ctx.queue=[];await saveDraft()};
 async function saveDraft(){
   if(!ctx.draft.length){renderHome();return}
-  let d;if(ctx.mode==='add')d=await dbGet('docs',ctx.docId);
+  let d;if(ctx.mode==='add'||ctx.mode==='edit')d=await dbGet('docs',ctx.docId);
+  if(ctx.mode==='edit'&&d){const old=d.pages[ctx.pi];if(old&&old.driveId)await addTomb([old.driveId]);d.pages[ctx.pi]=ctx.draft[0];ctx.draft=[];await dbPut('docs',d);toast('Saved ✓');await openDoc(d.id);openPage(ctx.pi);autoSync();return}
   if(!d){const id=ctx.mode==='id';d={id:uid(),name:(id?'ID Card ':'Scan ')+fmt(new Date()),created:Date.now(),pages:[]};if(id){d.kind='id';d.idScale=100}}
   d.pages.push(...ctx.draft);ctx.draft=[];
   await dbPut('docs',d);toast('Saved ✓');openDoc(d.id);autoSync();if(ctx.mode==='new')autoName(d.id,d.name)}
+
+/* ---------- recycle bin, dialogs, selection ---------- */
+const BIN_DAYS=30;
+const isIdCtx=()=>ctx.mode==='id'||!!ctx.isId;
+function askConfirm(t,m,ok='Delete',danger=true){return new Promise(res=>{$('#dlgT').textContent=t;$('#dlgM').textContent=m;const o=$('#dlgOk');o.textContent=ok;o.className=danger?'rdb':'pri';$('#dlg').classList.remove('hidden');
+  const done=v=>{$('#dlg').classList.add('hidden');o.onclick=$('#dlgNo').onclick=null;res(v)};o.onclick=()=>done(true);$('#dlgNo').onclick=()=>done(false)})}
+async function purge(ds){await addTomb(ds.flatMap(d=>d.pages.map(p=>p.driveId).filter(Boolean)));for(const d of ds)await dbDel('docs',d.id)}
+async function delDocs(ds){if(!ds.length)return;const n=ds.length;
+  if(!await askConfirm(n>1?`Move ${n} documents to Recycle bin?`:'Move to Recycle bin?',`You can restore ${n>1?'them':'it'} from Tools within ${BIN_DAYS} days. After that ${n>1?'they are':'it is'} deleted forever.`))return;
+  for(const d of ds){d.deleted=Date.now();await dbPut('docs',d)}
+  selMode=false;sel=new Set();pSel=null;toast('Moved to Recycle bin');renderHome()}
+function toggleSel(id){sel.has(id)?sel.delete(id):sel.add(id);renderHome()}
+document.addEventListener('click',e=>{if(e.target.closest('[data-sel]')){selMode=true;sel=new Set();renderHome()}});
+$('#selCancel').onclick=()=>{selMode=false;sel=new Set();renderHome()};
+$('#selAll').onclick=()=>{sel=sel.size&&visIds.every(i=>sel.has(i))?new Set():new Set(visIds);renderHome()};
+$('#selDel').onclick=async()=>{if(!sel.size)return toast('Select documents first');const ds=[];for(const id of sel){const d=await dbGet('docs',id);if(d)ds.push(d)}delDocs(ds)};
+$('#dSel').onclick=()=>{pSel=new Set();openDoc(cur.id,true)};
+$('#pgCancel').onclick=()=>{pSel=null;openDoc(cur.id)};
+$('#pgAll').onclick=()=>{pSel=pSel.size===cur.pages.length?new Set():new Set(cur.pages.map((_,i)=>i));openDoc(cur.id,true)};
+$('#pgDel').onclick=async()=>{const n=pSel.size;if(!n)return toast('Select pages first');
+  if(n===cur.pages.length)return delDocs([cur]);
+  if(!await askConfirm(`Delete ${n} page${n>1?'s':''}?`,"This can't be undone. The pages will also be removed from Google Drive."))return;
+  await addTomb(cur.pages.filter((_,i)=>pSel.has(i)).map(p=>p.driveId).filter(Boolean));
+  cur.pages=cur.pages.filter((_,i)=>!pSel.has(i));await dbPut('docs',cur);pSel=null;toast('Deleted');autoSync();openDoc(cur.id)};
+async function openBin(){
+  const ds=(await dbAll('docs')).filter(d=>d.deleted).sort((a,b)=>b.deleted-a.deleted);clearUrls();const el=$('#binList');
+  el.innerHTML=ds.length?'':'<p class="empty">Recycle bin is empty.</p>';$('#binHint').textContent=`Deleted documents stay here for ${BIN_DAYS} days.`;
+  for(const d of ds){const left=Math.max(0,Math.ceil(BIN_DAYS-(Date.now()-d.deleted)/864e5)),c=document.createElement('div');c.className='card';
+    c.innerHTML=`<img src="${mkUrl(d.pages[0].blob)}"><div><b></b><small>${left} day${left===1?'':'s'} left</small></div><div class="acts"><button class="ib" data-a="r" aria-label="Restore">${ico('restore')}</button><button class="ib" data-a="x" aria-label="Delete forever" style="color:#dc2626">${ico('trash')}</button></div>`;
+    c.querySelector('b').textContent=d.name;
+    c.onclick=async e=>{const a=e.target.closest('[data-a]');if(!a)return;
+      if(a.dataset.a==='r'){delete d.deleted;await dbPut('docs',d);toast('Restored');openBin()}
+      else if(await askConfirm('Delete forever?',"This can't be undone. The files will also be removed from Google Drive.")){await purge([d]);autoSync();openBin()}};
+    el.appendChild(c)}
+  show('bin')}
+$('#bBack').onclick=renderHome;
+$('#bEmpty').onclick=async()=>{const ds=(await dbAll('docs')).filter(d=>d.deleted);if(!ds.length)return toast('Bin is already empty');
+  if(!await askConfirm(`Delete ${ds.length} document${ds.length>1?'s':''} forever?`,"This can't be undone. The files will also be removed from Google Drive."))return;await purge(ds);autoSync();openBin()};
+
+/* ---------- retake / re-edit ---------- */
+$('#eRetake').onclick=()=>{ctx.retake=true;openSrc(ctx.last||null)};
+$('#vRetake').onclick=()=>{ctx={mode:'edit',docId:cur.id,pi:vi,draft:[],queue:[],side:0,isId:cur.kind==='id'};openSrc(null)};
+$('#vEdit').onclick=async()=>{const p=cur.pages[vi];toast('Opening...');
+  const img=await loadImg(p.orig||p.blob),c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;c.getContext('2d').drawImage(img,0,0);
+  ctx={mode:'edit',docId:cur.id,pi:vi,draft:[],queue:[],side:0,isId:cur.kind==='id'};
+  S={src:c,q:defQuad(c.width,c.height,0),drag:-1,sc:1};
+  E={base:c,small:shrink(c,900),o:p.orig&&p.opts?{mode:'doc',b:0,c:0,s:0,...p.opts}:{mode:'color',b:0,c:0,s:0},pushed:false};
+  $('#sB').value=E.o.b;$('#sC').value=E.o.c;$('#sS').value=E.o.s;renderEdit();show('edit')};
+
+/* ---------- view / preview ---------- */
+let PV=null;
+async function openPrev(d,o){let dd=d;
+  if(d.kind==='id'){const t=askWm();if(t===null)return;dd=await wmDoc(d,t)}
+  PV={d:dd,o};clearUrls();const box=$('#pvBox');box.innerHTML='';$('#pvT').textContent=d.name;
+  if(o){dd.pages.slice(0,2).forEach((p,k)=>{const u=mkUrl(p.blob),pg=document.createElement('div');pg.className='a4';
+    pg.innerHTML=sheetPos(o,k).map(q=>`<img src="${u}" style="left:${q.x/2.1}%;top:${q.y/2.97}%;width:${85.6/2.1}%;height:${53.98/2.97}%">`+(k===0&&o.marks?ticks(q.x,q.y).map(t=>`<i style="left:${Math.min(t[0],t[2])/2.1}%;top:${Math.min(t[1],t[3])/2.97}%;width:${Math.max(.2,Math.abs(t[2]-t[0]))/2.1}%;height:${Math.max(.2,Math.abs(t[3]-t[1]))/2.97}%"></i>`).join(''):'')).join('');box.appendChild(pg)})}
+  else dd.pages.forEach(p=>{const im=document.createElement('img');im.src=mkUrl(p.blob);im.className='pvi';box.appendChild(im)});
+  show('prev')}
+async function pvPdf(share){const d=PV.d,o=PV.o;toast('Creating PDF...');
+  const f=new File([await makePDF(d.pages,o?{...d,sheet:o}:d)],safe(d.name)+(o?'-sheet':'')+'.pdf',{type:'application/pdf'});share?shareFiles([f],d.name):dl(f)}
+$('#pvBack').onclick=()=>openDoc(cur.id);
+$('#pvPrint').onclick=()=>PV.o?printSheet(PV.d,PV.o):printDoc(PV.d);
+$('#pvShare').onclick=()=>pvPdf(1);$('#pvDl').onclick=()=>pvPdf(0);
 
 /* ---------- Google Drive sync ---------- */
 let token=null,tokenExp=0,syncing=false;
@@ -624,7 +730,7 @@ async function sync(){
       if(ch)await dbPut('docs',d)}
     setStatus('Synced ✓ '+new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}));
     if(!$('#main').classList.contains('hidden'))renderHome();
-    else if(!$('#docv').classList.contains('hidden')&&cur)openDoc(cur.id);
+    else if(!$('#docv').classList.contains('hidden')&&cur)openDoc(cur.id,true);
   }catch(e){setStatus('Sync error: '+e.message);toast('Sync failed')}
   finally{syncing=false;$('#btnSync').textContent='Sync'}}
 function autoSync(){if(token&&Date.now()<tokenExp)sync()}
@@ -633,8 +739,8 @@ $('#btnLogin').onclick=async()=>{
   $('#loginErr').textContent='';
   try{await getToken();await renderHome();sync()}
   catch(e){$('#loginErr').textContent=e.message}};
-$('#btnOut').onclick=()=>{
-  if(!confirm('Log out? Scanned documents will stay on this phone.'))return;
+$('#btnOut').onclick=async()=>{
+  if(!await askConfirm('Log out?','Scanned documents will stay on this phone.','Log out',false))return;
   try{if(token&&window.google)google.accounts.oauth2.revoke(token,()=>{})}catch(e){}
   token=null;tokenExp=0;localStorage.removeItem('swSignedIn');localStorage.removeItem('swFolder');
   $('#loginErr').textContent='';setStatus('');show('login')};
