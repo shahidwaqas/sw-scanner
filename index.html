@@ -111,7 +111,7 @@ header button .ic,.ib .ic,.tools .ic,#nav .ic{margin:0}
 header{background:linear-gradient(180deg,#2547b8,#0a1a5c);color:#fff;border:0;border-radius:0 0 22px 22px;padding:calc(env(safe-area-inset-top) + 26px) 12px 16px}
 header h1{color:#fff}
 header button{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.3);color:#fff}
-.hlogo{background:#fff;padding:3px}
+.hlogo{border-radius:8px;box-shadow:0 0 0 1.5px rgba(255,255,255,.6)}
 .pri{background:linear-gradient(180deg,#1e3a9e,#0a1a5c);color:#fff}
 #nav button{color:#64748b}#nav .on{color:#0f172a;font-weight:700}#nav .on .ic{background:none}
 .rdb{background:#dc2626;color:#fff}
@@ -129,6 +129,12 @@ header button{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255
 .a4{position:relative;width:100%;aspect-ratio:210/297;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.2);margin-bottom:12px;overflow:hidden}
 .a4 img{position:absolute}.a4 i{position:absolute;background:#666}
 .pvi{display:block;width:100%;margin-bottom:12px;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.2)}
+
+#cropBox{position:relative}
+#loupe{position:absolute;top:8px;width:110px;height:110px;border:3px solid #ea580c;border-radius:50%;display:none;z-index:3;background:#fff;pointer-events:none}
+#rvPager{flex:1;min-height:0;display:flex;overflow-x:auto;scroll-snap-type:x mandatory;background:#f1f5f9;-webkit-overflow-scrolling:touch}
+#rvPager>div{flex:none;width:100%;height:100%;scroll-snap-align:center;display:flex;align-items:center;justify-content:center;padding:12px}
+#rvPager img{max-width:100%;max-height:100%;object-fit:contain;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.2);background:#fff}
 </style>
 </head>
 <body>
@@ -167,7 +173,7 @@ header button{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255
 
 <div id="crop" class="screen hidden">
   <header><button id="cCancel">✕</button><h1>Adjust corners</h1><button id="cNext">Done ✓</button></header>
-  <div class="stage" id="cropBox"><canvas id="cropCv"></canvas></div>
+  <div class="stage" id="cropBox"><canvas id="cropCv"></canvas><canvas id="loupe" width="110" height="110"></canvas></div>
   <div class="hint">Drag the four corners onto the document edges</div>
   <div class="bar"><button id="cAuto">Auto detect</button><button id="cFull">Full image</button></div>
 </div>
@@ -202,6 +208,7 @@ header button{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255
 <input type="file" id="inGal" accept="image/*" multiple hidden>
 <input type="file" id="inFile" accept="image/*" multiple hidden>
 <input type="file" id="inRes" accept=".json,application/json" hidden>
+<div id="rev" class="screen hidden"><header><button id="rvBack">✕</button><h1 id="rvT">Review</h1></header><div id="rvPager"></div><div class="hint" id="rvHint"></div><div class="tools"><button id="rvEdit" data-ic="adj">Edit</button><button id="rvDel" data-ic="trash">Remove</button><button id="rvCam" data-ic="cam">Camera</button><button id="rvGal" data-ic="img">Gallery</button><button id="rvFile" data-ic="folder">Files</button></div><div class="bar"><button id="rvSave" class="ok">Save</button></div></div>
 <div id="prev" class="screen hidden"><header><button id="pvBack">←</button><h1 id="pvT"></h1></header><div class="scroll" id="pvBox" style="background:#e2e8f0;padding-top:12px"></div><div class="bar"><button id="pvPrint" class="pri">Print</button><button id="pvShare">Share PDF</button><button id="pvDl">Download</button></div></div>
 <div id="bin" class="screen hidden"><header><button id="bBack">←</button><h1>Recycle bin</h1><button id="bEmpty">Empty</button></header><div class="scroll"><p class="hint" id="binHint"></p><div id="binList"></div></div></div>
 <div id="dlg" class="sheet hidden"><div><b id="dlgT"></b><p id="dlgM"></p><button id="dlgOk" class="rdb">Delete</button><button id="dlgNo">Cancel</button></div></div>
@@ -474,16 +481,22 @@ $('#dDel').onclick=()=>delDocs([cur]);
 /* ---------- scan flow ---------- */
 let ctx={mode:'new',docId:null,draft:[],queue:[],side:0};
 const ID_W=1280,ID_H=Math.round(1280*53.98/85.6);
-function begin(mode,docId,src){ctx={mode,docId,draft:[],queue:[],side:0};openSrc(src)}
+function begin(mode,docId,src){ctx={mode,docId,draft:[],queue:[],side:0,ri:0,replace:null};openSrc(src)}
 function openSrc(s){if(!s){$('#src').classList.remove('hidden');return}$({cam:'#inCam',gal:'#inGal',file:'#inFile'}[s]).click()}
 $('#src').onclick=e=>{const s=e.target.dataset.s;if(!s&&e.target.id!=='src')return;$('#src').classList.add('hidden');
-  if(s&&s!=='x')openSrc(s);else if(ctx.draft.length)saveDraft()};
+  if(s&&s!=='x')openSrc(s)};
 $('#dAdd').onclick=()=>begin('add',cur.id,'cam');$('#dAddG').onclick=()=>begin('add',cur.id,'gal');
 async function onFiles(e){
   let files=[...e.target.files];e.target.value='';if(!files.length)return;
-  if(ctx.mode==='id'||ctx.mode==='edit')files=files.slice(0,1);
-  if(ctx.retake){ctx.retake=false;ctx.queue=files.slice(1).concat(ctx.queue)}else ctx.queue=files.slice(1);
-  try{await startCrop(files[0])}catch(err){toast(err.message)}}
+  try{
+    if(ctx.mode==='edit'){await startCrop(files[0]);return}
+    if(ctx.replace!=null){const i=ctx.replace;ctx.replace=null;toast('Processing...');await new Promise(r=>setTimeout(r,30));ctx.draft[i]=await autoPage(files[0]);ctx.ri=i;openRev();return}
+    if(isIdCtx())files=files.slice(0,2-ctx.draft.length);
+    if(!files.length){toast('An ID card has only front and back');return}
+    const start=ctx.draft.length;
+    for(let k=0;k<files.length;k++){toast(`Processing ${k+1}/${files.length}...`);await new Promise(r=>setTimeout(r,30));ctx.draft.push(await autoPage(files[k]))}
+    ctx.ri=start;openRev()
+  }catch(err){toast(err.message)}}
 [['#inCam','cam'],['#inGal','gal'],['#inFile','file']].forEach(([s,k])=>$(s).onchange=e=>{ctx.last=k;onFiles(e)});
 
 function autoQuad(c){const sc=Math.min(1,320/Math.max(c.width,c.height)),w=Math.round(c.width*sc),h=Math.round(c.height*sc),t=document.createElement('canvas');t.width=w;t.height=h;
@@ -499,7 +512,7 @@ async function startCrop(file){
   const c=document.createElement('canvas');c.width=Math.round(img.naturalWidth*m);c.height=Math.round(img.naturalHeight*m);
   c.getContext('2d').drawImage(img,0,0,c.width,c.height);
   let q=null;try{q=autoQuad(c)}catch(e){}
-  S={src:c,q:q||defQuad(c.width,c.height),drag:-1,sc:1};
+  S={src:c,q:q||defQuad(c.width,c.height),drag:-1,sc:1};E={};
   await goEdit()}
 function layoutCrop(){
   const cv=$('#cropCv'),box=$('#cropBox'),aw=box.clientWidth-16,ah=box.clientHeight-16;
@@ -515,26 +528,26 @@ function drawCrop(){
 (()=>{
   const cv=$('#cropCv');
   const pt=e=>{const r=cv.getBoundingClientRect();return{x:(e.clientX-r.left)*cv.width/r.width/S.sc,y:(e.clientY-r.top)*cv.height/r.height/S.sc}};
-  cv.addEventListener('pointerdown',e=>{const p=pt(e);let best=-1,bd=60/S.sc;
+  cv.addEventListener('pointerdown',e=>{const p=pt(e);let best=-1,bd=80/S.sc;
     S.q.forEach((q,i)=>{const d=Math.hypot(q.x-p.x,q.y-p.y);if(d<bd){bd=d;best=i}});
-    S.drag=best;if(best>=0)cv.setPointerCapture(e.pointerId)});
-  cv.addEventListener('pointermove',e=>{if(S.drag<0)return;const p=pt(e);
-    S.q[S.drag]={x:Math.max(0,Math.min(S.src.width,p.x)),y:Math.max(0,Math.min(S.src.height,p.y))};drawCrop()});
-  const up=()=>{S.drag=-1};cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
+    S.drag=best;if(best>=0){cv.setPointerCapture(e.pointerId);loupe()}});
+  cv.addEventListener('pointermove',e=>{if(S.drag<0)return;const p=pt(e),nq=S.q.slice();
+    nq[S.drag]={x:Math.max(0,Math.min(S.src.width,p.x)),y:Math.max(0,Math.min(S.src.height,p.y))};if(isConvex(nq))S.q=nq;drawCrop();loupe()});
+  const up=()=>{S.drag=-1;$('#loupe').style.display='none'};cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
   window.addEventListener('resize',()=>{if(!$('#crop').classList.contains('hidden'))layoutCrop()});
 })();
 $('#cAuto').onclick=()=>{const q=autoQuad(S.src);if(q){S.q=q;drawCrop()}else toast('Could not find edges, drag the corners')};
 $('#cFull').onclick=()=>{S.q=defQuad(S.src.width,S.src.height,0);drawCrop()};
-$('#cCancel').onclick=async()=>{ctx.queue=[];if(ctx.mode==='edit'){await openDoc(ctx.docId);openPage(ctx.pi)}else ctx.draft.length?saveDraft():renderHome()};
-$('#eBack').onclick=$('#cCancel').onclick;
+$('#cCancel').onclick=()=>show('edit');
+$('#eBack').onclick=async()=>{ctx.queue=[];if(ctx.mode==='edit'){await openDoc(ctx.docId);openPage(ctx.pi)}else openRev()};
 $('#eCrop').onclick=()=>{show('crop');requestAnimationFrame(layoutCrop)};
 $('#cNext').onclick=()=>goEdit();
 function idOrient(q){const d=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);return d(q[0],q[1])>=d(q[1],q[2])?q:[q[1],q[2],q[3],q[0]]}
 function shrink(cv,m){const k=Math.min(1,m/Math.max(cv.width,cv.height)),c=document.createElement('canvas');c.width=Math.round(cv.width*k);c.height=Math.round(cv.height*k);c.getContext('2d').drawImage(cv,0,0,c.width,c.height);return c}
 function goEdit(){toast('Processing...');return new Promise(r=>setTimeout(()=>{
-  const base=isIdCtx()?warp(S.src,idOrient(S.q),ID_W,ID_H):warp(S.src,S.q);
-  E={base,small:shrink(base,900),o:{mode:'doc',b:0,c:0,s:0},pushed:false};
-  ['sB','sC','sS'].forEach(i=>$('#'+i).value=0);renderEdit();show('edit');r()},30))}
+  const q=normQuad(S.q),base=isIdCtx()?warp(S.src,idOrient(q),ID_W,ID_H):warp(S.src,q),keep=E&&E.keepO?E:null;
+  E={base,small:shrink(base,900),o:keep?keep.o:{mode:'doc',b:0,c:0,s:0},pushed:false,bi:keep?keep.bi:undefined,keepO:!!keep};
+  ['sB','sC','sS'].forEach((k,j)=>$('#'+k).value=[E.o.b,E.o.c,E.o.s][j]);renderEdit();show('edit');r()},30))}
 
 /* ---------- edit: filters & adjust ---------- */
 let E={};
@@ -566,7 +579,7 @@ let rq=0;
 function renderEdit(){
   if(!rq)rq=requestAnimationFrame(()=>{rq=0;const out=proc(E.small,E.o),cv=$('#editCv');cv.width=out.width;cv.height=out.height;cv.getContext('2d').drawImage(out,0,0)});
   document.querySelectorAll('#fBar button').forEach(b=>b.classList.toggle('on',b.dataset.m===E.o.mode));
-  const id=ctx.mode==='id';$('#eNext').classList.toggle('hidden',ctx.mode==='edit'||(id&&ctx.side===1));
+  const id=ctx.mode==='id';$('#eNext').classList.add('hidden');$('#eSave').textContent=ctx.mode==='edit'?'Save':'Done';
   $('#eNext').textContent=id?'Add back side':ctx.queue.length?'Next photo':'Add page'}
 $('#fBar').innerHTML=FILTERS.map(f=>`<button data-m="${f[0]}">${f[1]}</button>`).join('');
 document.querySelectorAll('#fBar button').forEach(b=>b.onclick=()=>{E.o.mode=b.dataset.m;renderEdit()});
@@ -582,13 +595,16 @@ $('#eNext').onclick=async()=>{await commit();
   if(ctx.mode==='id'){ctx.side=1;openSrc(null)}
   else if(ctx.queue.length)startCrop(ctx.queue.shift()).catch(e=>toast(e.message));
   else openSrc('cam')};
-$('#eSave').onclick=async()=>{await commit();ctx.queue=[];await saveDraft()};
+$('#eSave').onclick=async()=>{
+  if(ctx.mode==='edit'){await commit();ctx.queue=[];await saveDraft();return}
+  toast('Processing...');const p=ctx.draft[E.bi],b=await new Promise(r=>proc(E.base,E.o).toBlob(r,'image/jpeg',.88)),ob=await new Promise(r=>E.base.toBlob(r,'image/jpeg',.92));
+  p.blob=b;p.orig=ob;p.opts={...E.o};p.q=S.q;openRev()};
 async function saveDraft(){
   if(!ctx.draft.length){renderHome();return}
   let d;if(ctx.mode==='add'||ctx.mode==='edit')d=await dbGet('docs',ctx.docId);
   if(ctx.mode==='edit'&&d){const old=d.pages[ctx.pi];if(old&&old.driveId)await addTomb([old.driveId]);d.pages[ctx.pi]=ctx.draft[0];ctx.draft=[];await dbPut('docs',d);toast('Saved ✓');await openDoc(d.id);openPage(ctx.pi);autoSync();return}
   if(!d){const id=ctx.mode==='id';d={id:uid(),name:(id?'ID Card ':'Scan ')+fmt(new Date()),created:Date.now(),pages:[]};if(id){d.kind='id';d.idScale=100}}
-  d.pages.push(...ctx.draft);ctx.draft=[];
+  d.pages.push(...ctx.draft.map(p=>({id:p.id,blob:p.blob,orig:p.orig,opts:p.opts})));ctx.draft=[];
   await dbPut('docs',d);toast('Saved ✓');openDoc(d.id);autoSync();if(ctx.mode==='new')autoName(d.id,d.name)}
 
 /* ---------- recycle bin, dialogs, selection ---------- */
@@ -630,14 +646,54 @@ $('#bEmpty').onclick=async()=>{const ds=(await dbAll('docs')).filter(d=>d.delete
   if(!await askConfirm(`Delete ${ds.length} document${ds.length>1?'s':''} forever?`,"This can't be undone. The files will also be removed from Google Drive."))return;await purge(ds);autoSync();openBin()};
 
 /* ---------- retake / re-edit ---------- */
-$('#eRetake').onclick=()=>{ctx.retake=true;openSrc(ctx.last||null)};
+$('#eRetake').onclick=()=>{ctx.replace=ctx.mode==='edit'?null:E.bi;openSrc(ctx.last||null)};
 $('#vRetake').onclick=()=>{ctx={mode:'edit',docId:cur.id,pi:vi,draft:[],queue:[],side:0,isId:cur.kind==='id'};openSrc(null)};
 $('#vEdit').onclick=async()=>{const p=cur.pages[vi];toast('Opening...');
   const img=await loadImg(p.orig||p.blob),c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;c.getContext('2d').drawImage(img,0,0);
   ctx={mode:'edit',docId:cur.id,pi:vi,draft:[],queue:[],side:0,isId:cur.kind==='id'};
   S={src:c,q:defQuad(c.width,c.height,0),drag:-1,sc:1};
-  E={base:c,small:shrink(c,900),o:p.orig&&p.opts?{mode:'doc',b:0,c:0,s:0,...p.opts}:{mode:'color',b:0,c:0,s:0},pushed:false};
+  E={base:c,small:shrink(c,900),o:p.orig&&p.opts?{mode:'doc',b:0,c:0,s:0,...p.opts}:{mode:'color',b:0,c:0,s:0},pushed:false,keepO:true};
   $('#sB').value=E.o.b;$('#sC').value=E.o.c;$('#sS').value=E.o.s;renderEdit();show('edit')};
+
+/* ---------- batch review (swipe pages, add more) ---------- */
+const isConvex=q=>{let s=0;for(let i=0;i<4;i++){const a=q[i],b=q[(i+1)%4],c=q[(i+2)%4],z=(b.x-a.x)*(c.y-b.y)-(b.y-a.y)*(c.x-b.x);if(!z)return false;const g=z>0?1:-1;if(s&&g!==s)return false;s=g}return true};
+function normQuad(q){const a=q.slice().sort((m,n)=>m.y-n.y),t=a.slice(0,2).sort((m,n)=>m.x-n.x),b=a.slice(2).sort((m,n)=>m.x-n.x);return[t[0],t[1],b[1],b[0]]}
+function loupe(){const L=$('#loupe');if(S.drag<0){L.style.display='none';return}
+  const q=S.q[S.drag],x=L.getContext('2d'),r=45,left=q.x<S.src.width/2;
+  L.style.display='block';L.style.left=left?'auto':'8px';L.style.right=left?'8px':'auto';
+  x.clearRect(0,0,110,110);x.save();x.beginPath();x.arc(55,55,55,0,7);x.clip();x.fillStyle='#fff';x.fillRect(0,0,110,110);x.drawImage(S.src,q.x-r,q.y-r,2*r,2*r,0,0,110,110);
+  x.strokeStyle='#22d3ee';x.lineWidth=2;x.beginPath();S.q.forEach((p,i)=>{const px=(p.x-q.x+r)*55/r,py=(p.y-q.y+r)*55/r;i?x.lineTo(px,py):x.moveTo(px,py)});x.closePath();x.stroke();
+  x.strokeStyle='#ea580c';x.beginPath();x.moveTo(45,55);x.lineTo(65,55);x.moveTo(55,45);x.lineTo(55,65);x.stroke();x.restore()}
+async function srcCanvas(blob){const img=await loadImg(blob),m=Math.min(1,2400/Math.max(img.naturalWidth,img.naturalHeight)),c=document.createElement('canvas');
+  c.width=Math.round(img.naturalWidth*m);c.height=Math.round(img.naturalHeight*m);c.getContext('2d').drawImage(img,0,0,c.width,c.height);return c}
+async function autoPage(file){
+  const c=await srcCanvas(file);let q=null;try{q=autoQuad(c)}catch(e){}q=q||defQuad(c.width,c.height);
+  const nq=normQuad(q),base=isIdCtx()?warp(c,idOrient(nq),ID_W,ID_H):warp(c,nq),o={mode:'doc',b:0,c:0,s:0};
+  const [blob,orig]=await Promise.all([new Promise(r=>proc(base,o).toBlob(r,'image/jpeg',.88)),new Promise(r=>base.toBlob(r,'image/jpeg',.92))]);
+  return{id:uid(),blob,orig,opts:o,file,q}}
+function openRev(){clearUrls();const pg=$('#rvPager');pg.innerHTML='';ctx.replace=null;
+  ctx.draft.forEach(p=>{const d=document.createElement('div');d.innerHTML=`<img src="${mkUrl(p.blob)}">`;pg.appendChild(d)});
+  if(ctx.ri>=ctx.draft.length)ctx.ri=ctx.draft.length-1;if(ctx.ri<0)ctx.ri=0;
+  show('rev');updRev();requestAnimationFrame(()=>{pg.scrollLeft=ctx.ri*pg.clientWidth})}
+function updRev(){const n=ctx.draft.length,id=isIdCtx();
+  $('#rvT').textContent=n?(id?(ctx.ri?'Back':'Front'):'Page')+` · ${ctx.ri+1}/${n}`:'Review';
+  $('#rvSave').textContent=n>1?`Save (${n} pages)`:'Save';
+  $('#rvHint').textContent=id&&n<2?'Now add the back side with Camera, Gallery or Files.':'Swipe to see all pages. Tap Edit to change crop or filter.'}
+$('#rvPager').addEventListener('scroll',()=>{const pg=$('#rvPager'),i=Math.round(pg.scrollLeft/(pg.clientWidth||1));if(i!==ctx.ri&&i<ctx.draft.length){ctx.ri=i;updRev()}});
+async function editBatch(i){const p=ctx.draft[i];toast('Opening...');ctx.ri=i;
+  const base=await srcCanvas(p.orig),c=p.file?await srcCanvas(p.file):base;
+  S={src:c,q:p.file&&p.q?p.q:defQuad(c.width,c.height,0),drag:-1,sc:1};
+  E={base,small:shrink(base,900),o:{mode:'doc',b:0,c:0,s:0,...p.opts},pushed:false,bi:i,keepO:true};
+  ['sB','sC','sS'].forEach((k,j)=>$('#'+k).value=[E.o.b,E.o.c,E.o.s][j]);renderEdit();show('edit')}
+$('#rvEdit').onclick=()=>{if(ctx.draft.length)editBatch(ctx.ri)};
+$('#rvDel').onclick=async()=>{if(!ctx.draft.length)return;if(!await askConfirm('Remove this page?','It will be removed from this scan.','Remove'))return;
+  ctx.draft.splice(ctx.ri,1);if(ctx.draft.length)openRev();else ctx.mode==='add'?openDoc(ctx.docId):renderHome()};
+const rvAdd=k=>{if(isIdCtx()&&ctx.draft.length>=2)return toast('An ID card has only front and back');ctx.replace=null;ctx.last=k;openSrc(k)};
+$('#rvCam').onclick=()=>rvAdd('cam');$('#rvGal').onclick=()=>rvAdd('gal');$('#rvFile').onclick=()=>rvAdd('file');
+$('#rvSave').onclick=()=>{if(!ctx.draft.length)return toast('Add a page first');saveDraft()};
+$('#rvBack').onclick=async()=>{const n=ctx.draft.length;
+  if(n&&!await askConfirm('Discard scans?',`${n} page${n>1?'s are':' is'} not saved yet.`,'Discard'))return;
+  ctx.draft=[];ctx.mode==='add'?openDoc(ctx.docId):renderHome()};
 
 /* ---------- view / preview ---------- */
 let PV=null;
