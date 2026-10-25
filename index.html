@@ -285,6 +285,8 @@ button{border-radius:18px}.sb{border-radius:16px}
 .pr .bm2{top:0;height:40px;width:4px;left:6%;border-radius:2px;background:linear-gradient(transparent,#fb923c,transparent);box-shadow:0 0 14px 4px rgba(251,146,60,.7);opacity:0}
 .pl{position:absolute;top:0;transform:translateX(-50%);font:700 10px system-ui,sans-serif;letter-spacing:.6px;color:#bfdbfe;z-index:2;text-transform:uppercase}
 #login p{text-shadow:0 1px 8px rgba(6,15,56,.95),0 0 3px rgba(6,15,56,.9)!important;font-weight:600}
+#prepWho{position:absolute;top:calc(env(safe-area-inset-top,0px) + 24px);left:0;right:0;text-align:center;font-size:14px;font-weight:600;color:#12297d;padding:0 16px;word-break:break-all}
+#prep{background:radial-gradient(circle at 50% 40%,#fff 30%,#eef2f8 100%)!important}
 </style>
 </head>
 <body>
@@ -367,12 +369,12 @@ button{border-radius:18px}.sb{border-radius:16px}
 <div id="bin" class="screen hidden"><header><button id="bBack">←</button><h1>Recycle bin</h1><button id="bEmpty">Empty</button></header><div class="scroll"><p class="hint" id="binHint"></p><div id="binList"></div></div></div>
 <div id="dlg" class="sheet hidden"><div><b id="dlgT"></b><p id="dlgM"></p><button id="dlgOk" class="rdb">Delete</button><button id="dlgNo">Cancel</button></div></div>
 <div id="toast"></div>
-<div id="prep" class="hidden"><div class="ring"><svg viewBox="0 0 100 100"><defs><linearGradient id="rg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2547b8"/><stop offset="1" stop-color="#ea580c"/></linearGradient></defs><circle cx="50" cy="50" r="44" class="rt"/><circle cx="50" cy="50" r="44" class="rp" id="rp"/></svg><b id="rpct">0%</b></div><div id="prepMsg"></div></div>
+<div id="prep" class="hidden"><div id="prepWho"></div><div class="ring"><svg viewBox="0 0 100 100"><defs><linearGradient id="rg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2547b8"/><stop offset="1" stop-color="#ea580c"/></linearGradient></defs><circle cx="50" cy="50" r="44" class="rt"/><circle cx="50" cy="50" r="44" class="rp" id="rp"/></svg><b id="rpct">0%</b></div><div id="prepMsg"></div></div>
 
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script>
 const CLIENT_ID='682622042304-3iivfit3fccho5a7vpeu6jdj90kdkjl0.apps.googleusercontent.com';
-const SCOPE='https://www.googleapis.com/auth/drive.file';
+const SCOPE='https://www.googleapis.com/auth/drive.file openid email';
 const $=s=>document.querySelector(s);
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
 const fmt=d=>d.toLocaleDateString('en-GB')+' '+d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
@@ -881,7 +883,7 @@ async function getToken(){if(!(token&&Date.now()<tokenExp))await gsiReady();retu
   if(token&&Date.now()<tokenExp)return res(token);
   if(!window.google||!google.accounts)return rej(new Error('Google script failed to load. Check your internet connection'));
   const tc=google.accounts.oauth2.initTokenClient({client_id:CLIENT_ID,scope:SCOPE,
-    callback:r=>{if(r.error)return rej(new Error(r.error));token=r.access_token;tokenExp=Date.now()+(r.expires_in-60)*1000;localStorage.setItem('swSignedIn','1');res(token)},
+    callback:r=>{if(r.error)return rej(new Error(r.error));token=r.access_token;tokenExp=Date.now()+(r.expires_in-60)*1000;localStorage.setItem('swSignedIn','1');saveEmail();res(token)},
     error_callback:e=>rej(new Error('Login failed: '+(e.type||'cancel')))});
   tc.requestAccessToken({prompt:localStorage.getItem('swSignedIn')?'':'consent'})})}
 async function gfetch(url,opt={}){
@@ -966,7 +968,7 @@ $('#btnLogin').onclick=async()=>{
 $('#btnOut').onclick=async()=>{
   if(!await askConfirm('Log out?','Scanned documents will stay on this phone.','Log out',false))return;
   try{if(token&&window.google)google.accounts.oauth2.revoke(token,()=>{})}catch(e){}
-  token=null;tokenExp=0;localStorage.removeItem('swSignedIn');localStorage.removeItem('swFolder');localStorage.removeItem(PIN_KEY);sessionStorage.removeItem('swOk');pinUi();
+  token=null;tokenExp=0;localStorage.removeItem('swSignedIn');localStorage.removeItem('swFolder');localStorage.removeItem(PIN_KEY);localStorage.removeItem('swEmail');sessionStorage.removeItem('swOk');pinUi();
   $('#loginErr').textContent='';setStatus('');show('login')};
 
 /* ---------- PDF import + zoom ---------- */
@@ -1016,7 +1018,7 @@ async function gate(){
   if(localStorage.getItem('swSignedIn')&&hasPin()){pinShow();return}
   show('login');splashOut()}
 $('#auGo').onclick=async()=>{const P=$('#auP'),E=$('#auE');E.textContent='';
-  if(await hp('pin',P.value)===localStorage.getItem(PIN_KEY)){unlocked();pinTry=0;await renderHome();splashOut()}
+  if(await hp('pin',P.value)===localStorage.getItem(PIN_KEY)){unlocked();pinTry=0;const pp=prepPin();await renderHome();splashOut();await pp}
   else{P.value='';if(++pinTry>=5){$('#auF').onclick();return}E.textContent='Wrong PIN ('+pinTry+'/5)'}};
 $('#auP').addEventListener('keydown',e=>{if(e.key==='Enter')$('#auGo').click()});
 $('#auF').onclick=()=>{show('login');splashOut()};
@@ -1048,10 +1050,13 @@ $('#btnDiag').onclick=async()=>{const L=[],t=async(n,f)=>{try{L.push('OK  '+n+':
   alert(L.join('\n'))};
 
 /* ---------- login theme docs + sign-in preparing screen ---------- */
-let prepT,prepP=0,prepG=25;const PM=[[0,'Signing you in…'],[30,'Preparing your workspace…'],[60,'Syncing your documents…'],[90,'Almost ready…']];
-function prepSet(){const v=Math.round(prepP);$('#rp').style.strokeDashoffset=276.5*(1-prepP/100);$('#rpct').textContent=v+'%';let m=PM[0][1];for(const [t,x] of PM)if(v>=t)m=x;$('#prepMsg').textContent=m}
+let prepT,prepP=0,prepG=25;const PM=[[0,'Signing you in…'],[30,'Preparing your workspace…'],[60,'Syncing your documents…'],[90,'Almost ready…']],PM2=[[0,'Loading your files…'],[25,'Checking your documents…'],[55,'Syncing your data…'],[85,'Almost ready…']];let PMc=PM;
+function setWho(){const w=$('#prepWho');if(!w)return;const em=localStorage.getItem('swEmail');w.textContent=em?'Logged in as '+em:''}
+async function saveEmail(){if(localStorage.getItem('swEmail')||!token)return;try{const r=await fetch('https://www.googleapis.com/oauth2/v3/userinfo',{headers:{Authorization:'Bearer '+token}});if(!r.ok)return;const j=await r.json();if(j.email){localStorage.setItem('swEmail',j.email);setWho()}}catch(e){}}
+function prepPin(){PMc=PM2;setWho();const t0=Date.now(),D=5000;prepP=0;prepSet();$('#prep').classList.remove('hidden');clearInterval(prepT);return new Promise(res=>{prepT=setInterval(()=>{prepP=Math.min(100,(Date.now()-t0)/D*100);prepSet();if(prepP>=100){clearInterval(prepT);setTimeout(()=>{$('#prep').classList.add('hidden');res()},350)}},60)})}
+function prepSet(){const v=Math.round(prepP);$('#rp').style.strokeDashoffset=276.5*(1-prepP/100);$('#rpct').textContent=v+'%';let m=PMc[0][1];for(const [t,x] of PMc)if(v>=t)m=x;$('#prepMsg').textContent=m}
 function prepTo(g){prepG=Math.max(prepG,g)}
-function prepShow(){prepP=0;prepG=25;prepSet();$('#prep').classList.remove('hidden');clearInterval(prepT);prepT=setInterval(()=>{prepP+=(prepG-prepP)*.06+.05;if(prepP>prepG)prepP=prepG;if(prepG<95&&prepP>=prepG-1)prepG=Math.min(95,prepG+.3);prepSet()},80)}
+function prepShow(){PMc=PM;setWho();prepP=0;prepG=25;prepSet();$('#prep').classList.remove('hidden');clearInterval(prepT);prepT=setInterval(()=>{prepP+=(prepG-prepP)*.06+.05;if(prepP>prepG)prepP=prepG;if(prepG<95&&prepP>=prepG-1)prepG=Math.min(95,prepG+.3);prepSet()},80)}
 function prepHide(now){if(now){clearInterval(prepT);$('#prep').classList.add('hidden');return}prepG=100;const f=setInterval(()=>{prepP+=(100-prepP)*.3+.5;if(prepP>=100){prepP=100;prepSet();clearInterval(f);clearInterval(prepT);setTimeout(()=>$('#prep').classList.add('hidden'),350)}else prepSet()},40)}
 
 /* ---------- start ---------- */
