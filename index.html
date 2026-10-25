@@ -413,7 +413,7 @@ html[data-theme=dark] #nav{background:rgba(28,36,64,.38)!important;border:.5px s
 </div>
 
 <div id="main" class="screen">
-  <div class="hdw"><header class="hd2"><i class="hfl"></i><div class="hr1"><svg class="hic" viewBox="0 0 100 100" role="img" aria-label="SW Scanner"><rect width="100" height="100" rx="26" fill="#fff"/><text x="50" y="63" text-anchor="middle" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="46" font-weight="800" letter-spacing="-2"><tspan fill="#12297d">S</tspan><tspan fill="#f97316">W</tspan></text><rect x="22" y="75" width="56" height="5" rx="2.5" fill="#e2e8f0"/><rect x="22" y="75" width="26" height="5" rx="2.5" fill="#f97316"/></svg><div class="hbn"><span><b>SW</b> Scanner</span><small>DOCUMENTS SCANNER</small></div></div><div class="hr2"><div id="greet" class="greet"></div><div class="hact"><button id="btnSync" data-ic="sync" aria-label="Sync"></button><button id="btnTheme" aria-label="Change theme"></button><button id="btnLock" data-ic="power" aria-label="Lock and close app"></button></div></div></header></div>
+  <div class="hdw"><header class="hd2"><i class="hfl"></i><div class="hr1"><svg class="hic" viewBox="0 0 100 100" role="img" aria-label="SW Scanner"><rect width="100" height="100" rx="26" fill="#fff"/><text x="50" y="63" text-anchor="middle" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="46" font-weight="800" letter-spacing="-2"><tspan fill="#12297d">S</tspan><tspan fill="#f97316">W</tspan></text><rect x="22" y="75" width="56" height="5" rx="2.5" fill="#e2e8f0"/><rect x="22" y="75" width="26" height="5" rx="2.5" fill="#f97316"/></svg><div class="hbn"><span><b>SW</b> Scanner</span><small>DOCUMENTS SCANNER</small></div></div><div class="hr2"><div id="greet" class="greet"></div><div class="hact"><button id="btnSync" data-ic="sync" aria-label="Sync"></button><button id="btnTheme" aria-label="Change theme"></button><button id="btnLock" data-ic="power" aria-label="Log out"></button></div></div></header></div>
   <div id="status"></div>
   <div class="scroll tab" id="t-home"><div class="qa"><button class="pri" data-go="scan" data-ic="cam">Scan document</button><button data-go="id" data-ic="id">ID card</button></div><div class="row"><h3>Last 30 days</h3><button class="sb" data-sel>Select</button></div><div id="list"></div></div>
   <div class="scroll tab hidden" id="t-docs"><input id="q" class="inp" placeholder="Search documents"><div class="row"><h3>All documents</h3><button class="sb" data-sel>Select</button></div><div id="listAll"></div></div>
@@ -1131,7 +1131,8 @@ async function sync(manual){
   finally{syncing=false;$('#btnSync').classList.remove('busy');if(again){again=false;setTimeout(sync,800)}}}
 function autoSync(){if($('#splash')||!localStorage.getItem('swSignedIn'))return;sync()}
 $('#btnSync').onclick=()=>sync(true);
-$('#btnLock').onclick=async()=>{if(!await askConfirm('Close app?',hasPin()?'The app will lock. You will need your PIN to open it again.':'The app will lock and show the login screen.','Close',false))return;sessionStorage.removeItem('swOk');location.reload()};
+$('#btnLock').onclick=async()=>{try{if(window.FB)await FB.signOut()}catch(e){}
+  localStorage.removeItem('swSignedIn');localStorage.removeItem(PIN_KEY);sessionStorage.removeItem('swOk');location.reload()};
 $('#btnOut').onclick=async()=>{
   if(!await askConfirm('Log out?','Scanned documents will stay on this phone.','Log out',false))return;
   try{if(window.FB)await FB.signOut()}catch(e){}
