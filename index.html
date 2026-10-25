@@ -842,11 +842,24 @@ function proc(cv,o){
     let acc=0,hi=255;for(let v=0;v<256;v++){acc+=hist[v];if(acc>=n*.01){lo=v;break}}
     acc=0;for(let v=0;v<256;v++){acc+=hist[v];if(acc>=n*.85){hi=v;break}}
     if(hi-lo<30)hi=Math.min(255,lo+30);k=255/(hi-lo)}
+  let BG=null,gw=0,gh=0,bs=0;
+  if(m==='magic'){bs=Math.max(24,Math.round(Math.max(w,h)/28));gw=Math.ceil(w/bs);gh=Math.ceil(h/bs);BG=new Float32Array(gw*gh*3);
+    for(let by=0;by<gh;by++)for(let bx=0;bx<gw;bx++){const H=[new Uint16Array(256),new Uint16Array(256),new Uint16Array(256)];let cnt=0;
+      const y1=Math.min(h,(by+1)*bs),x1=Math.min(w,(bx+1)*bs);
+      for(let yy=by*bs;yy<y1;yy+=2)for(let xx=bx*bs;xx<x1;xx+=2){const p=(yy*w+xx)*4;H[0][d[p]]++;H[1][d[p+1]]++;H[2][d[p+2]]++;cnt++}
+      for(let ch=0;ch<3;ch++){let a=0,t=cnt*.75,v=0;for(;v<255;v++){a+=H[ch][v];if(a>=t)break}BG[(by*gw+bx)*3+ch]=Math.max(v,60)}}
+    /* smooth the background map */
+    const B2=new Float32Array(BG.length);for(let by=0;by<gh;by++)for(let bx=0;bx<gw;bx++)for(let ch=0;ch<3;ch++){let s=0,c=0;
+      for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const yy=by+dy,xx=bx+dx;if(yy<0||xx<0||yy>=gh||xx>=gw)continue;s+=BG[(yy*gw+xx)*3+ch];c++}B2[(by*gw+bx)*3+ch]=s/c}
+    BG=B2}
   const cf=o.c*2.55,f=(259*(cf+255))/(255*(259-cf)),bo=o.b*1.27,lut=new Uint8Array(256);
   for(let i=0;i<256;i++){const v=f*(i-128)+128+bo;lut[i]=v<0?0:v>255?255:v}
   const q=v=>v<0?0:v>255?255:v|0;
   for(let i=0;i<n;i++){const j=i*4;let r=d[j],g=d[j+1],b=d[j+2];
-    if(m==='magic'){r=(r-lo)*k;g=(g-lo)*k;b=(b-lo)*k}
+    if(m==='magic'){const px=i%w,py=(i/w)|0,fx=Math.min(gw-1,Math.max(0,px/bs-.5)),fy=Math.min(gh-1,Math.max(0,py/bs-.5)),x0=fx|0,y0=fy|0,x1=Math.min(gw-1,x0+1),y1=Math.min(gh-1,y0+1),ax=fx-x0,ay=fy-y0;
+      const bl=ch=>(BG[(y0*gw+x0)*3+ch]*(1-ax)+BG[(y0*gw+x1)*3+ch]*ax)*(1-ay)+(BG[(y1*gw+x0)*3+ch]*(1-ax)+BG[(y1*gw+x1)*3+ch]*ax)*ay;
+      r=r*255/bl(0)*1.09;g=g*255/bl(1)*1.09;b=b*255/bl(2)*1.09;
+      const y=r*.299+g*.587+b*.114;if(y>215){r=g=b=255}else if(y>170){const t=(y-170)/45;r+=(255-r)*t;g+=(255-g)*t;b+=(255-b)*t}}
     else if(m!=='color'){let y=r*.299+g*.587+b*.114;if(m!=='gray')y=(y-lo)*k;if(m==='hc')y=(y-128)*1.7+128;r=g=b=y}
     d[j]=lut[q(r)];d[j+1]=lut[q(g)];d[j+2]=lut[q(b)]}
   if(o.s>0){const a=o.s/100*1.2,src=new Uint8ClampedArray(d);
