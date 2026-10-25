@@ -206,6 +206,13 @@ button{border-radius:18px}.sb{border-radius:16px}
 @keyframes upb{0%,72%{opacity:0}76%,88%{opacity:1}100%{opacity:0}}
 #prep{position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;background:radial-gradient(circle at 50% 40%,rgba(255,255,255,.97) 30%,rgba(238,242,248,.95) 100%)}
 #prep .spin2{width:56px;height:56px;border-radius:50%;background:conic-gradient(#ef4444,#f97316,#eab308,#22c55e,#06b6d4,#3b82f6,#8b5cf6,#ef4444);-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 7px),#000 calc(100% - 6px));mask:radial-gradient(farthest-side,transparent calc(100% - 7px),#000 calc(100% - 6px));animation:rot .9s linear infinite}
+#prep .ring{position:relative;width:96px;height:96px}
+#prep .ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+#prep .ring circle{fill:none;stroke-width:8;stroke-linecap:round}
+#prep .rt{stroke:#e2e8f0}
+#prep .rp{stroke:url(#rg);stroke-dasharray:276.5;stroke-dashoffset:276.5}
+#prep .ring b{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:20px;color:#0a1a5c}
+#splash .spin,#splash .msg,#splash .bar2{display:none!important}
 #prepMsg{font-size:15px;font-weight:600;color:#475569}
 /* animated scanning-desk background for login (v2) */
 .bgfx{position:absolute;inset:0;overflow:hidden;z-index:0;pointer-events:none;--H:100vh}
@@ -240,6 +247,44 @@ button{border-radius:18px}.sb{border-radius:16px}
 #auth h2{color:#fff}#auE{color:#fecaca}#auF{color:#bfdbfe}
 #auth #auGo{background:linear-gradient(180deg,#fb923c,#ea580c);box-shadow:0 6px 16px rgba(234,88,12,.4)!important}
 @media (prefers-reduced-motion:reduce){.bgfx .dd,.bgfx .bm{display:none}}
+/* login scene v3: clutter -> scanned -> sorted piles */
+.pp{position:absolute;left:0;top:0;border-radius:6px;overflow:hidden;box-shadow:0 5px 14px rgba(0,0,0,.3);opacity:0;will-change:transform,opacity;z-index:1}
+.pp.scd{box-shadow:0 0 0 2px #fb923c,0 0 18px rgba(251,146,60,.85)}.pp.tidy{box-shadow:0 2px 6px rgba(0,0,0,.28)}
+.pp i{position:absolute;left:6px;top:8px;font:italic 700 14px 'Bradley Hand','Segoe Script','Comic Sans MS',cursive;color:#1e3a8a;transform:rotate(-5deg);white-space:nowrap}
+.pp.bill{background:linear-gradient(#2547b8 0 13px,#fff 13px)}
+.pp.bill::before{content:'';position:absolute;left:6px;top:22px;right:6px;bottom:16px;background:repeating-linear-gradient(#cbd5e1 0 2px,transparent 2px 8px)}
+.pp.bill::after{content:'';position:absolute;left:6px;bottom:5px;width:40%;height:6px;border-radius:2px;background:#ea580c}
+.pp.rcpt{background:#fff}.pp.rcpt::before{content:'';position:absolute;left:5px;right:5px;top:7px;bottom:9px;background:repeating-linear-gradient(#94a3b8 0 2px,transparent 2px 6px)}
+.pp.rcpt::after{content:'';position:absolute;left:0;right:0;bottom:0;height:5px;background:repeating-linear-gradient(135deg,#0000 0 3px,#e2e8f0 3px 6px)}
+.pp.id{background:linear-gradient(#12297d 0 11px,#fff 11px)}
+.pp.id::before{content:'';position:absolute;left:5px;top:17px;width:20px;height:25px;border-radius:3px;background:radial-gradient(circle at 50% 36%,#64748b 0 4px,transparent 5px),#cbd5e1}
+.pp.id::after{content:'';position:absolute;left:31px;right:6px;top:19px;height:3px;border-radius:2px;background:#cbd5e1;box-shadow:0 7px 0 #cbd5e1,0 14px 0 #e2e8f0}
+.pp.photo{background:#fff}.pp.photo::before{content:'';position:absolute;inset:4px 4px 14px;border-radius:3px;background:radial-gradient(circle at 70% 28%,#fbbf24 0 7px,transparent 8px),linear-gradient(165deg,transparent 56%,#16a34a 57%),linear-gradient(#7dd3fc,#e0f2fe)}
+.pp.note{background:repeating-linear-gradient(#fff9c4 0 11px,#e5d98c 11px 12px)}
+.pp.hand{background:repeating-linear-gradient(#fffef8 0 11px,#cfdcf5 11px 12px)}.pp.hand i{font-size:17px;top:12px}
+.pp.book{background:linear-gradient(90deg,#0a1a5c 0 8px,#2547b8 8px);box-shadow:inset -4px 0 0 #e2e8f0,0 5px 14px rgba(0,0,0,.3)}
+.pp.book::after{content:'';position:absolute;left:16px;right:9px;top:16px;height:7px;border-radius:2px;background:#f97316;box-shadow:0 12px 0 -1px #bfdbfe}
+.pr{position:absolute;left:50%;bottom:18px;width:300px;height:186px;transform-origin:50% 100%;z-index:3}
+.pr>*{position:absolute}
+.pr .bw{left:0;right:0;top:66px;bottom:0;border-radius:18px 18px 14px 14px;background:linear-gradient(#fbfcfe,#dde3ec);box-shadow:0 20px 34px rgba(0,0,0,.4),inset 0 2px 0 #fff}
+.pr .dk{left:6px;right:6px;top:32px;height:76px;border-radius:14px 14px 6px 6px;background:linear-gradient(#3b4048,#22252b);box-shadow:inset 0 2px 0 rgba(255,255,255,.14)}
+.pr .lid{left:2px;right:2px;top:0;height:40px;background:linear-gradient(#a4aab3,#666b74);clip-path:polygon(5% 0,95% 0,100% 100%,0 100%);border-radius:6px}
+.pr .lid::after{content:'';position:absolute;left:0;right:0;top:0;height:5px;background:rgba(255,255,255,.35)}
+.pr .lcd{left:46px;top:54px;width:64px;height:14px;border-radius:2px;background:#0e2a2c;box-shadow:0 0 0 2px #14171c}
+.pr .lcd::after{content:'';position:absolute;left:5px;right:12px;top:4px;height:2px;background:#5eead4;box-shadow:0 4px 0 #2dd4bf80}
+.pr .bt{top:60px;width:7px;height:7px;border-radius:50%;background:#9aa3b2}
+.pr .dial{left:186px;top:51px;width:28px;height:28px;border-radius:50%;background:radial-gradient(circle,#4a505a 0 8px,#2c3037 9px 11px,#565c66 12px);box-shadow:0 0 0 2px #14171c}
+.pr .pw{left:240px;top:56px;width:16px;height:16px;border-radius:50%;background:radial-gradient(circle,#2c3037 0 4px,#d4dae6 5px);box-shadow:0 0 0 2px #14171c}
+.pr .led{left:224px;top:60px;width:7px;height:7px;border-radius:50%;background:#22c55e;box-shadow:0 0 8px #22c55e;animation:led 1s ease-in-out infinite alternate}
+.pr.on .led{background:#f97316;box-shadow:0 0 10px #f97316}
+.pr .slot{left:24px;right:24px;top:100px;height:20px;border-radius:5px 5px 0 0;background:#1b1e23}
+.pr .sheet{left:62px;right:62px;top:96px;height:40px;background:#fff;clip-path:polygon(0 0,100% 0,96% 100%,4% 100%);background-image:linear-gradient(#0000 0 4px,#111 4px 9px,#0000 9px),linear-gradient(90deg,#334155 0 14px,#0000 14px 24px,#334155 24px 38px,#0000 38px 48px,#334155 48px 60px,#0000 60px);background-size:100% 14px,100% 10px;background-repeat:repeat-y,no-repeat;background-position:0 8px,0 28px}
+.pr .vent{left:262px;top:80px;width:26px;height:56px;border-radius:3px;background:repeating-linear-gradient(#c3cad8 0 2px,#0000 2px 6px)}
+.pr .tray{left:38px;right:38px;top:136px;height:48px;background:linear-gradient(#fff,#dfe5ee);clip-path:polygon(8% 0,92% 0,100% 100%,0 100%);box-shadow:0 8px 14px rgba(0,0,0,.3)}
+.pr .tp{left:58px;right:58px;top:144px;height:34px;background:#fff;clip-path:polygon(8% 0,92% 0,100% 100%,0 100%);opacity:.95}
+.pr .bm2{top:0;height:40px;width:4px;left:6%;border-radius:2px;background:linear-gradient(transparent,#fb923c,transparent);box-shadow:0 0 14px 4px rgba(251,146,60,.7);opacity:0}
+.pl{position:absolute;top:0;transform:translateX(-50%);font:700 10px system-ui,sans-serif;letter-spacing:.6px;color:#bfdbfe;z-index:2;text-transform:uppercase}
+#login p{text-shadow:0 1px 8px rgba(6,15,56,.95),0 0 3px rgba(6,15,56,.9)!important;font-weight:600}
 </style>
 </head>
 <body>
@@ -262,6 +307,7 @@ button{border-radius:18px}.sb{border-radius:16px}
   <div class="scroll tab hidden" id="t-tools"><h3>Tools</h3><button class="big" data-go="id" data-ic="id">ID Card Scan<small>CNIC / licence, prints at real card size</small></button><button class="big" data-go="tab-import" data-ic="imp">Import<small>Camera, Gallery or Files</small></button><button class="big" data-go="sync" data-ic="sync">Sync to Google Drive<small>Back up and sync your scans</small></button><button class="big" data-go="bin" data-ic="trash">Recycle bin<small id="binN">Restore deleted documents</small></button></div>
   <div class="scroll tab hidden" id="t-me"><div class="me"><div class="av" id="av">?</div><div id="meStat"></div></div>
     <input class="inp" id="pn" placeholder="Your name"><input class="inp" id="pe" placeholder="Email" type="email"><input class="inp" id="pp" placeholder="Phone" type="tel"><button class="pri" id="pEdit" style="width:100%;margin-bottom:10px"></button>
+    <button class="big" id="btnPin" data-ic="user">PIN login<small id="pinSm"></small></button>
     <button class="big" id="btnDiag" data-ic="sync">Sync check<small>Find out why sync is failing</small></button>
     <button class="big" id="btnBackup" data-ic="backup">Backup<small>Save all documents to a file</small></button>
     <button class="big" id="btnRestore" data-ic="restore">Restore<small>Load documents from a backup file</small></button>
@@ -321,7 +367,7 @@ button{border-radius:18px}.sb{border-radius:16px}
 <div id="bin" class="screen hidden"><header><button id="bBack">←</button><h1>Recycle bin</h1><button id="bEmpty">Empty</button></header><div class="scroll"><p class="hint" id="binHint"></p><div id="binList"></div></div></div>
 <div id="dlg" class="sheet hidden"><div><b id="dlgT"></b><p id="dlgM"></p><button id="dlgOk" class="rdb">Delete</button><button id="dlgNo">Cancel</button></div></div>
 <div id="toast"></div>
-<div id="prep" class="hidden"><div class="spin2"></div><div id="prepMsg"></div></div>
+<div id="prep" class="hidden"><div class="ring"><svg viewBox="0 0 100 100"><defs><linearGradient id="rg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2547b8"/><stop offset="1" stop-color="#ea580c"/></linearGradient></defs><circle cx="50" cy="50" r="44" class="rt"/><circle cx="50" cy="50" r="44" class="rp" id="rp"/></svg><b id="rpct">0%</b></div><div id="prepMsg"></div></div>
 
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script>
@@ -915,12 +961,12 @@ function autoSync(){if($('#splash')||!localStorage.getItem('swSignedIn'))return;
 $('#btnSync').onclick=sync;
 $('#btnLogin').onclick=async()=>{
   $('#loginErr').textContent='';
-  prepShow();try{await getToken();await renderHome();await sync();prepHide()}
+  prepShow();try{await getToken();unlocked();prepTo(50);await renderHome();prepTo(70);await sync();prepHide()}
   catch(e){prepHide(1);$('#loginErr').textContent=e.message}};
 $('#btnOut').onclick=async()=>{
   if(!await askConfirm('Log out?','Scanned documents will stay on this phone.','Log out',false))return;
   try{if(token&&window.google)google.accounts.oauth2.revoke(token,()=>{})}catch(e){}
-  token=null;tokenExp=0;localStorage.removeItem('swSignedIn');localStorage.removeItem('swFolder');
+  token=null;tokenExp=0;localStorage.removeItem('swSignedIn');localStorage.removeItem('swFolder');localStorage.removeItem(PIN_KEY);sessionStorage.removeItem('swOk');pinUi();
   $('#loginErr').textContent='';setStatus('');show('login')};
 
 /* ---------- PDF import + zoom ---------- */
@@ -957,22 +1003,31 @@ $('#camSnap').onclick=()=>{const v=$('#camVid');if(!v.videoWidth)return;const c=
   c.toBlob(b=>{ctx.last='cam';onFiles({target:{files:[b],value:''}})},'image/jpeg',.95)};
 
 /* ---------- app login (username + password), preview zoom ---------- */
-const AUTH_KEY='swAuth';
+const PIN_KEY='swPin';let pinTry=0;
 async function hp(u,p){const h=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('sw|'+u.toLowerCase()+'|'+p));return[...new Uint8Array(h)].map(x=>x.toString(16).padStart(2,'0')).join('')}
-const getAuth=()=>JSON.parse(localStorage.getItem(AUTH_KEY)||'null');
-function authShow(){const a=getAuth(),mk=!a;['.spin','.msg','.bar2'].forEach(c=>{const e=document.querySelector('#splash '+c);if(e)e.style.display='none'});
-  $('#auth').style.display='flex';$('#splash').classList.add('au');$('#auT').textContent=mk?'Create your login':'Welcome back';$('#auP2').style.display=mk?'':'none';
-  $('#auGo').textContent=mk?'Create & continue':'Login';$('#auF').style.display=mk?'none':'';$('#auU').value=a?a.u:'';$('#auP').value='';$('#auP2').value='';$('#auE').textContent='';$(a?'#auP':'#auU').focus()}
-function authDone(){const sp=$('#splash');sp.classList.add('out');setTimeout(()=>{sp.remove();autoSync()},600)}
-$('#auGo').onclick=async()=>{const u=$('#auU').value.trim(),p=$('#auP').value,a=getAuth(),E=$('#auE');E.textContent='';
-  if(!u||!p){E.textContent='Enter username and password';return}
-  try{if(!a){if(p.length<4){E.textContent='Password must be at least 4 characters';return}if(p!==$('#auP2').value){E.textContent='Passwords do not match';return}
-      localStorage.setItem(AUTH_KEY,JSON.stringify({u:u.toLowerCase(),h:await hp(u,p)}))}
-    else if(a.u!==u.toLowerCase()||a.h!==await hp(u,p)){E.textContent='Wrong username or password';return}
-    authDone()}catch(e){E.textContent='Login error: '+(e.message||e)}};
-['auU','auP','auP2'].forEach(i=>$('#'+i).addEventListener('keydown',e=>{if(e.key==='Enter')$('#auGo').click()}));
-$('#auF').onclick=async()=>{if(!confirm('Google sign-in will be asked to confirm it is you, then you can set a new username and password. Your scans stay safe. Continue?'))return;
-  try{await getToken();localStorage.removeItem(AUTH_KEY);authShow()}catch(e){$('#auE').textContent='Google confirmation failed: '+(e.message||e)}};
+const hasPin=()=>!!localStorage.getItem(PIN_KEY);
+const unlocked=()=>sessionStorage.setItem('swOk','1');
+function splashOut(){const sp=$('#splash');if(!sp)return;sp.classList.add('out');setTimeout(()=>{sp.remove();autoSync()},600)}
+function pinShow(){['.spin','.msg','.bar2'].forEach(c=>{const e=document.querySelector('#splash '+c);if(e)e.style.display='none'});
+  $('#auth').style.display='flex';$('#splash').classList.add('au');$('#auT').textContent='Enter your PIN';$('#auU').style.display='none';$('#auP2').style.display='none';
+  const P=$('#auP');P.placeholder='PIN';P.setAttribute('inputmode','numeric');P.maxLength=6;P.value='';$('#auE').textContent='';$('#auGo').textContent='Unlock';$('#auF').textContent='Forgot PIN? Use Google login';$('#auF').style.display='';P.focus()}
+async function gate(){
+  if(sessionStorage.getItem('swOk')){splashOut();return}
+  if(localStorage.getItem('swSignedIn')&&hasPin()){pinShow();return}
+  show('login');splashOut()}
+$('#auGo').onclick=async()=>{const P=$('#auP'),E=$('#auE');E.textContent='';
+  if(await hp('pin',P.value)===localStorage.getItem(PIN_KEY)){unlocked();pinTry=0;await renderHome();splashOut()}
+  else{P.value='';if(++pinTry>=5){$('#auF').onclick();return}E.textContent='Wrong PIN ('+pinTry+'/5)'}};
+$('#auP').addEventListener('keydown',e=>{if(e.key==='Enter')$('#auGo').click()});
+$('#auF').onclick=()=>{show('login');splashOut()};
+function pinUi(){$('#pinSm').textContent=hasPin()?'PIN is on. Tap to change or remove':'Use a short PIN instead of Google login every time'}
+$('#btnPin').onclick=async()=>{
+  if(hasPin()&&await askConfirm('PIN login','Remove the PIN? You will need Google login each time. (Cancel to change it instead)','Remove')){localStorage.removeItem(PIN_KEY);pinUi();toast('PIN removed');return}
+  const a=prompt('New PIN (4 to 6 digits)');if(a===null)return;
+  if(!/^\d{4,6}$/.test(a)){toast('PIN must be 4 to 6 digits');return}
+  if(prompt('Confirm PIN')!==a){toast('PINs do not match');return}
+  localStorage.setItem(PIN_KEY,await hp('pin',a));pinUi();toast('PIN set ✓')};
+pinUi();
 let PZ=1;
 function pvZoom(z){PZ=Math.max(1,Math.min(5,z));const b=$('#pvBox');b.querySelectorAll('.a4,.pvi').forEach(e=>e.style.width=(PZ*100)+'%')}
 $('#zIn').onclick=()=>pvZoom(PZ*1.4);$('#zOut').onclick=()=>pvZoom(PZ/1.4);$('#zFit').onclick=()=>pvZoom(1);
@@ -992,37 +1047,58 @@ $('#btnDiag').onclick=async()=>{const L=[],t=async(n,f)=>{try{L.push('OK  '+n+':
   await t('Drive access',async()=>(await gfetch(API+'?pageSize=1&fields=files(id)')).status);
   alert(L.join('\n'))};
 
-/* ---------- login background animation ---------- */
-(()=>{const fx=$('#login .fx'),ic=['<path d="M15 3H8a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V8z"/><path d="M15 3v5h5M9 13h6M9 17h6"/>','<path d="M7 18a4 4 0 0 1-.5-7.97A5.5 5.5 0 0 1 17 8.5 4.5 4.5 0 0 1 17 18"/><path d="M12 12v8M9 15l3-3 3 3"/>','<path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/><path d="M4 12h16"/>','<rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="9" cy="12" r="2"/><path d="M14 10h5M14 14h4"/>'];
-  for(let i=0;i<8;i++){const sp=document.createElement('span'),sz=28+Math.random()*30;
-    sp.style.cssText=`left:${Math.random()*92}%;width:${sz}px;height:${sz}px;animation-duration:${8+Math.random()*9}s;animation-delay:-${Math.random()*14}s;--dx:${(Math.random()*80-40)|0}px;--r:${(Math.random()*40-20)|0}deg;--o:${(.18+Math.random()*.25).toFixed(2)};color:${i%4===1?'#fdba74':'#fff'}`;
-    sp.innerHTML=`<svg viewBox="0 0 24 24">${ic[i%4]}</svg>`;fx.appendChild(sp)}
-  makeDocs(fx)})();
-
 /* ---------- login theme docs + sign-in preparing screen ---------- */
-function makeDocs(fx){const W=innerWidth,H=innerHeight,cw=Math.min(78,W/5),words=['Notes','Bill','CNIC','Fee','Rent','Deed','Slip','ID'],rnd=(a,b)=>a+Math.random()*(b-a);
-  words.forEach((w,i)=>{const col=i%4,row=i>>2,d=document.createElement('div');d.className='dc';
-    d.style.cssText=`--sx:${(rnd(-.42,.42)*W)|0}px;--sy:${(rnd(-.42,.42)*H)|0}px;--sr:${rnd(-30,30)|0}deg;--gx:${((col-1.5)*cw*1.12)|0}px;--gy:${((row?0.37:-0.37)*H)|0}px;animation-delay:${(i*.12).toFixed(2)}s`;
-    d.innerHTML=`<i class="hw" style="transform:rotate(${rnd(-14,14)|0}deg) skewX(${rnd(-14,14)|0}deg)">${w}</i><b class="pr">${w.toUpperCase()}</b><u></u><u></u><s class="sl"></s><em class="up">↑</em>`;fx.appendChild(d)})}
-let prepT,prepS=0;const PM=['Signing you in…','Preparing your workspace…','Syncing your documents…','Almost ready…'];
-function prepShow(){prepS=Date.now();let i=0;$('#prepMsg').textContent=PM[0];$('#prep').classList.remove('hidden');clearInterval(prepT);prepT=setInterval(()=>{$('#prepMsg').textContent=PM[Math.min(++i,PM.length-1)]},1100)}
-function prepHide(now){setTimeout(()=>{clearInterval(prepT);$('#prep').classList.add('hidden')},now?0:Math.max(0,2800-(Date.now()-prepS)))}
+let prepT,prepP=0,prepG=25;const PM=[[0,'Signing you in…'],[30,'Preparing your workspace…'],[60,'Syncing your documents…'],[90,'Almost ready…']];
+function prepSet(){const v=Math.round(prepP);$('#rp').style.strokeDashoffset=276.5*(1-prepP/100);$('#rpct').textContent=v+'%';let m=PM[0][1];for(const [t,x] of PM)if(v>=t)m=x;$('#prepMsg').textContent=m}
+function prepTo(g){prepG=Math.max(prepG,g)}
+function prepShow(){prepP=0;prepG=25;prepSet();$('#prep').classList.remove('hidden');clearInterval(prepT);prepT=setInterval(()=>{prepP+=(prepG-prepP)*.06+.05;if(prepP>prepG)prepP=prepG;if(prepG<95&&prepP>=prepG-1)prepG=Math.min(95,prepG+.3);prepSet()},80)}
+function prepHide(now){if(now){clearInterval(prepT);$('#prep').classList.add('hidden');return}prepG=100;const f=setInterval(()=>{prepP+=(100-prepP)*.3+.5;if(prepP>=100){prepP=100;prepSet();clearInterval(f);clearInterval(prepT);setTimeout(()=>$('#prep').classList.add('hidden'),350)}else prepSet()},40)}
 
 /* ---------- start ---------- */
 (async()=>{
   const SM=['Loading your data…','Loading your files…','Checking your documents…','Preparing your workspace…','Almost ready…'];let smi=0;
   const smT=setInterval(()=>{const m=$('#splMsg');if(!m)return clearInterval(smT);m.style.opacity=0;setTimeout(()=>{m.textContent=SM[Math.min(++smi,SM.length-1)];m.style.opacity=1},200)},1000);
-  setTimeout(()=>{clearInterval(smT);authShow()},5000);
+  setTimeout(()=>{clearInterval(smT);gate()},2000);
   await openDB();
   if(localStorage.getItem('swSignedIn')){await renderHome()}else show('login');
   if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
   if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();
 })();
-/* ---------- animated login background ---------- */
-(()=>{const sp=document.getElementById('splash');if(!sp)return;const f=document.createElement('div');f.className='bgfx';f.setAttribute('aria-hidden','true');
-const D=[['note','Notes'],['photo',''],['id',''],['book',''],['rcp',''],['cert','Deed'],['note','Bill'],['id',''],['photo',''],['book','']],SX=['-34vw','30vw','-24vw','36vw','-10vw','16vw','-38vw','24vw','-18vw','8vw'],SY=['5vh','9vh','26vh','32vh','1vh','58vh','44vh','50vh','14vh','20vh'],SR=['-18deg','12deg','-9deg','16deg','-22deg','8deg','14deg','-14deg','20deg','-8deg'];
-f.innerHTML=D.map((d,i)=>`<div class="dd ${d[0]}" style="--i:${i};--sx:${SX[i]};--sy:${SY[i]};--sr:${SR[i]}">${d[1]?'<i>'+d[1]+'</i>':''}</div>`).join('')+'<div class="sc"><b class="bm"></b><b class="bd"></b><b class="ld"></b></div>';
-sp.insertBefore(f,sp.firstChild)})();
+/* ---------- login scene: clutter -> scanned -> sorted piles ---------- */
+(()=>{const fx=document.querySelector('#login .fx');if(!fx)return;
+const R=(a,b)=>a+Math.random()*(b-a),sleep=ms=>new Promise(r=>setTimeout(r,ms)),T=t=>`translate(${t.x}px,${t.y}px) rotate(${t.r}deg) scale(${t.s})`;
+const KINDS=[['bill',0,54,70],['rcpt',0,40,74],['id',0,74,48],['photo',0,56,64],['note',1,56,68],['hand',1,56,68],['book',1,58,74]];
+const WORDS={note:['To do','Ideas','Plan','Shop'],hand:['Hello','Rent','Cash','Fee','Notes']};
+fx.innerHTML='<div class="pr"><div class="bw"></div><div class="vent"></div><div class="slot"></div><div class="sheet"></div><div class="dk"></div><div class="lid"></div><div class="lcd"></div><div class="bt" style="left:122px"></div><div class="bt" style="left:136px"></div><div class="bt" style="left:150px"></div><div class="dial"></div><div class="led"></div><div class="pw"></div><div class="bm2"></div><div class="tray"></div><div class="tp"></div></div><div class="pl">Papers</div><div class="pl">Notes</div>';
+const pr=fx.querySelector('.pr'),PL=fx.querySelectorAll('.pl');
+const shown=()=>fx.offsetWidth>0&&fx.offsetHeight>0&&!document.hidden;
+function geo(){const W=fx.clientWidth,H=fx.clientHeight,pw=Math.min(W*.66,280),k=pw/300,side=(W-pw)/2;return{W,H,k,cx:W/2,ty:H-18-186*k,sc:Math.max(.4,Math.min(.62,(side-10)/58)),px:[side/2,W-side/2]}}
+function layout(){const g=geo();pr.style.transform=`translateX(-50%) scale(${g.k})`;PL.forEach((l,i)=>{l.style.left=g.px[i]+'px';l.style.top=(g.H-34)+'px'})}
+addEventListener('resize',layout);
+let items=[],cnt=[0,0];
+function spawn(){fx.querySelectorAll('.pp').forEach(e=>e.remove());items=[];cnt=[0,0];layout();const g=geo(),n=Math.max(22,Math.min(40,Math.round(g.W*g.H/9000))),yMax=Math.max(90,g.ty-24);
+  for(let i=0;i<n;i++){const [k,side,w,h]=KINDS[(Math.random()*KINDS.length)|0],el=document.createElement('div');el.className='pp '+k;el.style.width=w+'px';el.style.height=h+'px';el.style.left=(-w/2)+'px';el.style.top=(-h/2)+'px';
+    if(WORDS[k])el.innerHTML='<i>'+WORDS[k][(Math.random()*WORDS[k].length)|0]+'</i>';
+    el._t={x:R(w/2,g.W-w/2),y:R(h/2+6,yMax),r:R(-40,40),s:1};el._side=side;el._h=h;el.style.transform=T(el._t);el.style.zIndex=1;fx.appendChild(el);items.push(el);
+    setTimeout(()=>{el.style.transition='opacity .5s';el.style.opacity=.96},i*45)}}
+async function go(el,to,ms,ease){const a=el.animate([{transform:T(el._t)},{transform:T(to)}],{duration:ms,easing:ease||'ease-in-out',fill:'forwards'});await a.finished.catch(()=>{});el._t=to;el.style.transform=T(to);a.cancel()}
+function beam(){const b=pr.querySelector('.bm2');b.animate([{left:'6%',opacity:0},{opacity:1,offset:.12},{opacity:1,offset:.88},{left:'92%',opacity:0}],{duration:800,easing:'linear'});pr.classList.add('on');setTimeout(()=>pr.classList.remove('on'),850)}
+async function file(el){const g=geo(),lx=g.cx,ly=g.ty+22*g.k;el.style.transition='none';el.style.zIndex=20;
+  await go(el,{x:lx,y:ly-46*g.k-12,r:R(-4,4),s:.8},900,'cubic-bezier(.3,.1,.3,1)');
+  await go(el,{x:lx,y:ly,r:0,s:.62},260,'ease-in');
+  beam();el.classList.add('scd');await sleep(820);
+  el.style.transition='opacity .22s';el.style.opacity=0;await sleep(240);
+  el.classList.remove('scd');el.classList.add('tidy');el._t={x:g.cx,y:g.ty+158*g.k,r:0,s:.5};el.style.transform=T(el._t);el.style.opacity=1;await sleep(230);
+  const side=el._side,n=cnt[side]++,py=g.H-38-(el._h*g.sc)/2-Math.min(n,12)*2.2;
+  await go(el,{x:g.px[side]+R(-1.5,1.5),y:py,r:R(-1.5,1.5),s:g.sc},800,'cubic-bezier(.3,.7,.3,1)');el.style.zIndex=2+Math.min(n,12)}
+(async()=>{for(;;){
+  while(!shown())await sleep(400);
+  spawn();await sleep(1500);
+  const order=items.slice().sort(()=>Math.random()-.5),fl=[];
+  for(const el of order){while(!shown())await sleep(400);fl.push(file(el));await sleep(1050)}
+  await Promise.all(fl);await sleep(2200);
+  fx.querySelectorAll('.pp').forEach(e=>{e.style.transition='opacity .8s';e.style.opacity=0});await sleep(900)}})();
+})();
 </script>
 </body>
 </html>
