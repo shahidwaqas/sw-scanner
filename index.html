@@ -3,6 +3,7 @@
 <head>
 <meta charset="utf-8">
 <script>try{var m=localStorage.getItem("swTheme")||"auto";document.documentElement.dataset.theme=(m==="dark"||(m==="auto"&&matchMedia("(prefers-color-scheme: dark)").matches))?"dark":"light"}catch(e){}</script>
+<style>html,body{background:#f5f8fd!important}html[data-theme=dark],html[data-theme=dark] body{background:#0b1020!important}</style>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <title>SW Scanner</title>
 <link rel="manifest" href="manifest.json">
@@ -367,6 +368,11 @@ header.hd2{display:block!important;position:relative;padding:calc(env(safe-area-
 @keyframes pls{to{opacity:.3}}
 #prepHi{font:800 26px/1.2 system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;color:#0a1a5c;text-align:center;padding:0 20px}
 html[data-theme=dark] #prepHi{color:#e5e9f5}
+/* round back button, bottom-left */
+.bk{width:52px;height:52px;padding:0!important;border-radius:50%!important;display:grid;place-items:center;flex:none!important;min-width:0!important;background:linear-gradient(160deg,#2f55c9,#173098)!important;color:#fff!important;box-shadow:0 6px 16px rgba(10,26,92,.3)!important}
+.bk .ic{width:24px;height:24px;margin:0}
+.bkf{position:fixed;left:14px;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);z-index:14}
+#docv .fab{padding-left:80px}
 </style>
 </head>
 <body>
@@ -381,7 +387,7 @@ html[data-theme=dark] #prepHi{color:#e5e9f5}
 </div>
 
 <div id="main" class="screen">
-  <div class="hdw"><header class="hd2"><i class="hfl"></i><div class="hr1"><svg class="hic" viewBox="0 0 100 100" role="img" aria-label="SW Scanner"><rect width="100" height="100" rx="26" fill="#fff"/><text x="50" y="63" text-anchor="middle" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="46" font-weight="800" letter-spacing="-2"><tspan fill="#12297d">S</tspan><tspan fill="#f97316">W</tspan></text><rect x="22" y="75" width="56" height="5" rx="2.5" fill="#e2e8f0"/><rect x="22" y="75" width="26" height="5" rx="2.5" fill="#f97316"/></svg><div class="hbn"><span><b>SW</b> Scanner</span><small>DOCUMENTS SCANNER</small></div></div><div class="hr2"><div id="greet" class="greet"></div><div class="hact"><button id="btnSync" data-ic="sync" aria-label="Sync"></button><button id="btnTheme" aria-label="Change theme"></button><button id="btnOutH" data-ic="out" aria-label="Log out"></button><button id="btnLock" data-ic="power" aria-label="Lock and close app"></button></div></div></header></div>
+  <div class="hdw"><header class="hd2"><i class="hfl"></i><div class="hr1"><svg class="hic" viewBox="0 0 100 100" role="img" aria-label="SW Scanner"><rect width="100" height="100" rx="26" fill="#fff"/><text x="50" y="63" text-anchor="middle" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="46" font-weight="800" letter-spacing="-2"><tspan fill="#12297d">S</tspan><tspan fill="#f97316">W</tspan></text><rect x="22" y="75" width="56" height="5" rx="2.5" fill="#e2e8f0"/><rect x="22" y="75" width="26" height="5" rx="2.5" fill="#f97316"/></svg><div class="hbn"><span><b>SW</b> Scanner</span><small>DOCUMENTS SCANNER</small></div></div><div class="hr2"><div id="greet" class="greet"></div><div class="hact"><button id="btnSync" data-ic="sync" aria-label="Sync"></button><button id="btnTheme" aria-label="Change theme"></button><button id="btnLock" data-ic="power" aria-label="Lock and close app"></button></div></div></header></div>
   <div id="status"></div>
   <div class="scroll tab" id="t-home"><div class="qa"><button class="pri" data-go="scan" data-ic="cam">Scan document</button><button data-go="id" data-ic="id">ID card</button></div><div class="row"><h3>Last 30 days</h3><button class="sb" data-sel>Select</button></div><div id="list"></div></div>
   <div class="scroll tab hidden" id="t-docs"><input id="q" class="inp" placeholder="Search documents"><div class="row"><h3>All documents</h3><button class="sb" data-sel>Select</button></div><div id="listAll"></div></div>
@@ -400,10 +406,11 @@ html[data-theme=dark] #prepHi{color:#e5e9f5}
 </div>
 
 <div id="docv" class="screen hidden">
-  <header><button id="dBack">←</button><h1 id="dTitle"></h1><button id="dShare">Share</button><button id="dDel" data-ic="trash" aria-label="Delete"></button></header>
+  <header><h1 id="dTitle"></h1><button id="dShare">Share</button><button id="dDel" data-ic="trash" aria-label="Delete"></button></header>
   <div class="scroll"><div class="row"><p class="hint" style="flex:1;text-align:left">Tap the title to rename. Tap a page to open it.</p><button id="dSel" class="sb">Select</button></div>
     <div id="idBox" class="idbox hidden"><b>Print size</b><button id="idM">−</button><span id="idV">100%</span><button id="idP">+</button><button id="idR">Actual size</button><button id="idView" class="pri" style="flex:1 0 100%">View A4 copies sheet</button><button id="idSet" style="flex:1 0 100%">Sheet settings (copies, gap, flip)</button></div>
     <div class="grid" id="dGrid"></div></div>
+  <button id="dBack" class="bk bkf" data-ic="back" aria-label="Back"></button>
   <div class="fab" id="dFab"><button class="pri" id="dAdd" data-ic="cam">Add photo</button></div>
   <div id="pgBar" class="selbar hidden"><button id="pgCancel">Cancel</button><button id="pgAll">Select all</button><button class="rdb" id="pgDel">Delete (0)</button></div>
 </div>
@@ -425,9 +432,9 @@ html[data-theme=dark] #prepHi{color:#e5e9f5}
 </div>
 
 <div id="viewer" class="screen hidden">
-  <header><button id="vBack">←</button><h1 id="vTitle"></h1><button id="vShare">Share</button><button id="vDel" data-ic="trash" aria-label="Delete"></button></header>
+  <header><h1 id="vTitle"></h1><button id="vShare">Share</button><button id="vDel" data-ic="trash" aria-label="Delete"></button></header>
   <div class="stage"><img id="viewImg"></div>
-  <div class="bar"><button id="vEdit" data-ic="adj">Edit</button><button id="vRetake" data-ic="retake">Retake</button></div>
+  <div class="bar"><button id="vBack" class="bk" data-ic="back" aria-label="Back"></button><button id="vEdit" data-ic="adj">Edit</button><button id="vRetake" data-ic="retake">Retake</button></div>
 </div>
 
 <div id="src" class="sheet hidden"><div><b>Choose source</b><button data-s="cam" class="pri">Camera</button><button data-s="gal">Gallery</button><button data-s="file">Files</button><button data-s="x">Cancel</button></div></div>
@@ -441,6 +448,7 @@ html[data-theme=dark] #prepHi{color:#e5e9f5}
 <label class="row">Cut marks<input type="checkbox" id="shM"></label>
 <button data-s="prev" class="pri">Preview</button><button data-s="spdf">Share PDF</button><button data-s="sprint" class="ok">Print</button><button data-s="x">Cancel</button></div></div>
 <div id="pk" class="sheet hidden"><div><b id="pkT">Share</b><div class="seg"><button data-f="img" class="on">Image</button><button data-f="pdf">PDF</button></div><div class="pgs" id="pkG"></div><button id="pkAll">Select all</button><button class="pri" id="pkGo">Send</button><button data-s="x">Cancel</button></div></div>
+<div id="aps" class="sheet hidden"><div><b>Apply this filter to</b><div class="seg" id="apSeg"><button data-k="one" class="on">This page</button><button data-k="all">All pages</button><button data-k="sel">Selected</button></div><div class="pgs hidden" id="apG"></div><button class="pri" id="apGo">Apply</button><button data-s="x">Cancel</button></div></div>
 <input type="file" id="inCam" accept="image/*" capture="environment" hidden>
 <input type="file" id="inGal" accept="image/*" multiple hidden>
 <input type="file" id="inFile" accept="image/*,application/pdf,.pdf" multiple hidden>
@@ -601,7 +609,7 @@ async function wmBlob(b,t){const im=await loadImg(b),c=document.createElement('c
   return new Promise(r=>c.toBlob(r,'image/jpeg',.9))}
 async function wmDoc(d,t){if(!t)return d;return{...d,pages:await Promise.all(d.pages.map(async p=>({...p,blob:await wmBlob(p.blob,t)})))}}
 
-const ICO={sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',moon:'<path d="M21 13a9 9 0 1 1-10-10 7 7 0 0 0 10 10z"/>',power:'<path d="M12 3v9"/><path d="M6.4 6.4a8 8 0 1 0 11.2 0"/>',home:'<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/>',docs:'<path d="M15 3H8a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V8z"/><path d="M15 3v5h5M4 7v13a2 2 0 0 0 2 2h9"/>',imp:'<path d="M12 3v12M7 10l5 5 5-5M4 19h16"/>',tools:'<rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/>',user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',cam:'<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',img:'<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="M21 16l-5-5-9 9"/>',folder:'<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',id:'<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2"/><path d="M6 16c.5-2 5.5-2 6 0M14 10h4M14 14h4"/>',share:'<circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.2 10.8l7.6-3.6M8.2 13.2l7.6 3.6"/>',edit:'<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/>',trash:'<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',rot:'<path d="M20 12a8 8 0 1 1-2.5-5.8"/><path d="M20 4v5h-5"/>',crop:'<path d="M7 3v14h14"/><path d="M3 7h14v14"/>',sync:'<path d="M7 18a4 4 0 0 1-.5-8A6 6 0 0 1 18 9a4.5 4.5 0 0 1 0 9z"/>',backup:'<path d="M12 4v11M7 11l5 5 5-5M5 20h14"/>',restore:'<path d="M12 16V5M7 9l5-5 5 5M5 20h14"/>',out:'<path d="M9 4H5v16h4M16 8l4 4-4 4M20 12H9"/>',filt:'<circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 0 0 16z"/>',adj:'<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>',retake:'<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><path d="M14.5 12.5a2.7 2.7 0 1 0-.6 2.2"/><path d="M14.8 10.6v2h-2"/>'};
+const ICO={back:'<path d="M19 12H5M11 6l-6 6 6 6"/>',sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',moon:'<path d="M21 13a9 9 0 1 1-10-10 7 7 0 0 0 10 10z"/>',power:'<path d="M12 3v9"/><path d="M6.4 6.4a8 8 0 1 0 11.2 0"/>',home:'<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/>',docs:'<path d="M15 3H8a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V8z"/><path d="M15 3v5h5M4 7v13a2 2 0 0 0 2 2h9"/>',imp:'<path d="M12 3v12M7 10l5 5 5-5M4 19h16"/>',tools:'<rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/>',user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',cam:'<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',img:'<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="M21 16l-5-5-9 9"/>',folder:'<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',id:'<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2"/><path d="M6 16c.5-2 5.5-2 6 0M14 10h4M14 14h4"/>',share:'<circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.2 10.8l7.6-3.6M8.2 13.2l7.6 3.6"/>',edit:'<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/>',trash:'<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',rot:'<path d="M20 12a8 8 0 1 1-2.5-5.8"/><path d="M20 4v5h-5"/>',crop:'<path d="M7 3v14h14"/><path d="M3 7h14v14"/>',sync:'<path d="M7 18a4 4 0 0 1-.5-8A6 6 0 0 1 18 9a4.5 4.5 0 0 1 0 9z"/>',backup:'<path d="M12 4v11M7 11l5 5 5-5M5 20h14"/>',restore:'<path d="M12 16V5M7 9l5-5 5 5M5 20h14"/>',out:'<path d="M9 4H5v16h4M16 8l4 4-4 4M20 12H9"/>',filt:'<circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 0 0 16z"/>',adj:'<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>',retake:'<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><path d="M14.5 12.5a2.7 2.7 0 1 0-.6 2.2"/><path d="M14.8 10.6v2h-2"/>'};
 const ico=n=>`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${ICO[n]||''}</svg>`;
 document.querySelectorAll('[data-ic]').forEach(e=>e.insertAdjacentHTML('afterbegin',ico(e.dataset.ic)));
 async function renameDoc(d){const n=prompt('New name',d.name);if(!n||!n.trim())return;d.name=n.trim();d.nameDirty=true;await dbPut('docs',d);await renderHome();autoSync()}
@@ -654,7 +662,7 @@ async function renderHome(){
 $('#q').oninput=renderHome;
 document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
 document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(!g)return;const v=g.dataset.go;
-  if(v==='tab-import')showTab('import');else if(v==='id')begin('id',null,null);else if(v==='sync')sync();else if(v==='bin')openBin();else begin('new',null,v==='scan'?null:v)});
+  if(v==='tab-import')showTab('import');else if(v==='id')begin('id',null,null);else if(v==='sync')sync(true);else if(v==='bin')openBin();else begin('new',null,v==='scan'?null:v)});
 const prof=()=>JSON.parse(localStorage.getItem('swProfile')||'{}');
 async function renderMe(){const p=prof(),docs=(await dbAll('docs')).filter(d=>!d.deleted);
   $('#pn').value=p.n||'';$('#pe').value=p.e||'';$('#pp').value=p.p||'';$('#av').textContent=(p.n||'?')[0].toUpperCase();
@@ -687,7 +695,7 @@ async function openDoc(id,keep){
   clearUrls();$('#dTitle').textContent=cur.name;const idd=cur.kind==='id';if(idd)pSel=null;
   $('#idBox').classList.toggle('hidden',!idd);$('#dFab').classList.toggle('hidden',idd||!!pSel);$('#dSel').classList.toggle('hidden',idd||!!pSel);$('#pgBar').classList.toggle('hidden',!pSel);
   if(pSel)$('#pgDel').textContent=`Delete (${pSel.size})`;
-  $('#idV').textContent=(cur.idScale||100)+'%';
+  $('#idV').textContent=(cur.idScale||100)+'%';$('#dBack').classList.toggle('hidden',!!pSel);
   const g=$('#dGrid');g.innerHTML='';
   cur.pages.forEach((p,i)=>{const w=document.createElement('div'),on=pSel&&pSel.has(i);
     w.innerHTML=(pSel?`<input type="checkbox" class="ck" ${on?'checked':''}>`:'')+`<img src="${mkUrl(p.blob)}"><span>${idd?(i?'Back':'Front'):i+1}</span>`;
@@ -819,6 +827,23 @@ function proc(cv,o){
       for(let ch=0;ch<3;ch++){const v=src[p+ch];d[p+ch]=v+a*(4*v-src[p-4+ch]-src[p+4+ch]-src[p-w*4+ch]-src[p+w*4+ch])}}}
   if(m==='bw')for(let i=0;i<n;i++){const v=d[i*4]>160?255:0;d[i*4]=d[i*4+1]=d[i*4+2]=v}
   x.putImageData(im,0,0);return c}
+const optsChanged=(p,o)=>{const a=p&&p.opts?{mode:'doc',b:0,c:0,s:0,...p.opts}:{mode:'color',b:0,c:0,s:0};return a.mode!==o.mode||a.b!==o.b||a.c!==o.c||a.s!==o.s};
+async function applyOpts(blob,o){const c=await srcCanvas(blob);return new Promise(r=>proc(c,o).toBlob(r,'image/jpeg',.88))}
+async function applyDocPages(id,idx,o){const d=await dbGet('docs',id);if(!d)return;let n=0;
+  for(const i of idx){const p=d.pages[i];if(!p)continue;toast(`Applying ${++n}/${idx.size}...`);await new Promise(r=>setTimeout(r,20));
+    const src=p.orig||p.blob,nb=await applyOpts(src,o);if(p.driveId)await addTomb([p.driveId]);d.pages[i]={id:uid(),blob:nb,orig:src,opts:{...o}}}
+  await dbPut('docs',d)}
+function askScope(blobs,curI){return new Promise(res=>{
+  const sh=$('#aps'),g=$('#apG');let k='one';const sel=new Set(),us=[];g.innerHTML='';
+  blobs.forEach((b,i)=>{const u=URL.createObjectURL(b);us.push(u);const l=document.createElement('label');l.className='th';
+    l.innerHTML=`<img src="${u}"><input type="checkbox"${i===curI?' checked disabled':''}>`;
+    if(i!==curI)l.querySelector('input').onchange=e=>{e.target.checked?sel.add(i):sel.delete(i)};g.appendChild(l)});
+  const upd=()=>{document.querySelectorAll('#apSeg button').forEach(b=>b.classList.toggle('on',b.dataset.k===k));g.classList.toggle('hidden',k!=='sel')};
+  const done=v=>{sh.classList.add('hidden');us.forEach(u=>URL.revokeObjectURL(u));sh.onclick=null;res(v)};
+  document.querySelectorAll('#apSeg button').forEach(b=>b.onclick=()=>{k=b.dataset.k;upd()});
+  $('#apGo').onclick=()=>done(k==='one'?new Set():k==='all'?new Set(blobs.map((_,i)=>i).filter(i=>i!==curI)):sel);
+  sh.onclick=e=>{if(e.target.id==='aps'||e.target.dataset.s==='x')done(null)};
+  upd();sh.classList.remove('hidden')})}
 const rotC=(cv,deg)=>{const c=document.createElement('canvas'),q=deg===90;c.width=q?cv.height:cv.width;c.height=q?cv.width:cv.height;const x=c.getContext('2d');
   if(q){x.translate(c.width,0);x.rotate(Math.PI/2)}else{x.translate(c.width,c.height);x.rotate(Math.PI)}x.drawImage(cv,0,0);return c};
 let rq=0;
@@ -844,9 +869,15 @@ $('#eNext').onclick=async()=>{await commit();
   else if(ctx.queue.length)startCrop(ctx.queue.shift()).catch(e=>toast(e.message));
   else openSrc('cam')};
 $('#eSave').onclick=async()=>{
-  if(ctx.mode==='edit'){await commit();ctx.queue=[];await saveDraft();return}
-  toast('Processing...');const p=ctx.draft[E.bi],b=await new Promise(r=>proc(E.base,E.o).toBlob(r,'image/jpeg',.88)),ob=await new Promise(r=>E.base.toBlob(r,'image/jpeg',.92));
-  p.blob=b;p.orig=ob;p.opts={...E.o};p.q=S.q;openRev()};
+  if(ctx.mode==='edit'){let ex=new Set();const d0=await dbGet('docs',ctx.docId);
+    if(d0&&d0.pages.length>1&&optsChanged(d0.pages[ctx.pi],E.o)){ex=await askScope(d0.pages.map(q=>q.blob),ctx.pi);if(!ex)return}
+    await commit();ctx.queue=[];if(ex.size)await applyDocPages(ctx.docId,ex,E.o);await saveDraft();return}
+  const p=ctx.draft[E.bi];let ex=new Set();
+  if(ctx.draft.length>1&&optsChanged(p,E.o)){ex=await askScope(ctx.draft.map(q=>q.blob),E.bi);if(!ex)return}
+  toast('Processing...');const b=await new Promise(r=>proc(E.base,E.o).toBlob(r,'image/jpeg',.88)),ob=await new Promise(r=>E.base.toBlob(r,'image/jpeg',.92));
+  p.blob=b;p.orig=ob;p.opts={...E.o};p.q=S.q;
+  let n=0;for(const i of ex){const q=ctx.draft[i];if(!q)continue;toast(`Applying ${++n}/${ex.size}...`);await new Promise(r=>setTimeout(r,20));q.blob=await applyOpts(q.orig||q.blob,E.o);q.opts={...E.o}}
+  openRev()};
 async function saveDraft(){
   if(!ctx.draft.length){renderHome();return}
   let d;if(ctx.mode==='add'||ctx.mode==='edit')d=await dbGet('docs',ctx.docId);
@@ -960,17 +991,18 @@ $('#pvShare').onclick=()=>pvPdf(1);$('#pvDl').onclick=()=>pvPdf(0);
 
 /* ---------- Google Drive sync ---------- */
 let token=null,tokenExp=0,syncing=false,again=false;
+try{const t=JSON.parse(localStorage.getItem('swTok')||'null');if(t&&t.t&&Date.now()<t.e){token=t.t;tokenExp=t.e}}catch(e){}
 async function getToken(){if(!(token&&Date.now()<tokenExp))await gsiReady();return new Promise((res,rej)=>{
   if(token&&Date.now()<tokenExp)return res(token);
   if(!window.google||!google.accounts)return rej(new Error('Google script failed to load. Check your internet connection'));
-  const tc=google.accounts.oauth2.initTokenClient({client_id:CLIENT_ID,scope:SCOPE,
-    callback:r=>{if(r.error)return rej(new Error(r.error));token=r.access_token;tokenExp=Date.now()+(r.expires_in-60)*1000;localStorage.setItem('swSignedIn','1');saveEmail();res(token)},
+  const tc=google.accounts.oauth2.initTokenClient({client_id:CLIENT_ID,scope:SCOPE,hint:localStorage.getItem('swEmail')||undefined,
+    callback:r=>{if(r.error)return rej(new Error(r.error));token=r.access_token;tokenExp=Date.now()+(r.expires_in-60)*1000;try{localStorage.setItem('swTok',JSON.stringify({t:token,e:tokenExp}))}catch(e){}localStorage.setItem('swSignedIn','1');saveEmail();res(token)},
     error_callback:e=>rej(new Error('Login failed: '+(e.type||'cancel')))});
   tc.requestAccessToken({prompt:localStorage.getItem('swSignedIn')?'':'consent'})})}
 async function gfetch(url,opt={}){
   const t=await getToken();
   let r;for(let i=0;;i++){try{r=await fetch(url,{...opt,headers:{...(opt.headers||{}),Authorization:'Bearer '+t}});break}catch(e){if(i>=2){const u=new URL(url);throw new Error('Network error reaching '+u.hostname+u.pathname.slice(0,40)+' ('+(e.message||e)+')')}await new Promise(k=>setTimeout(k,1200*(i+1)))}}
-  if(!r.ok){if(r.status===401)token=null;throw new Error('Drive '+r.status+': '+(await r.text()).slice(0,160))}
+  if(!r.ok){if(r.status===401){token=null;localStorage.removeItem('swTok')}throw new Error('Drive '+r.status+': '+(await r.text()).slice(0,160))}
   return r}
 const API='https://www.googleapis.com/drive/v3/files';
 async function folderId(){
@@ -995,8 +1027,10 @@ async function upload(fid,d,p,idx){
   return j.id}
 const JSONH={'Content-Type':'application/json'};
 function setStatus(s,err){const e=$('#status');e.textContent=s;e.classList.toggle('err',!!err)}
-async function sync(){
-  if(syncing){again=true;return}syncing=true;$('#btnSync').classList.add('busy');
+async function sync(manual){
+  if(syncing){again=true;return}
+  if(manual!==true&&!(token&&Date.now()<tokenExp)){setStatus('Tap the sync button to connect Google Drive');return}
+  syncing=true;$('#btnSync').classList.add('busy');
   try{
     await getToken();setStatus('Syncing...');
     const fid=await folderId();
@@ -1006,10 +1040,12 @@ async function sync(){
     const remote=await listRemote(fid),rIds=new Set(remote.map(f=>f.id));
     let docs=await dbAll('docs');
     const synced=docs.flatMap(d=>d.pages).filter(p=>p.driveId),gone=synced.filter(p=>!rIds.has(p.driveId));
-    if(gone.length&&gone.length>=Math.max(3,synced.length*.5)){for(const d of docs){let c=0;d.pages.forEach(p=>{if(p.driveId&&!rIds.has(p.driveId)){delete p.driveId;c++}});if(c)await dbPut('docs',d)}}
-    else for(const d of docs){
-      const n=d.pages.length;d.pages=d.pages.filter(p=>!p.driveId||rIds.has(p.driveId));
-      if(d.pages.length!==n){d.pages.length?await dbPut('docs',d):await dbDel('docs',d.id)}}
+    if(gone.length){
+      const mass=gone.length>=Math.max(3,synced.length*.5);let del=false;
+      if(!mass)del=await askConfirm('Deleted on another device',`${gone.length} page${gone.length>1?'s were':' was'} deleted from Google Drive (another phone). Delete here too? Cancel keeps a copy here.`,'Delete here');
+      if(del){for(const d of docs){const n=d.pages.length;d.pages=d.pages.filter(p=>!p.driveId||rIds.has(p.driveId));
+        if(d.pages.length!==n){d.pages.length?await dbPut('docs',d):await dbDel('docs',d.id)}}}
+      else{for(const d of docs){let c=0;d.pages.forEach(p=>{if(p.driveId&&!rIds.has(p.driveId)){delete p.driveId;c++}});if(c)await dbPut('docs',d)}}}
     docs=(await dbAll('docs'));
     const byDoc={},byPage={};
     docs.forEach(d=>{byDoc[d.id]=d;d.pages.forEach(p=>byPage[p.id]=p)});
@@ -1041,7 +1077,7 @@ async function sync(){
     setStatus('⚠ Sync failed: '+f+(f===m?'':' ('+m.slice(0,160)+')'),1);toast('Sync failed: '+f)}
   finally{syncing=false;$('#btnSync').classList.remove('busy');if(again){again=false;setTimeout(sync,800)}}}
 function autoSync(){if($('#splash')||!localStorage.getItem('swSignedIn'))return;sync()}
-$('#btnSync').onclick=sync;
+$('#btnSync').onclick=()=>sync(true);
 $('#btnLock').onclick=async()=>{if(!await askConfirm('Close app?',hasPin()?'The app will lock. You will need your PIN to open it again.':'The app will lock and show the login screen.','Close',false))return;sessionStorage.removeItem('swOk');location.reload()};
 $('#btnLogin').onclick=async()=>{
   $('#loginErr').textContent='';
@@ -1050,7 +1086,7 @@ $('#btnLogin').onclick=async()=>{
 $('#btnOut').onclick=async()=>{
   if(!await askConfirm('Log out?','Scanned documents will stay on this phone.','Log out',false))return;
   try{if(token&&window.google)google.accounts.oauth2.revoke(token,()=>{})}catch(e){}
-  token=null;tokenExp=0;localStorage.removeItem('swSignedIn');localStorage.removeItem('swFolder');localStorage.removeItem(PIN_KEY);localStorage.removeItem('swEmail');sessionStorage.removeItem('swOk');pinUi();
+  token=null;tokenExp=0;localStorage.removeItem('swTok');localStorage.removeItem('swSignedIn');localStorage.removeItem('swFolder');localStorage.removeItem(PIN_KEY);localStorage.removeItem('swEmail');sessionStorage.removeItem('swOk');pinUi();
   $('#loginErr').textContent='';setStatus('');show('login')};
 
 /* ---------- PDF import + zoom ---------- */
@@ -1077,7 +1113,7 @@ function zr(){Z.s=1;Z.x=Z.y=0;Z.p.clear();zap()}
 window.addEventListener('online',autoSync);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)autoSync()});
 setInterval(()=>{if(!document.hidden&&token&&Date.now()<tokenExp)sync()},180000);
-$('#status').onclick=()=>{if($('#status').classList.contains('err'))sync()};
+$('#status').onclick=()=>{sync(true)};
 function stopCam(){const v=$('#camVid');if(v.srcObject){v.srcObject.getTracks().forEach(t=>t.stop());v.srcObject=null}}
 const camBack=()=>ctx.draft.length?openRev():(ctx.mode==='add'||ctx.mode==='edit')?openDoc(ctx.docId):renderHome();
 async function openCam(){try{const st=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:4096},height:{ideal:2160}},audio:false});$('#camVid').srcObject=st;show('camv')}
@@ -1157,7 +1193,6 @@ function setHi(back){const n=firstName();$('#prepHi').textContent=(back?'Welcome
 function updGreet(){const h=new Date().getHours(),g=h>=5&&h<12?'Morning':h>=12&&h<17?'Afternoon':h>=17&&h<21?'Evening':'Night',n=firstName(),e=$('#greet');if(e)e.textContent='Good '+g+(n?', '+n:'')+'!'}
 setInterval(updGreet,60000);document.addEventListener('visibilitychange',updGreet);
 $('#btnTheme').onclick=()=>{localStorage.setItem(THK,document.documentElement.dataset.theme==='dark'?'light':'dark');applyTheme()};
-$('#btnOutH').onclick=()=>$('#btnOut').click();
 /* ---------- start ---------- */
 (async()=>{
   const SM=['Loading your data…','Loading your files…','Checking your documents…','Preparing your workspace…','Almost ready…'];let smi=0;
