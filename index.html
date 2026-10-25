@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<script>try{var m=localStorage.getItem("swTheme")||"auto";document.documentElement.dataset.theme=(m==="dark"||(m==="auto"&&matchMedia("(prefers-color-scheme: dark)").matches))?"dark":"light"}catch(e){}</script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <title>SW Scanner</title>
 <link rel="manifest" href="manifest.json">
@@ -295,11 +296,65 @@ button{border-radius:18px}.sb{border-radius:16px}
 #nav .ic{width:24px!important;height:24px!important;padding:0!important;margin:0!important;background:none!important;border-radius:0!important}
 #nav .on{background:rgba(10,26,92,.09)!important;color:#0f172a!important}
 #main .scroll{padding-bottom:110px}
+
+header #btnSync,header #btnLock{padding:10px 12px!important}
+header{gap:8px!important}
+/* v4 login card: blue folded page */
+#auth{background:none!important;box-shadow:none!important;padding:0!important;border-radius:0!important;filter:drop-shadow(0 18px 26px rgba(4,10,40,.55))}
+#auth .ac{position:relative;display:flex;flex-direction:column;gap:10px;padding:26px 22px 20px;border-radius:30px;background:linear-gradient(160deg,#2f55c9,#173098 78%);box-shadow:inset 0 0 0 1px rgba(255,255,255,.18),inset 0 1px 0 rgba(255,255,255,.3);-webkit-mask:linear-gradient(225deg,transparent 0 42px,#000 46px);mask:linear-gradient(225deg,transparent 0 42px,#000 46px)}
+#auth .fl{position:absolute;top:0;right:0;width:62px;height:62px;border-bottom-left-radius:20px;background:linear-gradient(45deg,#b9c9f0 0,#eef3ff 48%,transparent 50%);filter:drop-shadow(-3px 3px 4px rgba(4,10,40,.35));pointer-events:none}
+#auth .aic{width:92px;height:92px;margin:0 auto;display:block;border-radius:24px;box-shadow:0 8px 18px rgba(4,10,40,.35),0 0 0 1px rgba(255,255,255,.5)}
+#auth .abn{text-align:center;font:800 30px/1.1 system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;color:#cfdcff;letter-spacing:-.5px}
+#auth .abn b{color:#fff}
+#auth .atg{text-align:center;font:600 11px/1 ui-monospace,Menlo,Consolas,monospace;letter-spacing:3.5px;color:#fb923c;margin-bottom:4px}
+#auWho{text-align:center;font-size:12.5px;color:#bfd0ff;word-break:break-all;padding:6px 10px;border-radius:12px;background:rgba(255,255,255,.1)}
+#auWho:empty{display:none}
+#auth h2{font-size:16px!important;margin:0!important}
+/* login scene can live inside the splash (PIN screen) */
+#splash>.fx{position:absolute!important;inset:0;z-index:1!important}
+#splash.au{background:radial-gradient(circle at 50% 36%,#2a4fd0 0,#173098 32%,#0a1a5c 68%,#060f38 100%)!important}
+#splash.au::after{display:none}
+/* dark theme */
+html[data-theme=dark]{color-scheme:dark;--bg:#0b1020}
+html[data-theme=dark],html[data-theme=dark] body{background:#0b1020;color:#e5e9f5}
+html[data-theme=dark] .screen{background:#0b1020}
+:where(html[data-theme=dark]) button{background:#1c2440;color:#e5e9f5}
+html[data-theme=dark] .sb,html[data-theme=dark] .chips button{background:#1c2440;color:#e5e9f5}
+html[data-theme=dark] .chips button.on,html[data-theme=dark] .bar button.on{background:#ea580c;color:#fff}
+html[data-theme=dark] h3{color:#cbd5ff}
+html[data-theme=dark] .hint,html[data-theme=dark] .empty,html[data-theme=dark] .adj,html[data-theme=dark] #status{color:#94a3b8}
+html[data-theme=dark] #status.err{background:#3a1519;color:#fca5a5}
+html[data-theme=dark] .card,html[data-theme=dark] .big,html[data-theme=dark] .idbox,html[data-theme=dark] .grid div,html[data-theme=dark] .th{background:#151c33}
+html[data-theme=dark] .card.sel{background:#2a1d14}
+html[data-theme=dark] .big small,html[data-theme=dark] .card small{color:#94a3b8}
+html[data-theme=dark] .ib,html[data-theme=dark] .tools button{color:#cbd5e1}
+html[data-theme=dark] .tools button.on{color:#fb923c}
+html[data-theme=dark] .inp,html[data-theme=dark] .row input[type=number],html[data-theme=dark] .row select{background:#151c33!important;color:#e5e9f5;border-color:#2a3454!important}
+html[data-theme=dark] .inp[readonly]{background:#10172b!important;border-color:transparent!important}
+html[data-theme=dark] #nav{background:rgba(21,28,51,.72)!important;border-color:rgba(255,255,255,.12)!important;box-shadow:0 8px 24px rgba(0,0,0,.45)!important}
+html[data-theme=dark] #nav button{color:#94a3b8}
+html[data-theme=dark] #nav .on{background:rgba(255,255,255,.12)!important;color:#fff!important}
+html[data-theme=dark] .selbar{background:#151c33}
+html[data-theme=dark] .fab{background:linear-gradient(transparent,#0b1020 45%)}
+html[data-theme=dark] .sheet>div{background:#151c33;color:#e5e9f5}
+html[data-theme=dark] #dlg p{color:#94a3b8}
+html[data-theme=dark] #crop,html[data-theme=dark] #edit,html[data-theme=dark] #viewer{background:#0b1020;color:#e5e9f5}
+html[data-theme=dark] #crop .stage,html[data-theme=dark] #edit .stage,html[data-theme=dark] #viewer .stage,html[data-theme=dark] #rvPager{background:#121a30}
+html[data-theme=dark] .seg{background:#1c2440}
+html[data-theme=dark] .seg button{color:#cbd5e1}
+html[data-theme=dark] .seg button.on{background:#2a3558;color:#fff}
+html[data-theme=dark] #pvBox{background:#121a30!important}
+html[data-theme=dark] .zc button{background:#1c2440;color:#e5e9f5}
+html[data-theme=dark] #prep{background:radial-gradient(circle at 50% 40%,#162044 30%,#0b1020 100%)!important}
+html[data-theme=dark] #prepWho{color:#cbd5ff}
+html[data-theme=dark] #prepMsg{color:#94a3b8}
+html[data-theme=dark] #prep .ring b{color:#e5e9f5}
+html[data-theme=dark] #prep .rt{stroke:#2a3454}
 </style>
 </head>
 <body>
 
-<div id="splash"><img src="logo.png" alt=""><div class="spin"></div><div class="msg" id="splMsg">Loading your data…</div><div id="auth"><img class="aic" src="icon-180.png" alt="SW Scanner"><h2 id="auT"></h2><input class="inp" id="auU" placeholder="Username" autocomplete="username" autocapitalize="none"><input class="inp" id="auP" type="password" placeholder="Password" autocomplete="current-password"><input class="inp" id="auP2" type="password" placeholder="Confirm password" autocomplete="new-password"><div id="auE"></div><button class="pri" id="auGo"></button><button id="auF">Forgot password?</button></div><div class="bar2"><i></i></div></div>
+<div id="splash"><img src="logo.png" alt=""><div class="spin"></div><div class="msg" id="splMsg">Loading your data…</div><div id="auth"><div class="ac"><i class="fl"></i><svg class="aic" viewBox="0 0 100 100" role="img" aria-label="SW Scanner"><rect width="100" height="100" rx="26" fill="#fff"/><text x="50" y="63" text-anchor="middle" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="46" font-weight="800" letter-spacing="-2"><tspan fill="#12297d">S</tspan><tspan fill="#f97316">W</tspan></text><rect x="22" y="75" width="56" height="5" rx="2.5" fill="#e2e8f0"/><rect x="22" y="75" width="26" height="5" rx="2.5" fill="#f97316"/></svg><div class="abn"><b>SW</b> Scanner</div><div class="atg">DOCUMENTS SCANNER</div><div id="auWho"></div><h2 id="auT"></h2><input class="inp" id="auU" placeholder="Username" autocomplete="username" autocapitalize="none"><input class="inp" id="auP" type="password" placeholder="Password" autocomplete="current-password"><input class="inp" id="auP2" type="password" placeholder="Confirm password" autocomplete="new-password"><div id="auE"></div><button class="pri" id="auGo"></button><button id="auF">Forgot password?</button></div></div><div class="bar2"><i></i></div></div>
 <div id="camv" class="screen hidden" style="background:#000"><video id="camVid" autoplay playsinline muted style="flex:1;min-height:0;width:100%;object-fit:cover"></video><div class="bar" style="background:#000;padding-top:14px;justify-content:space-around"><button id="camX">Close</button><button id="camSnap" class="ok" style="flex:2;padding:18px;font-size:17px">Capture</button></div></div>
 <div id="login" class="screen hidden"><div class="fx" aria-hidden="true"></div>
   <img src="logo.png" alt="SW Scanner">
@@ -309,7 +364,7 @@ button{border-radius:18px}.sb{border-radius:16px}
 </div>
 
 <div id="main" class="screen">
-  <header><img class="hlogo" src="mark.png" alt=""><h1>SW Scanner</h1><button id="btnSync">Sync</button></header>
+  <header><img class="hlogo" src="mark.png" alt=""><h1>SW Scanner</h1><button id="btnSync">Sync</button><button id="btnLock" data-ic="out" aria-label="Lock and close app"></button></header>
   <div id="status"></div>
   <div class="scroll tab" id="t-home"><div class="qa"><button class="pri" data-go="scan" data-ic="cam">Scan document</button><button data-go="id" data-ic="id">ID card</button></div><div class="row"><h3>Last 30 days</h3><button class="sb" data-sel>Select</button></div><div id="list"></div></div>
   <div class="scroll tab hidden" id="t-docs"><input id="q" class="inp" placeholder="Search documents"><div class="row"><h3>All documents</h3><button class="sb" data-sel>Select</button></div><div id="listAll"></div></div>
@@ -317,6 +372,7 @@ button{border-radius:18px}.sb{border-radius:16px}
   <div class="scroll tab hidden" id="t-tools"><h3>Tools</h3><button class="big" data-go="id" data-ic="id">ID Card Scan<small>CNIC / licence, prints at real card size</small></button><button class="big" data-go="tab-import" data-ic="imp">Import<small>Camera, Gallery or Files</small></button><button class="big" data-go="sync" data-ic="sync">Sync to Google Drive<small>Back up and sync your scans</small></button><button class="big" data-go="bin" data-ic="trash">Recycle bin<small id="binN">Restore deleted documents</small></button></div>
   <div class="scroll tab hidden" id="t-me"><div class="me"><div class="av" id="av">?</div><div id="meStat"></div></div>
     <input class="inp" id="pn" placeholder="Your name"><input class="inp" id="pe" placeholder="Email" type="email"><input class="inp" id="pp" placeholder="Phone" type="tel"><button class="pri" id="pEdit" style="width:100%;margin-bottom:10px"></button>
+    <h3>Theme</h3><div class="seg" id="thSeg" style="margin-bottom:12px"><button data-th="auto">Auto</button><button data-th="light">Light</button><button data-th="dark">Dark</button></div>
     <button class="big" id="btnPin" data-ic="user">PIN login<small id="pinSm"></small></button>
     <button class="big" id="btnDiag" data-ic="sync">Sync check<small>Find out why sync is failing</small></button>
     <button class="big" id="btnBackup" data-ic="backup">Backup<small>Save all documents to a file</small></button>
@@ -969,6 +1025,7 @@ async function sync(){
   finally{syncing=false;$('#btnSync').textContent='Sync';if(again){again=false;setTimeout(sync,800)}}}
 function autoSync(){if($('#splash')||!localStorage.getItem('swSignedIn'))return;sync()}
 $('#btnSync').onclick=sync;
+$('#btnLock').onclick=async()=>{if(!await askConfirm('Close app?',hasPin()?'The app will lock. You will need your PIN to open it again.':'The app will lock and show the login screen.','Close',false))return;sessionStorage.removeItem('swOk');location.reload()};
 $('#btnLogin').onclick=async()=>{
   $('#loginErr').textContent='';
   prepShow();try{await getToken();unlocked();prepTo(50);await renderHome();prepTo(70);await sync();prepHide()}
@@ -1017,8 +1074,9 @@ const PIN_KEY='swPin';let pinTry=0;
 async function hp(u,p){const h=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('sw|'+u.toLowerCase()+'|'+p));return[...new Uint8Array(h)].map(x=>x.toString(16).padStart(2,'0')).join('')}
 const hasPin=()=>!!localStorage.getItem(PIN_KEY);
 const unlocked=()=>sessionStorage.setItem('swOk','1');
-function splashOut(){const sp=$('#splash');if(!sp)return;sp.classList.add('out');setTimeout(()=>{sp.remove();autoSync()},600)}
-function pinShow(){['.spin','.msg','.bar2'].forEach(c=>{const e=document.querySelector('#splash '+c);if(e)e.style.display='none'});
+function splashOut(){const sp=$('#splash');if(!sp)return;sp.classList.add('out');setTimeout(()=>{moveScene($('#login'));sp.remove();autoSync()},600)}
+function moveScene(h){const fx=document.querySelector('.fx');if(fx&&h&&fx.parentNode!==h){h.insertBefore(fx,h.firstChild);dispatchEvent(new Event('resize'))}}
+function pinShow(){moveScene($('#splash'));{const em=localStorage.getItem('swEmail');$('#auWho').textContent=em?'Logged in as '+em:''}['.spin','.msg','.bar2'].forEach(c=>{const e=document.querySelector('#splash '+c);if(e)e.style.display='none'});
   $('#auth').style.display='flex';$('#splash').classList.add('au');$('#auT').textContent='Enter your PIN';$('#auU').style.display='none';$('#auP2').style.display='none';
   const P=$('#auP');P.placeholder='PIN';P.setAttribute('inputmode','numeric');P.maxLength=6;P.value='';$('#auE').textContent='';$('#auGo').textContent='Unlock';$('#auF').textContent='Forgot PIN? Use Google login';$('#auF').style.display='';P.focus()}
 async function gate(){
@@ -1067,6 +1125,12 @@ function prepTo(g){prepG=Math.max(prepG,g)}
 function prepShow(){PMc=PM;setWho();prepP=0;prepG=25;prepSet();$('#prep').classList.remove('hidden');clearInterval(prepT);prepT=setInterval(()=>{prepP+=(prepG-prepP)*.06+.05;if(prepP>prepG)prepP=prepG;if(prepG<95&&prepP>=prepG-1)prepG=Math.min(95,prepG+.3);prepSet()},80)}
 function prepHide(now){if(now){clearInterval(prepT);$('#prep').classList.add('hidden');return}prepG=100;const f=setInterval(()=>{prepP+=(100-prepP)*.3+.5;if(prepP>=100){prepP=100;prepSet();clearInterval(f);clearInterval(prepT);setTimeout(()=>$('#prep').classList.add('hidden'),350)}else prepSet()},40)}
 
+/* ---------- theme ---------- */
+const THK='swTheme',mqD=matchMedia('(prefers-color-scheme: dark)');
+function applyTheme(){const m=localStorage.getItem(THK)||'auto',d=m==='dark'||(m==='auto'&&mqD.matches);document.documentElement.dataset.theme=d?'dark':'light';document.querySelectorAll('#thSeg button').forEach(b=>b.classList.toggle('on',b.dataset.th===m))}
+document.querySelectorAll('#thSeg button').forEach(b=>b.onclick=()=>{localStorage.setItem(THK,b.dataset.th);applyTheme()});
+if(mqD.addEventListener)mqD.addEventListener('change',applyTheme);else mqD.addListener(applyTheme);
+applyTheme();
 /* ---------- start ---------- */
 (async()=>{
   const SM=['Loading your data…','Loading your files…','Checking your documents…','Preparing your workspace…','Almost ready…'];let smi=0;
@@ -1094,8 +1158,12 @@ function spawn(){fx.querySelectorAll('.pp').forEach(e=>e.remove());items=[];cnt=
     if(WORDS[k])el.innerHTML='<i>'+WORDS[k][(Math.random()*WORDS[k].length)|0]+'</i>';
     el._t={x:R(w/2,g.W-w/2),y:R(h/2+6,yMax),r:R(-40,40),s:1};el._side=side;el._h=h;el.style.transform=T(el._t);el.style.zIndex=1;fx.appendChild(el);items.push(el);
     setTimeout(()=>{el.style.transition='opacity .5s';el.style.opacity=.96},i*45)}}
-async function go(el,to,ms,ease){const a=el.animate([{transform:T(el._t)},{transform:T(to)}],{duration:ms,easing:ease||'ease-in-out',fill:'forwards'});await a.finished.catch(()=>{});el._t=to;el.style.transform=T(to);a.cancel()}
-function beam(){const b=pr.querySelector('.bm2');b.animate([{left:'6%',opacity:0},{opacity:1,offset:.12},{opacity:1,offset:.88},{left:'92%',opacity:0}],{duration:800,easing:'linear'});pr.classList.add('on');setTimeout(()=>pr.classList.remove('on'),850)}
+const bez=(a,b,c,d)=>t=>{let lo=0,hi=1,u=t;for(let k=0;k<18;k++){u=(lo+hi)/2;const x=3*a*u*(1-u)*(1-u)+3*c*u*u*(1-u)+u*u*u;if(x<t)lo=u;else hi=u}return 3*b*u*(1-u)*(1-u)+3*d*u*u*(1-u)+u*u*u};
+const EZ={'ease-in-out':bez(.42,0,.58,1),'ease-in':bez(.42,0,1,1),'cubic-bezier(.3,.1,.3,1)':bez(.3,.1,.3,1),'cubic-bezier(.3,.7,.3,1)':bez(.3,.7,.3,1)};
+function go(el,to,ms,ease){return new Promise(res=>{const f={...el._t},E=EZ[ease||'ease-in-out']||EZ['ease-in-out'],t0=performance.now();
+ const st=n=>{const p=Math.min(1,Math.max(0,(n-t0)/ms)),e=E(p);el.style.transform=T({x:f.x+(to.x-f.x)*e,y:f.y+(to.y-f.y)*e,r:f.r+(to.r-f.r)*e,s:f.s+(to.s-f.s)*e});if(p<1)requestAnimationFrame(st);else{el._t=to;el.style.transform=T(to);res()}};requestAnimationFrame(st)})}
+function beam(){const b=pr.querySelector('.bm2'),t0=performance.now();pr.classList.add('on');
+ const st=n=>{const p=Math.min(1,(n-t0)/800);b.style.left=(6+86*p)+'%';b.style.opacity=p<.12?p/.12:p>.88?(1-p)/.12:1;if(p<1)requestAnimationFrame(st);else{b.style.opacity=0;pr.classList.remove('on')}};requestAnimationFrame(st)}
 async function file(el){const g=geo(),lx=g.cx,ly=g.ty+22*g.k;el.style.transition='none';el.style.zIndex=20;
   await go(el,{x:lx,y:ly-46*g.k-12,r:R(-4,4),s:.8},900,'cubic-bezier(.3,.1,.3,1)');
   await go(el,{x:lx,y:ly,r:0,s:.62},260,'ease-in');
