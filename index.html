@@ -287,6 +287,14 @@ button{border-radius:18px}.sb{border-radius:16px}
 #login p{text-shadow:0 1px 8px rgba(6,15,56,.95),0 0 3px rgba(6,15,56,.9)!important;font-weight:600}
 #prepWho{position:absolute;top:calc(env(safe-area-inset-top,0px) + 24px);left:0;right:0;text-align:center;font-size:14px;font-weight:600;color:#12297d;padding:0 16px;word-break:break-all}
 #prep{background:radial-gradient(circle at 50% 40%,#fff 30%,#eef2f8 100%)!important}
+/* nav v3: floating translucent capsule (Instagram iPhone style) */
+#nav{position:fixed!important;left:14px;right:14px;bottom:calc(env(safe-area-inset-bottom,0px) + 12px);height:62px;border-radius:31px!important;background:rgba(255,255,255,.62)!important;-webkit-backdrop-filter:blur(18px) saturate(1.6);backdrop-filter:blur(18px) saturate(1.6);border:.5px solid rgba(10,26,92,.14)!important;box-shadow:0 8px 24px rgba(10,26,92,.14)!important;padding:0 8px!important;align-items:center;justify-content:space-around;z-index:30}
+#nav.hidden{display:none!important}
+#nav button{flex:0 0 auto!important;width:50px;height:46px;border-radius:23px!important;padding:0!important;justify-content:center;color:#475569}
+#nav button span{display:none}
+#nav .ic{width:24px!important;height:24px!important;padding:0!important;margin:0!important;background:none!important;border-radius:0!important}
+#nav .on{background:rgba(10,26,92,.09)!important;color:#0f172a!important}
+#main .scroll{padding-bottom:110px}
 </style>
 </head>
 <body>
@@ -315,7 +323,7 @@ button{border-radius:18px}.sb{border-radius:16px}
     <button class="big" id="btnRestore" data-ic="restore">Restore<small>Load documents from a backup file</small></button>
     <button class="big" id="btnOut" data-ic="out">Logout</button></div>
   <div id="selBar" class="selbar hidden"><button id="selCancel">Cancel</button><button id="selAll">Select all</button><button class="rdb" id="selDel">Delete (0)</button></div>
-  <nav id="nav"><button data-tab="home" data-ic="home" class="on"><span>Home</span></button><button data-tab="docs" data-ic="docs"><span>All docs</span></button><button data-tab="import" data-ic="imp"><span>Import</span></button><button data-tab="tools" data-ic="tools"><span>Tools</span></button><button data-tab="me" data-ic="user"><span>Me</span></button></nav>
+  <nav id="nav"><button data-tab="home" data-ic="home" class="on" aria-label="Home"><span>Home</span></button><button data-tab="docs" data-ic="docs" aria-label="All docs"><span>All docs</span></button><button data-tab="import" data-ic="imp" aria-label="Import"><span>Import</span></button><button data-tab="tools" data-ic="tools" aria-label="Tools"><span>Tools</span></button><button data-tab="me" data-ic="user" aria-label="Me"><span>Me</span></button></nav>
 </div>
 
 <div id="docv" class="screen hidden">
