@@ -376,6 +376,12 @@ html[data-theme=dark] #prepHi{color:#e5e9f5}
 #login .inp{width:min(320px,100%);margin:0 0 10px;text-align:left;font-size:16px;position:relative;z-index:2}
 #btnLogin{justify-content:center;width:min(320px,100%);margin-top:4px}
 #splash{transition:opacity .25s}
+html,body{overscroll-behavior-x:none}
+#dlg{z-index:140}
+#prep.scn{z-index:100;background:radial-gradient(circle at 50% 45%,rgba(6,15,56,.12),rgba(6,15,56,.55))!important}
+#prep.scn #prepWho,#prep.scn #prepHi,#prep.scn #prepMsg,#prep.scn .ring b{color:#fff!important;text-shadow:0 1px 8px rgba(6,15,56,.9)}
+#prep.scn .rt{stroke:rgba(255,255,255,.28)}
+#edit.bulk #eCrop,#edit.bulk #eRotL,#edit.bulk #eRot,#edit.bulk #eRetake{display:none}
 </style>
 </head>
 <body>
@@ -385,7 +391,7 @@ html[data-theme=dark] #prepHi{color:#e5e9f5}
 <div id="login" class="screen hidden"><div class="fx" aria-hidden="true"></div>
   <img src="logo.png" alt="SW Scanner">
   <p>Scan your important documents and keep them safe</p>
-  <input class="inp" id="lgE" type="email" placeholder="Email" autocomplete="username" autocapitalize="none" autocorrect="off" inputmode="email"><input class="inp" id="lgP" type="password" placeholder="Password" autocomplete="current-password"><button id="btnLogin">Sign in</button>
+  
   <div id="loginErr"></div>
 </div>
 
@@ -394,7 +400,7 @@ html[data-theme=dark] #prepHi{color:#e5e9f5}
   <div id="status"></div>
   <div class="scroll tab" id="t-home"><div class="qa"><button class="pri" data-go="scan" data-ic="cam">Scan document</button><button data-go="id" data-ic="id">ID card</button></div><div class="row"><h3>Last 30 days</h3><button class="sb" data-sel>Select</button></div><div id="list"></div></div>
   <div class="scroll tab hidden" id="t-docs"><input id="q" class="inp" placeholder="Search documents"><div class="row"><h3>All documents</h3><button class="sb" data-sel>Select</button></div><div id="listAll"></div></div>
-  <div class="scroll tab hidden" id="t-import"><h3>Import</h3><button class="big" data-go="cam" data-ic="cam">Camera<small>Take a photo of a document</small></button><button class="big" data-go="gal" data-ic="img">Gallery<small>Choose one or more photos</small></button><button class="big" data-go="file" data-ic="folder">Files<small>Pick an image or PDF from your files</small></button></div>
+  <div class="scroll tab hidden" id="t-import"><h3>Import</h3><button class="big" data-go="cam" data-ic="cam">Camera<small>Take a photo of a document</small></button><button class="big" data-go="gal" data-ic="img">Gallery<small>Choose one or more photos (iPhone also lists Files here)</small></button><button class="big" data-go="file" data-ic="folder">Files<small>Pick a PDF from your files</small></button></div>
   <div class="scroll tab hidden" id="t-tools"><h3>Tools</h3><button class="big" data-go="id" data-ic="id">ID Card Scan<small>CNIC / licence, prints at real card size</small></button><button class="big" data-go="tab-import" data-ic="imp">Import<small>Camera, Gallery or Files</small></button><button class="big" data-go="sync" data-ic="sync">Sync to Google Drive<small>Back up and sync your scans</small></button><button class="big" data-go="bin" data-ic="trash">Recycle bin<small id="binN">Restore deleted documents</small></button></div>
   <div class="scroll tab hidden" id="t-me"><div class="me"><div class="av" id="av">?</div><div id="meStat"></div></div>
     <input class="inp" id="pn" placeholder="Your name"><input class="inp" id="pe" placeholder="Email" type="email"><input class="inp" id="pp" placeholder="Phone" type="tel"><button class="pri" id="pEdit" style="width:100%;margin-bottom:10px"></button>
@@ -411,7 +417,7 @@ html[data-theme=dark] #prepHi{color:#e5e9f5}
 
 <div id="docv" class="screen hidden">
   <header><h1 id="dTitle"></h1><button id="dShare">Share</button><button id="dDel" data-ic="trash" aria-label="Delete"></button></header>
-  <div class="scroll"><div class="row"><p class="hint" style="flex:1;text-align:left">Tap the title to rename. Tap a page to open it.</p><button id="dSel" class="sb">Select</button></div>
+  <div class="scroll"><div class="row"><p class="hint" style="flex:1;text-align:left">Tap the title to rename. Tap a page to open it.</p><button id="dAll" class="sb">Edit all</button><button id="dSel" class="sb">Select</button></div>
     <div id="idBox" class="idbox hidden"><b>Print size</b><button id="idM">−</button><span id="idV">100%</span><button id="idP">+</button><button id="idR">Actual size</button><button id="idView" class="pri" style="flex:1 0 100%">View A4 copies sheet</button><button id="idSet" style="flex:1 0 100%">Sheet settings (copies, gap, flip)</button></div>
     <div class="grid" id="dGrid"></div></div>
   <button id="dBack" class="bk bkf" data-ic="back" aria-label="Back"></button>
@@ -455,7 +461,7 @@ html[data-theme=dark] #prepHi{color:#e5e9f5}
 <div id="aps" class="sheet hidden"><div><b>Apply this filter to</b><div class="seg" id="apSeg"><button data-k="one" class="on">This page</button><button data-k="all">All pages</button><button data-k="sel">Selected</button></div><div class="pgs hidden" id="apG"></div><button class="pri" id="apGo">Apply</button><button data-s="x">Cancel</button></div></div>
 <input type="file" id="inCam" accept="image/*" capture="environment" hidden>
 <input type="file" id="inGal" accept="image/*" multiple hidden>
-<input type="file" id="inFile" accept="application/pdf,.pdf,.jpg,.jpeg,.png,.heic,.webp" multiple hidden>
+<input type="file" id="inFile" accept="application/pdf,.pdf" multiple hidden>
 <input type="file" id="inRes" accept=".json,application/json" hidden>
 <div id="rev" class="screen hidden"><header><button id="rvBack">✕</button><h1 id="rvT">Review</h1></header><div id="rvPager"></div><div class="hint" id="rvHint"></div><div class="tools"><button id="rvEdit" data-ic="adj">Edit</button><button id="rvDel" data-ic="trash">Remove</button><button id="rvCam" data-ic="cam">Camera</button><button id="rvGal" data-ic="img">Gallery</button><button id="rvFile" data-ic="folder">Files</button></div><div class="bar"><button id="rvSave" class="ok">Save</button></div></div>
 <div id="prev" class="screen hidden"><div class="zc"><button id="zIn" aria-label="Zoom in">+</button><button id="zOut" aria-label="Zoom out">−</button><button id="zFit" style="font-size:12px">Fit</button></div><header><button id="pvBack">←</button><h1 id="pvT"></h1></header><div class="scroll" id="pvBox" style="background:#e2e8f0;padding-top:12px"></div><div class="bar"><button id="pvPrint" class="pri">Print</button><button id="pvShare">Share PDF</button><button id="pvDl">Download</button></div></div>
@@ -697,7 +703,7 @@ async function openDoc(id,keep){
   cur=await dbGet('docs',id);if(!cur||cur.deleted){renderHome();return}
   if(!keep)pSel=null;
   clearUrls();$('#dTitle').textContent=cur.name;const idd=cur.kind==='id';if(idd)pSel=null;
-  $('#idBox').classList.toggle('hidden',!idd);$('#dFab').classList.toggle('hidden',idd||!!pSel);$('#dSel').classList.toggle('hidden',idd||!!pSel);$('#pgBar').classList.toggle('hidden',!pSel);
+  $('#idBox').classList.toggle('hidden',!idd);$('#dFab').classList.toggle('hidden',idd||!!pSel);$('#dSel').classList.toggle('hidden',idd||!!pSel);$('#dAll').classList.toggle('hidden',idd||!!pSel||cur.pages.length<2);$('#pgBar').classList.toggle('hidden',!pSel);
   if(pSel)$('#pgDel').textContent=`Delete (${pSel.size})`;
   $('#idV').textContent=(cur.idScale||100)+'%';$('#dBack').classList.toggle('hidden',!!pSel);
   const g=$('#dGrid');g.innerHTML='';
@@ -796,7 +802,7 @@ function drawCrop(){
 $('#cAuto').onclick=()=>{const q=autoQuad(S.src);if(q){S.q=q;drawCrop()}else toast('Could not find edges, drag the corners')};
 $('#cFull').onclick=()=>{S.q=defQuad(S.src.width,S.src.height,0);drawCrop()};
 $('#cCancel').onclick=()=>show('edit');
-$('#eBack').onclick=async()=>{ctx.queue=[];if(ctx.mode==='edit'){await openDoc(ctx.docId);openPage(ctx.pi)}else openRev()};
+$('#eBack').onclick=async()=>{ctx.queue=[];if(ctx.mode==='edit'){const al=ctx.all;ctx.all=false;await openDoc(ctx.docId);if(!al)openPage(ctx.pi)}else openRev()};
 $('#eCrop').onclick=()=>{show('crop');requestAnimationFrame(layoutCrop)};
 $('#cNext').onclick=()=>goEdit();
 function idDims(q){const d=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y),k=Math.max(.3,d(q[0],q[1])/Math.max(1,d(q[1],q[2])));return Math.abs(k/1.586-1)<.3?[ID_W,ID_H]:[ID_W,Math.round(ID_W/k)]}
@@ -854,7 +860,7 @@ let rq=0;
 function renderEdit(){
   if(!rq)rq=requestAnimationFrame(()=>{rq=0;const out=proc(E.small,E.o),cv=$('#editCv');cv.width=out.width;cv.height=out.height;cv.getContext('2d').drawImage(out,0,0)});
   document.querySelectorAll('#fBar button').forEach(b=>b.classList.toggle('on',b.dataset.m===E.o.mode));
-  const id=ctx.mode==='id';$('#eNext').classList.add('hidden');$('#eSave').textContent=ctx.mode==='edit'?'Save':'Done';
+  const id=ctx.mode==='id';$('#edit').classList.toggle('bulk',!!ctx.all);$('#edit h1').textContent=ctx.all?'Edit all pages':'Edit page';$('#eNext').classList.add('hidden');$('#eSave').textContent=ctx.mode==='edit'?'Save':'Done';
   $('#eNext').textContent=id?'Add back side':ctx.queue.length?'Next photo':'Add page'}
 $('#fBar').innerHTML=FILTERS.map(f=>`<button data-m="${f[0]}">${f[1]}</button>`).join('');
 document.querySelectorAll('#fBar button').forEach(b=>b.onclick=()=>{E.o.mode=b.dataset.m;renderEdit()});
@@ -873,6 +879,8 @@ $('#eNext').onclick=async()=>{await commit();
   else if(ctx.queue.length)startCrop(ctx.queue.shift()).catch(e=>toast(e.message));
   else openSrc('cam')};
 $('#eSave').onclick=async()=>{
+  if(ctx.mode==='edit'&&ctx.all){const d0=await dbGet('docs',ctx.docId);if(!d0)return;toast('Applying to all pages...');
+    await applyDocPages(ctx.docId,new Set(d0.pages.map((_,i)=>i)),E.o);ctx.all=false;ctx.draft=[];toast('Applied to all pages ✓');await openDoc(ctx.docId);autoSync();return}
   if(ctx.mode==='edit'){let ex=new Set();const d0=await dbGet('docs',ctx.docId);
     if(d0&&d0.pages.length>1&&optsChanged(d0.pages[ctx.pi],E.o)){ex=await askScope(d0.pages.map(q=>q.blob),ctx.pi);if(!ex)return}
     await commit();ctx.queue=[];if(ex.size)await applyDocPages(ctx.docId,ex,E.o);await saveDraft();return}
@@ -934,6 +942,13 @@ $('#vRetake').onclick=()=>{ctx={mode:'edit',docId:cur.id,pi:vi,draft:[],queue:[]
 $('#vEdit').onclick=async()=>{const p=cur.pages[vi];toast('Opening...');
   const img=await loadImg(p.orig||p.blob),c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;c.getContext('2d').drawImage(img,0,0);
   ctx={mode:'edit',docId:cur.id,pi:vi,draft:[],queue:[],side:0,isId:cur.kind==='id'};
+  S={src:c,q:defQuad(c.width,c.height,0),drag:-1,sc:1};
+  E={base:c,small:shrink(c,900),o:p.orig&&p.opts?{mode:'doc',b:0,c:0,s:0,...p.opts}:{mode:'color',b:0,c:0,s:0},pushed:false,keepO:true};
+  $('#sB').value=E.o.b;$('#sC').value=E.o.c;$('#sS').value=E.o.s;renderEdit();show('edit')};
+
+$('#dAll').onclick=async()=>{const p=cur.pages[0];toast('Opening...');
+  const img=await loadImg(p.orig||p.blob),c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;c.getContext('2d').drawImage(img,0,0);
+  ctx={mode:'edit',docId:cur.id,pi:0,draft:[],queue:[],side:0,isId:false,all:true};
   S={src:c,q:defQuad(c.width,c.height,0),drag:-1,sc:1};
   E={base:c,small:shrink(c,900),o:p.orig&&p.opts?{mode:'doc',b:0,c:0,s:0,...p.opts}:{mode:'color',b:0,c:0,s:0},pushed:false,keepO:true};
   $('#sB').value=E.o.b;$('#sC').value=E.o.c;$('#sS').value=E.o.s;renderEdit();show('edit')};
@@ -1094,27 +1109,17 @@ async function sync(manual){
     if(!$('#main').classList.contains('hidden'))renderHome();
     else if(!$('#docv').classList.contains('hidden')&&cur)openDoc(cur.id,true);
   }catch(e){
-    if(e&&e.code==='sw/no-user'){localStorage.removeItem('swSignedIn');sessionStorage.removeItem('swOk');setStatus('');show('login');$('#loginErr').textContent='Please sign in again to continue syncing'}
+    if(e&&e.code==='sw/no-user'){localStorage.removeItem('swSignedIn');sessionStorage.removeItem('swOk');localStorage.setItem('swMsg','Please sign in again to continue syncing');location.reload()}
     else{const m=syncMsg(e);setStatus('⚠ Sync failed: '+m+'. Tap to retry',1);if(manual===true)toast('Sync failed: '+m)}}
   finally{syncing=false;$('#btnSync').classList.remove('busy');if(again){again=false;setTimeout(sync,800)}}}
 function autoSync(){if($('#splash')||!localStorage.getItem('swSignedIn'))return;sync()}
 $('#btnSync').onclick=()=>sync(true);
 $('#btnLock').onclick=async()=>{if(!await askConfirm('Close app?',hasPin()?'The app will lock. You will need your PIN to open it again.':'The app will lock and show the login screen.','Close',false))return;sessionStorage.removeItem('swOk');location.reload()};
-$('#btnLogin').onclick=async()=>{
-  const em=$('#lgE').value.trim(),pw=$('#lgP').value,E=$('#loginErr');E.textContent='';
-  if(!em||!pw){E.textContent='Enter your email and password';return}
-  prepShow();
-  try{const F=await fbw();const cr=await F.signIn(em,pw);
-    localStorage.setItem('swSignedIn','1');localStorage.setItem('swEmail',(cr.user&&cr.user.email)||em);setWho();
-    $('#lgP').value='';unlocked();localStorage.setItem('swSeen','1');prepTo(50);await renderHome();prepTo(70);await sync(true);prepHide()}
-  catch(e){prepHide(1);E.textContent=authMsg(e)}};
-$('#lgP').addEventListener('keydown',e=>{if(e.key==='Enter')$('#btnLogin').click()});
-$('#lgE').addEventListener('keydown',e=>{if(e.key==='Enter')$('#lgP').focus()});
 $('#btnOut').onclick=async()=>{
   if(!await askConfirm('Log out?','Scanned documents will stay on this phone.','Log out',false))return;
   try{if(window.FB)await FB.signOut()}catch(e){}
   localStorage.removeItem('swSignedIn');localStorage.removeItem(PIN_KEY);localStorage.removeItem('swEmail');sessionStorage.removeItem('swOk');pinUi();
-  $('#loginErr').textContent='';setStatus('');show('login')};
+  location.reload()};
 
 /* ---------- one-time import of old scans from Google Drive ---------- */
 let gsiLoading=null;
@@ -1194,18 +1199,38 @@ const hasPin=()=>!!localStorage.getItem(PIN_KEY);
 const unlocked=()=>sessionStorage.setItem('swOk','1');
 function splashOut(){const sp=$('#splash');if(!sp)return;sp.classList.add('out');setTimeout(()=>{moveScene($('#login'));sp.remove();autoSync()},260)}
 function moveScene(h){const fx=document.querySelector('.fx');if(fx&&h&&fx.parentNode!==h){h.insertBefore(fx,h.firstChild);dispatchEvent(new Event('resize'))}}
-function pinShow(){moveScene($('#splash'));{const em=localStorage.getItem('swEmail');$('#auWho').textContent=em?'Logged in as '+em:''}['.spin','.msg','.bar2'].forEach(c=>{const e=document.querySelector('#splash '+c);if(e)e.style.display='none'});
+function pinShow(){AUM='pin';moveScene($('#splash'));{const em=localStorage.getItem('swEmail');$('#auWho').textContent=em?'Logged in as '+em:''}['.spin','.msg','.bar2'].forEach(c=>{const e=document.querySelector('#splash '+c);if(e)e.style.display='none'});
   $('#auth').style.display='flex';$('#splash').classList.add('au');$('#auT').textContent='Enter your PIN';$('#auU').style.display='none';$('#auP2').style.display='none';
   const P=$('#auP');P.placeholder='PIN';P.setAttribute('inputmode','numeric');P.maxLength=6;P.value='';$('#auE').textContent='';$('#auGo').textContent='Unlock';$('#auF').textContent='Forgot PIN? Sign in with email';$('#auF').style.display='';P.focus()}
 async function gate(){
   if(sessionStorage.getItem('swOk')){splashOut();return}
   if(localStorage.getItem('swSignedIn')&&hasPin()){pinShow();return}
-  show('login');$('#lgE').value=localStorage.getItem('swEmail')||'';splashOut()}
-$('#auGo').onclick=async()=>{const P=$('#auP'),E=$('#auE');E.textContent='';
+  loginShow()}
+let AUM='pin';
+function loginShow(){AUM='login';moveScene($('#splash'));$('#auWho').textContent='';
+  const U=$('#auU'),P=$('#auP');$('#auth').style.display='flex';$('#splash').classList.add('au');$('#auT').textContent='Sign in';
+  U.style.display='';U.type='email';U.placeholder='Email';U.setAttribute('autocomplete','username');U.setAttribute('autocapitalize','none');U.setAttribute('inputmode','email');U.value=localStorage.getItem('swEmail')||'';
+  $('#auP2').style.display='none';P.placeholder='Password';P.removeAttribute('inputmode');P.removeAttribute('maxlength');P.setAttribute('autocomplete','current-password');P.value='';
+  const m=localStorage.getItem('swMsg');localStorage.removeItem('swMsg');$('#auE').textContent=m||'';
+  $('#auGo').textContent='Sign in';$('#auGo').disabled=false;$('#auF').style.display='none';(U.value?P:U).focus()}
+async function doLogin(){
+  const U=$('#auU'),P=$('#auP'),E=$('#auE'),em=U.value.trim(),pw=P.value;E.textContent='';
+  if(!em||!pw){E.textContent='Enter your email and password';return}
+  const gb=$('#auGo');gb.disabled=true;$('#auth').style.display='none';
+  const t0=prepShow();
+  try{const F=await fbw();const cr=await F.signIn(em,pw);
+    localStorage.setItem('swSignedIn','1');localStorage.setItem('swEmail',(cr.user&&cr.user.email)||em);setWho();
+    P.value='';unlocked();localStorage.setItem('swSeen','1');await renderHome();await sync(true);
+    const left=5000-(Date.now()-t0);if(left>0)await new Promise(r=>setTimeout(r,left));
+    prepHide();setTimeout(splashOut,500)}
+  catch(e){prepHide(1);$('#auth').style.display='flex';E.textContent=authMsg(e)}
+  finally{gb.disabled=false}}
+$('#auU').addEventListener('keydown',e=>{if(e.key==='Enter')$('#auP').focus()});
+$('#auGo').onclick=async()=>{if(AUM==='login'){doLogin();return}const P=$('#auP'),E=$('#auE');E.textContent='';
   if(await hp('pin',P.value)===localStorage.getItem(PIN_KEY)){unlocked();pinTry=0;await renderHome();splashOut()}
   else{P.value='';if(++pinTry>=5){$('#auF').onclick();return}E.textContent='Wrong PIN ('+pinTry+'/5)'}};
 $('#auP').addEventListener('keydown',e=>{if(e.key==='Enter')$('#auGo').click()});
-$('#auF').onclick=()=>{show('login');$('#lgE').value=localStorage.getItem('swEmail')||'';splashOut()};
+$('#auF').onclick=()=>{loginShow()};
 function pinUi(){$('#pinSm').textContent=hasPin()?'PIN is on. Tap to change or remove':'Use a short PIN instead of password every time'}
 $('#btnPin').onclick=async()=>{
   if(hasPin()&&await askConfirm('PIN login','Remove the PIN? You will need your email and password each time. (Cancel to change it instead)','Remove')){localStorage.removeItem(PIN_KEY);pinUi();toast('PIN removed');return}
@@ -1236,8 +1261,8 @@ let prepT,prepP=0,prepG=25;const PM=[[0,'Signing you in…'],[30,'Preparing your
 function setWho(){const w=$('#prepWho');if(!w)return;const em=localStorage.getItem('swEmail');w.textContent=em?'Logged in as '+em:''}
 function prepSet(){const v=Math.round(prepP);$('#rp').style.strokeDashoffset=276.5*(1-prepP/100);$('#rpct').textContent=v+'%';let m=PMc[0][1];for(const [t,x] of PMc)if(v>=t)m=x;$('#prepMsg').textContent=m}
 function prepTo(g){prepG=Math.max(prepG,g)}
-function prepShow(){PMc=PM;setWho();setHi(!!(localStorage.getItem('swSeen')||localStorage.getItem('swEmail')||localStorage.getItem('swFolder')));prepP=0;prepG=25;prepSet();$('#prep').classList.remove('hidden');clearInterval(prepT);prepT=setInterval(()=>{prepP+=(prepG-prepP)*.06+.05;if(prepP>prepG)prepP=prepG;if(prepG<95&&prepP>=prepG-1)prepG=Math.min(95,prepG+.3);prepSet()},80)}
-function prepHide(now){if(now){clearInterval(prepT);$('#prep').classList.add('hidden');return}prepG=100;const f=setInterval(()=>{prepP+=(100-prepP)*.3+.5;if(prepP>=100){prepP=100;prepSet();clearInterval(f);clearInterval(prepT);setTimeout(()=>$('#prep').classList.add('hidden'),350)}else prepSet()},40)}
+function prepShow(){PMc=PM;setWho();setHi(!!(localStorage.getItem('swSeen')||localStorage.getItem('swEmail')));const t0=Date.now();prepP=0;prepSet();const pr=$('#prep');pr.classList.add('scn');pr.classList.remove('hidden');clearInterval(prepT);prepT=setInterval(()=>{prepP=Math.min(95,Math.max(prepP,(Date.now()-t0)/5000*95));prepSet()},60);return t0}
+function prepHide(now){if(now){clearInterval(prepT);$('#prep').classList.add('hidden');return}clearInterval(prepT);prepG=100;const f=setInterval(()=>{prepP+=(100-prepP)*.3+.5;if(prepP>=100){prepP=100;prepSet();clearInterval(f);clearInterval(prepT);setTimeout(()=>$('#prep').classList.add('hidden'),350)}else prepSet()},40)}
 
 /* ---------- theme ---------- */
 const THK='swTheme',mqD=matchMedia('(prefers-color-scheme: dark)');
@@ -1251,6 +1276,22 @@ function setHi(back){const n=firstName();$('#prepHi').textContent=(back?'Welcome
 function updGreet(){const h=new Date().getHours(),g=h>=5&&h<12?'Morning':h>=12&&h<17?'Afternoon':h>=17&&h<21?'Evening':'Night',n=firstName(),e=$('#greet');if(e)e.textContent='Good '+g+(n?', '+n:'')+'!'}
 setInterval(updGreet,60000);document.addEventListener('visibilitychange',updGreet);
 $('#btnTheme').onclick=()=>{localStorage.setItem(THK,document.documentElement.dataset.theme==='dark'?'light':'dark');applyTheme()};
+/* ---------- left-edge swipe = Back (iPhone) ---------- */
+function goBack(){
+  if(!$('#dlg').classList.contains('hidden')){$('#dlgNo').click();return}
+  const sh=$('#shs');if(sh&&!sh.classList.contains('hidden')){$('#shX').click();return}
+  const ap=$('#aps');if(ap&&!ap.classList.contains('hidden')){ap.click();return}
+  if(!$('#src').classList.contains('hidden')){$('#src').classList.add('hidden');return}
+  const vis=document.querySelector('.screen:not(.hidden)');if(!vis)return;
+  if(vis.id==='docv'&&pSel){$('#pgCancel').click();return}
+  if(vis.id==='main'){if(selMode){$('#selCancel').click();return}if(curTab!=='home')showTab('home');return}
+  const map={camv:'#camX',docv:'#dBack',crop:'#cCancel',edit:'#eBack',viewer:'#vBack',rev:'#rvBack',prev:'#pvBack',bin:'#bBack'},b=map[vis.id]&&$(map[vis.id]);
+  if(b&&!b.classList.contains('hidden'))b.click()}
+(()=>{let sx=0,sy=0,t0=0,on=false;
+  document.addEventListener('touchstart',e=>{const c=e.touches[0];on=e.touches.length===1&&c.clientX<=30;sx=c.clientX;sy=c.clientY;t0=Date.now()},{passive:true});
+  document.addEventListener('touchend',e=>{if(!on)return;on=false;const c=e.changedTouches[0],dx=c.clientX-sx,dy=Math.abs(c.clientY-sy);
+    if(dx>70&&dx>dy*1.8&&Date.now()-t0<900&&!$('#splash'))goBack()},{passive:true});
+  document.addEventListener('touchcancel',()=>{on=false},{passive:true})})();
 /* ---------- start ---------- */
 (async()=>{
   try{await openDB();
