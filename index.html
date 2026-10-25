@@ -13,17 +13,6 @@
 <meta name="apple-mobile-web-app-title" content="SW Scanner">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="apple-touch-icon" href="icon-180.png">
-<link rel="apple-touch-startup-image" href="splash-1290x2796.png" media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
-<link rel="apple-touch-startup-image" href="splash-1179x2556.png" media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
-<link rel="apple-touch-startup-image" href="splash-1284x2778.png" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
-<link rel="apple-touch-startup-image" href="splash-1170x2532.png" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
-<link rel="apple-touch-startup-image" href="splash-1125x2436.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
-<link rel="apple-touch-startup-image" href="splash-828x1792.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
-<link rel="apple-touch-startup-image" href="splash-1242x2688.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
-<link rel="apple-touch-startup-image" href="splash-1242x2208.png" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
-<link rel="apple-touch-startup-image" href="splash-750x1334.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)">
-<link rel="apple-touch-startup-image" href="splash-1206x2622.png" media="(device-width: 402px) and (device-height: 874px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
-<link rel="apple-touch-startup-image" href="splash-1320x2868.png" media="(device-width: 440px) and (device-height: 956px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)">
 <link rel="icon" href="icon-192.png">
 <style>
 :root{--o:#f97316;--bg:#eef2f8}
@@ -384,16 +373,19 @@ html[data-theme=dark] #prepHi{color:#e5e9f5}
 .bk .ic{width:24px;height:24px;margin:0}
 .bkf{position:fixed;left:14px;bottom:calc(env(safe-area-inset-bottom,0px) + 14px);z-index:14}
 #docv .fab{padding-left:80px}
+#login .inp{width:min(320px,100%);margin:0 0 10px;text-align:left;font-size:16px;position:relative;z-index:2}
+#btnLogin{justify-content:center;width:min(320px,100%);margin-top:4px}
+#splash{transition:opacity .25s}
 </style>
 </head>
 <body>
 
-<div id="splash"><img src="logo.png" alt=""><div class="spin"></div><div class="msg" id="splMsg">Loading your data…</div><div id="auth"><div class="ac"><i class="fl"></i><svg class="aic" viewBox="0 0 100 100" role="img" aria-label="SW Scanner"><rect width="100" height="100" rx="26" fill="#fff"/><text x="50" y="63" text-anchor="middle" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="46" font-weight="800" letter-spacing="-2"><tspan fill="#12297d">S</tspan><tspan fill="#f97316">W</tspan></text><rect x="22" y="75" width="56" height="5" rx="2.5" fill="#e2e8f0"/><rect x="22" y="75" width="26" height="5" rx="2.5" fill="#f97316"/></svg><div class="abn"><b>SW</b> Scanner</div><div class="atg">DOCUMENTS SCANNER</div><div id="auWho"></div><h2 id="auT"></h2><input class="inp" id="auU" placeholder="Username" autocomplete="username" autocapitalize="none"><input class="inp" id="auP" type="password" placeholder="Password" autocomplete="current-password"><input class="inp" id="auP2" type="password" placeholder="Confirm password" autocomplete="new-password"><div id="auE"></div><button class="pri" id="auGo"></button><button id="auF">Forgot password?</button></div></div><div class="bar2"><i></i></div></div>
+<div id="splash"><img src="logo.png" alt=""><div id="auth"><div class="ac"><i class="fl"></i><svg class="aic" viewBox="0 0 100 100" role="img" aria-label="SW Scanner"><rect width="100" height="100" rx="26" fill="#fff"/><text x="50" y="63" text-anchor="middle" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="46" font-weight="800" letter-spacing="-2"><tspan fill="#12297d">S</tspan><tspan fill="#f97316">W</tspan></text><rect x="22" y="75" width="56" height="5" rx="2.5" fill="#e2e8f0"/><rect x="22" y="75" width="26" height="5" rx="2.5" fill="#f97316"/></svg><div class="abn"><b>SW</b> Scanner</div><div class="atg">DOCUMENTS SCANNER</div><div id="auWho"></div><h2 id="auT"></h2><input class="inp" id="auU" placeholder="Username" autocomplete="username" autocapitalize="none"><input class="inp" id="auP" type="password" placeholder="Password" autocomplete="current-password"><input class="inp" id="auP2" type="password" placeholder="Confirm password" autocomplete="new-password"><div id="auE"></div><button class="pri" id="auGo"></button><button id="auF">Forgot password?</button></div></div></div>
 <div id="camv" class="screen hidden" style="background:#000"><video id="camVid" autoplay playsinline muted style="flex:1;min-height:0;width:100%;object-fit:cover"></video><div class="bar" style="background:#000;padding-top:14px;justify-content:space-around"><button id="camX">Close</button><button id="camSnap" class="ok" style="flex:2;padding:18px;font-size:17px">Capture</button></div></div>
 <div id="login" class="screen hidden"><div class="fx" aria-hidden="true"></div>
   <img src="logo.png" alt="SW Scanner">
   <p>Scan your important documents and keep them safe</p>
-  <button id="btnLogin"><svg viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9.1 3.6l6.8-6.8C35.8 2.4 30.3 0 24 0 14.6 0 6.5 5.4 2.6 13.2l7.9 6.1C12.4 13.6 17.7 9.5 24 9.5z"/><path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v9h12.7c-.6 3-2.3 5.5-4.8 7.2l7.6 5.9c4.4-4.1 7-10.1 7-17.6z"/><path fill="#FBBC05" d="M10.5 28.7a14.500 14.500 0 0 1 0-9.4l-7.9-6.1a24 24 0 0 0 0 21.6l7.9-6.1z"/><path fill="#34A853" d="M24 48c6.5 0 11.900-2.100 15.900-5.800l-7.600-5.900c-2.100 1.400-4.900 2.300-8.300 2.300-6.300 0-11.600-4.100-13.500-9.800l-7.900 6.100C6.500 42.600 14.600 48 24 48z"/></svg>Sign in with Google</button>
+  <input class="inp" id="lgE" type="email" placeholder="Email" autocomplete="username" autocapitalize="none" autocorrect="off" inputmode="email"><input class="inp" id="lgP" type="password" placeholder="Password" autocomplete="current-password"><button id="btnLogin">Sign in</button>
   <div id="loginErr"></div>
 </div>
 
@@ -411,6 +403,7 @@ html[data-theme=dark] #prepHi{color:#e5e9f5}
     <button class="big" id="btnDiag" data-ic="sync">Sync check<small>Find out why sync is failing</small></button>
     <button class="big" id="btnBackup" data-ic="backup">Backup<small>Save all documents to a file</small></button>
     <button class="big" id="btnRestore" data-ic="restore">Restore<small>Load documents from a backup file</small></button>
+    <button class="big" id="btnImport" data-ic="restore">Import from Google Drive<small>One time: bring your old Drive scans here</small></button>
     <button class="big" id="btnOut" data-ic="out">Logout</button></div>
   <div id="selBar" class="selbar hidden"><button id="selCancel">Cancel</button><button id="selAll">Select all</button><button class="rdb" id="selDel">Delete (0)</button></div>
   <nav id="nav"><button data-tab="home" data-ic="home" class="on" aria-label="Home"><span>Home</span></button><button data-tab="docs" data-ic="docs" aria-label="All docs"><span>All docs</span></button><button data-tab="import" data-ic="imp" aria-label="Import"><span>Import</span></button><button data-tab="tools" data-ic="tools" aria-label="Tools"><span>Tools</span></button><button data-tab="me" data-ic="user" aria-label="Me"><span>Me</span></button></nav>
@@ -471,7 +464,7 @@ html[data-theme=dark] #prepHi{color:#e5e9f5}
 <div id="toast"></div>
 <div id="prep" class="hidden"><div id="prepWho"></div><div id="prepHi"></div><div class="ring"><svg viewBox="0 0 100 100"><defs><linearGradient id="rg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2547b8"/><stop offset="1" stop-color="#ea580c"/></linearGradient></defs><circle cx="50" cy="50" r="44" class="rt"/><circle cx="50" cy="50" r="44" class="rp" id="rp"/></svg><b id="rpct">0%</b></div><div id="prepMsg"></div></div>
 
-<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script src="fb.js" defer></script>
 <script>
 const CLIENT_ID='682622042304-3iivfit3fccho5a7vpeu6jdj90kdkjl0.apps.googleusercontent.com';
 const SCOPE='https://www.googleapis.com/auth/drive.file openid email';
@@ -489,7 +482,7 @@ const dbAll=st=>tx(st,'readonly',s=>s.getAll());
 const dbGet=(st,k)=>tx(st,'readonly',s=>s.get(k));
 const dbPut=(st,v)=>tx(st,'readwrite',s=>s.put(v));
 const dbDel=(st,k)=>tx(st,'readwrite',s=>s.delete(k));
-const addTomb=ids=>ids.length?dbPut('tomb',{id:uid(),driveIds:ids}):Promise.resolve();
+const addTomb=(ids,docIds=[])=>(ids.length||docIds.length)?dbPut('tomb',{id:uid(),driveIds:ids,docIds}):Promise.resolve();
 
 /* ---------- image helpers ---------- */
 function loadImg(blob){return new Promise((res,rej)=>{const u=URL.createObjectURL(blob);const i=new Image();i.onload=()=>{res(i);setTimeout(()=>URL.revokeObjectURL(u),5000)};i.onerror=()=>rej(new Error('Could not load image'));i.src=u})}
@@ -650,7 +643,7 @@ let urls=[];const urlBlob=new Map();const mkUrl=bl=>{const u=URL.createObjectURL
 const clearUrls=()=>{const o=urls;urls=[];setTimeout(()=>o.forEach(u=>{URL.revokeObjectURL(u);urlBlob.delete(u)}),30000)};
 document.addEventListener('error',e=>{const i=e.target;if(!i||i.tagName!=='IMG'||i.dataset.re)return;const bl=urlBlob.get(i.src);if(!bl)return;i.dataset.re=1;const f=new FileReader();f.onload=()=>{i.src=f.result};f.readAsDataURL(bl)},true);
 let cur=null,curTab='home';
-function showTab(t){curTab=t;document.querySelectorAll('.tab').forEach(e=>e.classList.toggle('hidden',e.id!=='t-'+t));document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));if(t==='me')renderMe()}
+function showTab(t){curTab=t;document.querySelectorAll('.tab').forEach(e=>e.classList.toggle('hidden',e.id!=='t-'+t));document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));if(t==='me'){renderMe();loadGsi()}}
 let selMode=false,sel=new Set(),visIds=[];
 async function renderHome(){
   let all=await dbAll('docs');const old=all.filter(d=>d.deleted&&Date.now()-d.deleted>BIN_DAYS*864e5);
@@ -659,7 +652,7 @@ async function renderHome(){
   const docs=all.filter(d=>!d.deleted).sort((a,b)=>b.created-a.created);clearUrls();
   const q=$('#q').value.trim().toLowerCase(),lim=Date.now()-30*864e5;
   const fill=(el,arr,msg)=>{el.innerHTML='';if(!arr.length)el.innerHTML='<p class="empty">'+msg+'</p>';
-    for(const d of arr){const c=document.createElement('div');c.className='card'+(selMode&&sel.has(d.id)?' sel':'');const synced=d.pages.every(p=>p.driveId);
+    for(const d of arr){const c=document.createElement('div');c.className='card'+(selMode&&sel.has(d.id)?' sel':'');const synced=d.pages.every(p=>p.fs);
       c.innerHTML=(selMode?`<input type="checkbox" class="ck" ${sel.has(d.id)?'checked':''}>`:'')+`<img src="${mkUrl(d.pages[0].blob)}"><div><b></b><small>${d.pages.length} page${d.pages.length>1?'s':''} · ${fmt(new Date(d.created))} · ${synced?'Synced':'Not synced'}</small></div>`+(selMode?'':`<div class="acts"><button class="ib" data-a="s" aria-label="Share">${ico('share')}</button><button class="ib" data-a="r" aria-label="Rename">${ico('edit')}</button><button class="ib" data-a="d" aria-label="Delete" style="color:#dc2626">${ico('trash')}</button></div>`);
       c.querySelector('b').textContent=d.name;if(d.kind==='id')c.querySelector('b').insertAdjacentHTML('beforeend','<span class="tag">ID</span>');
       c.onclick=e=>{if(selMode){toggleSel(d.id);return}const a=e.target.closest('[data-a]');if(!a)return openDoc(d.id);const k=a.dataset.a;if(k==='s')shareFlow(d);else if(k==='r')renameDoc(d);else delDocs([d])};el.appendChild(c)}
@@ -681,7 +674,7 @@ async function renderMe(){const p=prof(),docs=(await dbAll('docs')).filter(d=>!d
 let pEd=false;
 function lockP(){const p=prof(),has=!!(p.n||p.e||p.p),ro=has&&!pEd;['pn','pe','pp'].forEach(i=>{const e=$('#'+i);e.readOnly=ro;e.style.background=ro?'#f1f5f9':'#fff';e.style.borderColor=ro?'transparent':''});$('#pEdit').textContent=ro?'Edit profile':'Save profile'}
 $('#pEdit').onclick=()=>{const p=prof(),has=!!(p.n||p.e||p.p);if(has&&!pEd){pEd=true;lockP();return}
- localStorage.setItem('swProfile',JSON.stringify({n:$('#pn').value.trim(),e:$('#pe').value.trim(),p:$('#pp').value.trim()}));pEd=false;renderMe();updGreet();toast('Profile saved')};
+ localStorage.setItem('swProfile',JSON.stringify({n:$('#pn').value.trim(),e:$('#pe').value.trim(),p:$('#pp').value.trim()}));localStorage.setItem('swProfDirty','1');pEd=false;renderMe();updGreet();toast('Profile saved');autoSync()};
 $('#btnBackup').onclick=async()=>{
   toast('Creating backup...');const docs=(await dbAll('docs')).filter(d=>!d.deleted);
   const b64=b=>new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result);f.readAsDataURL(b)});
@@ -718,8 +711,8 @@ function openPage(i){vi=i;zr();$('#viewImg').src=mkUrl(cur.pages[i].blob);$('#vT
 $('#vBack').onclick=()=>openDoc(cur.id);
 $('#vShare').onclick=async()=>{let d=cur;if(cur.kind==='id'){const t=askWm();if(t===null)return;d=await wmDoc(cur,t)}shareFiles([imgFiles(d)[vi]],cur.name)};
 $('#vDel').onclick=async()=>{
-  if(cur.pages.length===1)return delDocs([cur]);if(!await askConfirm('Delete this page?',"This can't be undone. It will also be removed from Google Drive."))return;
-  const p=cur.pages.splice(vi,1)[0];if(p.driveId)await addTomb([p.driveId]);
+  if(cur.pages.length===1)return delDocs([cur]);if(!await askConfirm('Delete this page?',"This can't be undone. It will also be removed from your other phones."))return;
+  const p=cur.pages.splice(vi,1)[0];if(p.fs)await addTomb([p.id]);
   if(cur.pages.length)await dbPut('docs',cur);else await dbDel('docs',cur.id);
   toast('Deleted');autoSync();cur.pages.length?openDoc(cur.id):renderHome()};
 $('#dBack').onclick=renderHome;
@@ -842,7 +835,7 @@ const optsChanged=(p,o)=>{const a=p&&p.opts?{mode:'doc',b:0,c:0,s:0,...p.opts}:{
 async function applyOpts(blob,o){const c=await srcCanvas(blob);return new Promise(r=>proc(c,o).toBlob(r,'image/jpeg',.88))}
 async function applyDocPages(id,idx,o){const d=await dbGet('docs',id);if(!d)return;let n=0;
   for(const i of idx){const p=d.pages[i];if(!p)continue;toast(`Applying ${++n}/${idx.size}...`);await new Promise(r=>setTimeout(r,20));
-    const src=p.orig||p.blob,nb=await applyOpts(src,o);if(p.driveId)await addTomb([p.driveId]);d.pages[i]={id:uid(),blob:nb,orig:src,opts:{...o}}}
+    const src=p.orig||p.blob,nb=await applyOpts(src,o);if(p.fs)await addTomb([p.id]);d.pages[i]={id:uid(),blob:nb,orig:src,opts:{...o}}}
   await dbPut('docs',d)}
 function askScope(blobs,curI){return new Promise(res=>{
   const sh=$('#aps'),g=$('#apG');let k='one';const sel=new Set(),us=[];g.innerHTML='';
@@ -892,7 +885,7 @@ $('#eSave').onclick=async()=>{
 async function saveDraft(){
   if(!ctx.draft.length){renderHome();return}
   let d;if(ctx.mode==='add'||ctx.mode==='edit')d=await dbGet('docs',ctx.docId);
-  if(ctx.mode==='edit'&&d){const old=d.pages[ctx.pi];if(old&&old.driveId)await addTomb([old.driveId]);d.pages[ctx.pi]=ctx.draft[0];ctx.draft=[];await dbPut('docs',d);toast('Saved ✓');await openDoc(d.id);openPage(ctx.pi);autoSync();return}
+  if(ctx.mode==='edit'&&d){const old=d.pages[ctx.pi];if(old&&old.fs)await addTomb([old.id]);d.pages[ctx.pi]=ctx.draft[0];ctx.draft=[];await dbPut('docs',d);toast('Saved ✓');await openDoc(d.id);openPage(ctx.pi);autoSync();return}
   if(!d){const id=ctx.mode==='id';d={id:uid(),name:(id?'ID Card ':'Scan ')+fmt(new Date()),created:Date.now(),pages:[]};if(id){d.kind='id';d.idScale=100}}
   d.pages.push(...ctx.draft.map(p=>({id:p.id,blob:p.blob,orig:p.orig,opts:p.opts})));ctx.draft=[];
   await dbPut('docs',d);toast('Saved ✓');openDoc(d.id);autoSync();if(ctx.mode==='new')autoName(d.id,d.name)}
@@ -902,7 +895,7 @@ const BIN_DAYS=30;
 const isIdCtx=()=>ctx.mode==='id'||!!ctx.isId;
 function askConfirm(t,m,ok='Delete',danger=true){return new Promise(res=>{$('#dlgT').textContent=t;$('#dlgM').textContent=m;const o=$('#dlgOk');o.textContent=ok;o.className=danger?'rdb':'pri';$('#dlg').classList.remove('hidden');
   const done=v=>{$('#dlg').classList.add('hidden');o.onclick=$('#dlgNo').onclick=null;res(v)};o.onclick=()=>done(true);$('#dlgNo').onclick=()=>done(false)})}
-async function purge(ds){await addTomb(ds.flatMap(d=>d.pages.map(p=>p.driveId).filter(Boolean)));for(const d of ds)await dbDel('docs',d.id)}
+async function purge(ds){await addTomb(ds.flatMap(d=>d.pages.filter(p=>p.fs).map(p=>p.id)),ds.filter(d=>d.fsSig!==undefined||d.pages.some(p=>p.fs)).map(d=>d.id));for(const d of ds)await dbDel('docs',d.id)}
 async function delDocs(ds){if(!ds.length)return;const n=ds.length;
   if(!await askConfirm(n>1?`Move ${n} documents to Recycle bin?`:'Move to Recycle bin?',`You can restore ${n>1?'them':'it'} from Tools within ${BIN_DAYS} days. After that ${n>1?'they are':'it is'} deleted forever.`))return;
   for(const d of ds){d.deleted=Date.now();await dbPut('docs',d)}
@@ -917,8 +910,8 @@ $('#pgCancel').onclick=()=>{pSel=null;openDoc(cur.id)};
 $('#pgAll').onclick=()=>{pSel=pSel.size===cur.pages.length?new Set():new Set(cur.pages.map((_,i)=>i));openDoc(cur.id,true)};
 $('#pgDel').onclick=async()=>{const n=pSel.size;if(!n)return toast('Select pages first');
   if(n===cur.pages.length)return delDocs([cur]);
-  if(!await askConfirm(`Delete ${n} page${n>1?'s':''}?`,"This can't be undone. The pages will also be removed from Google Drive."))return;
-  await addTomb(cur.pages.filter((_,i)=>pSel.has(i)).map(p=>p.driveId).filter(Boolean));
+  if(!await askConfirm(`Delete ${n} page${n>1?'s':''}?`,"This can't be undone. The pages will also be removed from your other phones."))return;
+  await addTomb(cur.pages.filter((p,i)=>pSel.has(i)&&p.fs).map(p=>p.id));
   cur.pages=cur.pages.filter((_,i)=>!pSel.has(i));await dbPut('docs',cur);pSel=null;toast('Deleted');autoSync();openDoc(cur.id)};
 async function openBin(){
   const ds=(await dbAll('docs')).filter(d=>d.deleted).sort((a,b)=>b.deleted-a.deleted);clearUrls();const el=$('#binList');
@@ -928,12 +921,12 @@ async function openBin(){
     c.querySelector('b').textContent=d.name;
     c.onclick=async e=>{const a=e.target.closest('[data-a]');if(!a)return;
       if(a.dataset.a==='r'){delete d.deleted;await dbPut('docs',d);toast('Restored');openBin()}
-      else if(await askConfirm('Delete forever?',"This can't be undone. The files will also be removed from Google Drive.")){await purge([d]);autoSync();openBin()}};
+      else if(await askConfirm('Delete forever?',"This can't be undone. The files will also be removed from your other phones.")){await purge([d]);autoSync();openBin()}};
     el.appendChild(c)}
   show('bin')}
 $('#bBack').onclick=renderHome;
 $('#bEmpty').onclick=async()=>{const ds=(await dbAll('docs')).filter(d=>d.deleted);if(!ds.length)return toast('Bin is already empty');
-  if(!await askConfirm(`Delete ${ds.length} document${ds.length>1?'s':''} forever?`,"This can't be undone. The files will also be removed from Google Drive."))return;await purge(ds);autoSync();openBin()};
+  if(!await askConfirm(`Delete ${ds.length} document${ds.length>1?'s':''} forever?`,"This can't be undone. The files will also be removed from your other phones."))return;await purge(ds);autoSync();openBin()};
 
 /* ---------- retake / re-edit ---------- */
 $('#eRetake').onclick=()=>{ctx.replace=ctx.mode==='edit'?null:E.bi;openSrc(ctx.last||null)};
@@ -1000,105 +993,166 @@ $('#pvBack').onclick=()=>openDoc(cur.id);
 $('#pvPrint').onclick=()=>PV.o?printSheet(PV.d,PV.o):printDoc(PV.d);
 $('#pvShare').onclick=()=>pvPdf(1);$('#pvDl').onclick=()=>pvPdf(0);
 
-/* ---------- Google Drive sync ---------- */
-let token=null,tokenExp=0,syncing=false,again=false;
-try{const t=JSON.parse(localStorage.getItem('swTok')||'null');if(t&&t.t&&Date.now()<t.e){token=t.t;tokenExp=t.e}}catch(e){}
-async function getToken(){if(!(token&&Date.now()<tokenExp))await gsiReady();return new Promise((res,rej)=>{
-  if(token&&Date.now()<tokenExp)return res(token);
-  if(!window.google||!google.accounts)return rej(new Error('Google script failed to load. Check your internet connection'));
-  const tc=google.accounts.oauth2.initTokenClient({client_id:CLIENT_ID,scope:SCOPE,hint:localStorage.getItem('swEmail')||undefined,
-    callback:r=>{if(r.error)return rej(new Error(r.error));token=r.access_token;tokenExp=Date.now()+(r.expires_in-60)*1000;try{localStorage.setItem('swTok',JSON.stringify({t:token,e:tokenExp}))}catch(e){}localStorage.setItem('swSignedIn','1');saveEmail();res(token)},
-    error_callback:e=>rej(new Error('Login failed: '+(e.type||'cancel')))});
-  tc.requestAccessToken({prompt:localStorage.getItem('swSignedIn')?'':'consent'})})}
-async function gfetch(url,opt={}){
-  const t=await getToken();
-  let r;for(let i=0;;i++){try{r=await fetch(url,{...opt,headers:{...(opt.headers||{}),Authorization:'Bearer '+t}});break}catch(e){if(i>=2){const u=new URL(url);throw new Error('Network error reaching '+u.hostname+u.pathname.slice(0,40)+' ('+(e.message||e)+')')}await new Promise(k=>setTimeout(k,1200*(i+1)))}}
-  if(!r.ok){if(r.status===401){token=null;localStorage.removeItem('swTok')}throw new Error('Drive '+r.status+': '+(await r.text()).slice(0,160))}
-  return r}
-const API='https://www.googleapis.com/drive/v3/files';
-async function folderId(){
-  let id=localStorage.getItem('swFolder');if(id)return id;
-  const q=encodeURIComponent("name='SW Scanner' and mimeType='application/vnd.google-apps.folder' and trashed=false");
-  let j=await(await gfetch(`${API}?q=${q}&fields=files(id)`)).json();
-  if(j.files[0])id=j.files[0].id;
-  else{j=await(await gfetch(API+'?fields=id',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:'SW Scanner',mimeType:'application/vnd.google-apps.folder'})})).json();id=j.id}
-  localStorage.setItem('swFolder',id);return id}
-async function listRemote(fid){
-  let out=[],pt='';
-  do{const q=encodeURIComponent(`'${fid}' in parents and trashed=false`);
-    const j=await(await gfetch(`${API}?q=${q}&pageSize=200&fields=nextPageToken,files(id,appProperties)${pt?'&pageToken='+pt:''}`)).json();
-    out=out.concat(j.files);pt=j.nextPageToken}while(pt);
-  return out}
-async function upload(fid,d,p,idx){
-  const meta={name:`${d.name}_${idx+1}.jpg`.replace(/[\/\\]/g,'-'),parents:[fid],mimeType:'image/jpeg',
-    appProperties:{docId:d.id,pageId:p.id,idx:String(idx),docName:d.name.slice(0,50),created:String(d.created),kind:d.kind||'',idScale:String(d.idScale||100)}};
-  const b='swb'+uid();
-  const body=new Blob([`--${b}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${JSON.stringify(meta)}\r\n--${b}\r\nContent-Type: image/jpeg\r\n\r\n`,p.blob,`\r\n--${b}--`]);
-  const j=await(await gfetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id',{method:'POST',headers:{'Content-Type':'multipart/related; boundary='+b},body})).json();
-  return j.id}
-const JSONH={'Content-Type':'application/json'};
+/* ---------- Firebase sync (login + Firestore) ---------- */
+let syncing=false,again=false;
+const fbw=()=>window.FB?Promise.resolve(window.FB):new Promise((ok,no)=>{const t=setTimeout(()=>no(new Error('Sync module failed to load. Check your internet connection')),8000);addEventListener('fbready',()=>{clearTimeout(t);ok(window.FB)},{once:true})});
 function setStatus(s,err){const e=$('#status');e.textContent=s;e.classList.toggle('err',!!err)}
+function authMsg(e){const c=(e&&e.code)||'';
+  if(/invalid-credential|wrong-password|user-not-found|invalid-email|invalid-login/.test(c))return 'Wrong email or password';
+  if(c==='auth/too-many-requests')return 'Too many attempts. Try again in a few minutes';
+  if(c==='auth/network-request-failed')return 'No internet connection';
+  if(c==='auth/unauthorized-domain')return 'This website is not allowed yet. In Firebase add shahidwaqas.github.io under Authentication, Settings, Authorized domains';
+  if(c==='auth/operation-not-allowed')return 'Email/Password sign-in is not enabled in Firebase';
+  if(c==='auth/user-disabled')return 'This account is disabled';
+  return (e&&e.message)||String(e)}
+function syncMsg(e){const c=(e&&e.code)||'',m=(e&&e.message)||String(e);
+  if(c==='permission-denied')return 'Permission denied. Check the Firestore Rules in Firebase';
+  if(c==='resource-exhausted')return 'Daily free limit reached. Sync will continue tomorrow';
+  if(/unavailable|offline|network|deadline/i.test(c+' '+m))return navigator.onLine===false?'No internet connection':'Could not reach the server';
+  return m}
+/* signature of the parts of a document that sync: name, kind, scale, bin state, page order */
+const dsig=(d,ids)=>JSON.stringify([d.name||'',d.kind||'',+d.idScale||100,+d.deleted||0,ids||d.pages.map(p=>p.id)]);
+async function patchDoc(id,fn){const d=await dbGet('docs',id);if(!d)return;fn(d);await dbPut('docs',d)}
+async function resetFs(){for(const d of await dbAll('docs')){d.pages.forEach(p=>{delete p.fs});delete d.fsSig;await dbPut('docs',d)}for(const t of await dbAll('tomb'))await dbDel('tomb',t.id)}
 async function sync(manual){
+  if(!localStorage.getItem('swSignedIn'))return;
   if(syncing){again=true;return}
-  if(manual!==true&&!(token&&Date.now()<tokenExp)){setStatus('Tap the sync button to connect Google Drive');return}
   syncing=true;$('#btnSync').classList.add('busy');
   try{
-    await getToken();setStatus('Syncing...');
-    const fid=await folderId();
-    for(const t of await dbAll('tomb')){
-      for(const id of t.driveIds){try{await gfetch(`${API}/${id}`,{method:'PATCH',headers:JSONH,body:'{"trashed":true}'})}catch(e){if(!/ 404/.test(e.message))throw e}}
+    if(navigator.onLine===false)throw new Error('No internet connection');
+    const F=await fbw();await F.ready();
+    if(!F.user())throw Object.assign(new Error('signed out'),{code:'sw/no-user'});
+    setStatus('Syncing...');
+    const me=F.user().uid;
+    if(localStorage.getItem('swUid')!==me){await resetFs();localStorage.setItem('swUid',me);localStorage.removeItem('swPull')}
+    const tombs=await dbAll('tomb'),tp=new Set(tombs.flatMap(t=>t.driveIds||[])),td=new Set(tombs.flatMap(t=>t.docIds||[]));
+
+    /* 1. pull changes made on other phones */
+    const since=+localStorage.getItem('swPull')||0;
+    const remote=await F.docsSince(since-2000);
+    let docs=await dbAll('docs');const byDoc=new Map(docs.map(d=>[d.id,d]));let maxT=since;
+    const goneDocs=[],plan=[];let goneP=0;
+    for(const r of remote){maxT=Math.max(maxT,r.updatedMs||0);if(td.has(r.id))continue;
+      const d=byDoc.get(r.id);
+      if(r.gone){if(d)goneDocs.push(d);continue}
+      const rp=(r.pages||[]).filter(id=>!tp.has(id)),rset=new Set(rp);
+      const lc=d?(d.fsSig===undefined||dsig(d)!==d.fsSig):false;
+      const have=new Set(d?d.pages.map(p=>p.id):[]);
+      const miss=rp.filter(id=>!have.has(id));
+      if(d&&!lc)goneP+=d.pages.filter(p=>p.fs&&!rset.has(p.id)).length;
+      plan.push({r,rp,rset,miss,isNew:!d})}
+    let del=false;
+    const total=docs.length&&docs.flatMap(d=>d.pages).length;
+    const mass=(goneDocs.length+goneP)>=Math.max(3,Math.round(total*.5));
+    if((goneDocs.length||goneP)&&!mass){
+      const n=goneDocs.length+goneP;
+      del=await askConfirm('Deleted on another phone',`${n} item${n>1?'s were':' was'} deleted on another phone. Delete here too? Cancel keeps a copy here.`,'Delete here')}
+    for(const d of goneDocs){
+      if(del)await dbDel('docs',d.id);
+      else await patchDoc(d.id,x=>{x.fsSig='';x.pages.forEach(p=>{delete p.fs})})}
+    for(const it of plan){const {r,rp,rset,miss,isNew}=it;
+      const got=[];
+      for(const pid of miss){const b=await F.getPage(pid);if(b)got.push({id:pid,blob:b,fs:true})}
+      const apply=d=>{
+        const lc=isNew?false:(d.fsSig===undefined||dsig(d)!==d.fsSig);
+        for(const p of d.pages)if(!p.fs&&rset.has(p.id))p.fs=true;
+        for(const g of got)if(!d.pages.some(p=>p.id===g.id))d.pages.push(g);
+        if(!lc){
+          let kept=0;const ord=new Map(rp.map((id,i)=>[id,i]));
+          if(del)d.pages=d.pages.filter(p=>!p.fs||rset.has(p.id));
+          else d.pages.forEach(p=>{if(p.fs&&!rset.has(p.id)){delete p.fs;kept++}});
+          d.pages.sort((a,b)=>(ord.has(a.id)?ord.get(a.id):1e9)-(ord.has(b.id)?ord.get(b.id):1e9));
+          d.name=r.name||d.name||'Scan';d.kind=r.kind||undefined;d.idScale=+r.idScale||100;
+          if(+r.deleted)d.deleted=+r.deleted;else delete d.deleted;
+          d.fsSig=kept?'':dsig(d)}};
+      if(isNew){const d={id:r.id,name:r.name||'Scan',created:+r.created||Date.now(),pages:[]};apply(d);if(d.pages.length)await dbPut('docs',d)}
+      else{const d=await dbGet('docs',r.id);if(d){apply(d);d.pages.length?await dbPut('docs',d):await dbDel('docs',d.id)}}}
+    localStorage.setItem('swPull',String(maxT));
+
+    /* 2. send deletes made on this phone */
+    for(const t of tombs){
+      for(const pid of (t.driveIds||[]))await F.delPage(pid);
+      for(const did of (t.docIds||[]))await F.putDocMeta(did,{gone:true,pages:[],name:'',created:0});
       await dbDel('tomb',t.id)}
-    const remote=await listRemote(fid),rIds=new Set(remote.map(f=>f.id));
-    let docs=await dbAll('docs');
-    const synced=docs.flatMap(d=>d.pages).filter(p=>p.driveId),gone=synced.filter(p=>!rIds.has(p.driveId));
-    if(gone.length){
-      const mass=gone.length>=Math.max(3,synced.length*.5);let del=false;
-      if(!mass)del=await askConfirm('Deleted on another device',`${gone.length} page${gone.length>1?'s were':' was'} deleted from Google Drive (another phone). Delete here too? Cancel keeps a copy here.`,'Delete here');
-      if(del){for(const d of docs){const n=d.pages.length;d.pages=d.pages.filter(p=>!p.driveId||rIds.has(p.driveId));
-        if(d.pages.length!==n){d.pages.length?await dbPut('docs',d):await dbDel('docs',d.id)}}}
-      else{for(const d of docs){let c=0;d.pages.forEach(p=>{if(p.driveId&&!rIds.has(p.driveId)){delete p.driveId;c++}});if(c)await dbPut('docs',d)}}}
-    docs=(await dbAll('docs'));
-    const byDoc={},byPage={};
-    docs.forEach(d=>{byDoc[d.id]=d;d.pages.forEach(p=>byPage[p.id]=p)});
-    const fresh=[];
-    for(const f of remote){const ap=f.appProperties;if(!ap||!ap.docId)continue;
-      const lp=byPage[ap.pageId];
-      if(lp){if(!lp.driveId){lp.driveId=f.id;}}
-      else fresh.push(f)}
-    fresh.sort((a,b)=>(+a.appProperties.idx)-(+b.appProperties.idx));
-    const touched=new Set();
-    for(const f of fresh){const ap=f.appProperties;
-      const blob=await(await gfetch(`${API}/${f.id}?alt=media`)).blob();
-      let d=byDoc[ap.docId];
-      if(!d){d={id:ap.docId,name:ap.docName||'Scan',created:+ap.created||Date.now(),kind:ap.kind||undefined,idScale:+ap.idScale||100,pages:[]};byDoc[d.id]=d;docs.push(d)}
-      d.pages.push({id:ap.pageId,blob,driveId:f.id});byPage[ap.pageId]=d.pages[d.pages.length-1];touched.add(d.id)}
-    for(const f of remote){const ap=f.appProperties;if(!ap||!ap.docId)continue;const d=byDoc[ap.docId];
-      if(d&&!d.nameDirty&&ap.docName&&ap.docName!==d.name.slice(0,50)){d.name=ap.docName;touched.add(d.id)}
-      if(d&&!d.nameDirty&&ap.idScale&&+ap.idScale!==(d.idScale||100)){d.idScale=+ap.idScale;touched.add(d.id)}}
-    for(const d of docs){
-      let ch=touched.has(d.id);
-      for(let i=0;i<d.pages.length;i++){const p=d.pages[i];
-        if(!p.driveId){p.driveId=await upload(fid,d,p,i);ch=true;await dbPut('docs',d)}}
-      if(d.nameDirty){for(const p of d.pages)await gfetch(`${API}/${p.driveId}`,{method:'PATCH',headers:JSONH,body:JSON.stringify({appProperties:{docName:d.name.slice(0,50),idScale:String(d.idScale||100)}})});d.nameDirty=false;ch=true}
-      if(ch)await dbPut('docs',d)}
-    setStatus('Synced ✓ '+new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}));saveEmail();
+
+    /* 3. send new pages and changes made on this phone */
+    for(const d0 of await dbAll('docs')){
+      for(const p of d0.pages){if(p.fs)continue;
+        await F.putPage(p.id,d0.id,p.blob);
+        await patchDoc(d0.id,d=>{const q=d.pages.find(x=>x.id===p.id);if(q)q.fs=true})}
+      const d=await dbGet('docs',d0.id);if(!d)continue;
+      const ids=d.pages.filter(p=>p.fs).map(p=>p.id),sg=dsig(d,ids);
+      if(sg!==d.fsSig){
+        await F.putDocMeta(d.id,{name:d.name||'',created:+d.created||0,kind:d.kind||'',idScale:+d.idScale||100,deleted:+d.deleted||0,pages:ids,gone:false});
+        await patchDoc(d.id,x=>{x.fsSig=sg})}}
+
+    /* 4. profile (name for greeting) */
+    try{if(localStorage.getItem('swProfDirty')){await F.putProfile(prof());localStorage.removeItem('swProfDirty')}
+      else if(!localStorage.getItem('swProfile')){const rp=await F.getProfile();if(rp){localStorage.setItem('swProfile',JSON.stringify({n:rp.n||'',e:rp.e||'',p:rp.p||''}));updGreet()}}}catch(e){}
+
+    setStatus('Synced ✓ '+new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}));
     if(!$('#main').classList.contains('hidden'))renderHome();
     else if(!$('#docv').classList.contains('hidden')&&cur)openDoc(cur.id,true);
-  }catch(e){const m=e.message||String(e),f=/Network error reaching/.test(m)?(navigator.onLine===false?'No internet connection':'Could not reach Google Drive'):/popup|cancel|blocked|access_denied|immediate_failed/i.test(m)?'Google login was blocked or cancelled. Tap here to retry':/Drive 40[13]/.test(m)?'Google Drive permission problem. Log out and log in again':m;
-    setStatus('⚠ Sync failed: '+f+(f===m?'':' ('+m.slice(0,160)+')'),1);toast('Sync failed: '+f)}
+  }catch(e){
+    if(e&&e.code==='sw/no-user'){localStorage.removeItem('swSignedIn');sessionStorage.removeItem('swOk');setStatus('');show('login');$('#loginErr').textContent='Please sign in again to continue syncing'}
+    else{const m=syncMsg(e);setStatus('⚠ Sync failed: '+m+'. Tap to retry',1);if(manual===true)toast('Sync failed: '+m)}}
   finally{syncing=false;$('#btnSync').classList.remove('busy');if(again){again=false;setTimeout(sync,800)}}}
 function autoSync(){if($('#splash')||!localStorage.getItem('swSignedIn'))return;sync()}
 $('#btnSync').onclick=()=>sync(true);
 $('#btnLock').onclick=async()=>{if(!await askConfirm('Close app?',hasPin()?'The app will lock. You will need your PIN to open it again.':'The app will lock and show the login screen.','Close',false))return;sessionStorage.removeItem('swOk');location.reload()};
 $('#btnLogin').onclick=async()=>{
-  $('#loginErr').textContent='';
-  prepShow();try{await getToken();unlocked();localStorage.setItem('swSeen','1');prepTo(50);await renderHome();prepTo(70);await sync();prepHide()}
-  catch(e){prepHide(1);$('#loginErr').textContent=e.message}};
+  const em=$('#lgE').value.trim(),pw=$('#lgP').value,E=$('#loginErr');E.textContent='';
+  if(!em||!pw){E.textContent='Enter your email and password';return}
+  prepShow();
+  try{const F=await fbw();const cr=await F.signIn(em,pw);
+    localStorage.setItem('swSignedIn','1');localStorage.setItem('swEmail',(cr.user&&cr.user.email)||em);setWho();
+    $('#lgP').value='';unlocked();localStorage.setItem('swSeen','1');prepTo(50);await renderHome();prepTo(70);await sync(true);prepHide()}
+  catch(e){prepHide(1);E.textContent=authMsg(e)}};
+$('#lgP').addEventListener('keydown',e=>{if(e.key==='Enter')$('#btnLogin').click()});
+$('#lgE').addEventListener('keydown',e=>{if(e.key==='Enter')$('#lgP').focus()});
 $('#btnOut').onclick=async()=>{
   if(!await askConfirm('Log out?','Scanned documents will stay on this phone.','Log out',false))return;
-  try{if(token&&window.google)google.accounts.oauth2.revoke(token,()=>{})}catch(e){}
-  token=null;tokenExp=0;localStorage.removeItem('swTok');localStorage.removeItem('swSignedIn');localStorage.removeItem('swFolder');localStorage.removeItem(PIN_KEY);localStorage.removeItem('swEmail');sessionStorage.removeItem('swOk');pinUi();
+  try{if(window.FB)await FB.signOut()}catch(e){}
+  localStorage.removeItem('swSignedIn');localStorage.removeItem(PIN_KEY);localStorage.removeItem('swEmail');sessionStorage.removeItem('swOk');pinUi();
   $('#loginErr').textContent='';setStatus('');show('login')};
+
+/* ---------- one-time import of old scans from Google Drive ---------- */
+let gsiLoading=null;
+function loadGsi(){if(window.google&&google.accounts)return Promise.resolve();
+  if(!gsiLoading)gsiLoading=new Promise(ok=>{const e=document.createElement('script');e.src='https://accounts.google.com/gsi/client';e.onload=()=>ok();e.onerror=()=>{gsiLoading=null;ok()};document.head.appendChild(e)});
+  return gsiLoading}
+function driveToken(){return new Promise(async(res,rej)=>{await loadGsi();
+  if(!window.google||!google.accounts)return rej(new Error('Google script failed to load. Check your internet connection'));
+  const tc=google.accounts.oauth2.initTokenClient({client_id:CLIENT_ID,scope:SCOPE,
+    callback:r=>r.error?rej(new Error(r.error)):res(r.access_token),
+    error_callback:e=>rej(new Error('Google login failed: '+(e.type||'cancelled')))});
+  tc.requestAccessToken({prompt:'consent'})})}
+$('#btnImport').onclick=async()=>{const bt=$('#btnImport');if(bt.dataset.busy)return;bt.dataset.busy='1';
+  try{
+    toast('Opening Google login...');
+    const tk=await driveToken(),API='https://www.googleapis.com/drive/v3/files';
+    const gf=async u=>{let r;for(let i=0;;i++){try{r=await fetch(u,{headers:{Authorization:'Bearer '+tk}});break}catch(e){if(i>=2)throw new Error('Could not reach Google Drive');await new Promise(k=>setTimeout(k,1200*(i+1)))}}
+      if(!r.ok)throw new Error('Drive '+r.status+': '+(await r.text()).slice(0,120));return r};
+    const fq=encodeURIComponent("name='SW Scanner' and mimeType='application/vnd.google-apps.folder' and trashed=false");
+    const folders=(await(await gf(`${API}?q=${fq}&fields=files(id)`)).json()).files||[];
+    if(!folders.length){toast('No SW Scanner folder found in this Google Drive');return}
+    let files=[];
+    for(const fo of folders){let pt='';do{const q=encodeURIComponent(`'${fo.id}' in parents and trashed=false`);
+      const j=await(await gf(`${API}?q=${q}&pageSize=200&fields=nextPageToken,files(id,appProperties)${pt?'&pageToken='+pt:''}`)).json();
+      files=files.concat(j.files||[]);pt=j.nextPageToken}while(pt)}
+    const mine=await dbAll('docs'),have=new Set(mine.flatMap(d=>d.pages.map(p=>p.id)));
+    const fresh=files.filter(f=>f.appProperties&&f.appProperties.docId&&f.appProperties.pageId&&!have.has(f.appProperties.pageId));
+    fresh.sort((a,b)=>(+a.appProperties.idx)-(+b.appProperties.idx));
+    if(!fresh.length){toast(files.length?'Everything from Drive is already here':'Drive folder is empty');return}
+    let n=0;
+    for(const f of fresh){const ap=f.appProperties;toast(`Importing ${++n}/${fresh.length}...`);
+      const blob=await(await gf(`${API}/${f.id}?alt=media`)).blob();
+      let d=await dbGet('docs',ap.docId);
+      if(!d)d={id:ap.docId,name:ap.docName||'Scan',created:+ap.created||Date.now(),kind:ap.kind||undefined,idScale:+ap.idScale||100,pages:[]};
+      d.pages.push({id:ap.pageId,blob});await dbPut('docs',d)}
+    await renderHome();toast(`Imported ${fresh.length} page${fresh.length>1?'s':''} from Drive`);sync(true)
+  }catch(e){toast('Import failed: '+(e.message||e))}
+  finally{delete bt.dataset.busy}};
 
 /* ---------- PDF import + zoom ---------- */
 async function expandPdf(fs){const out=[];for(const f of fs){if(!(f.type==='application/pdf'||/\.pdf$/i.test(f.name))){out.push(f);continue}
@@ -1123,7 +1177,7 @@ function zr(){Z.s=1;Z.x=Z.y=0;Z.p.clear();zap()}
 /* ---------- auto sync triggers + HD camera ---------- */
 window.addEventListener('online',autoSync);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)autoSync()});
-setInterval(()=>{if(!document.hidden&&token&&Date.now()<tokenExp)sync()},180000);
+setInterval(()=>{if(!document.hidden&&!$('#splash')&&localStorage.getItem('swSignedIn'))sync()},300000);
 $('#status').onclick=()=>{sync(true)};
 function stopCam(){const v=$('#camVid');if(v.srcObject){v.srcObject.getTracks().forEach(t=>t.stop());v.srcObject=null}}
 const camBack=()=>ctx.draft.length?openRev():(ctx.mode==='add'||ctx.mode==='edit')?openDoc(ctx.docId):renderHome();
@@ -1138,23 +1192,23 @@ const PIN_KEY='swPin';let pinTry=0;
 async function hp(u,p){const h=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('sw|'+u.toLowerCase()+'|'+p));return[...new Uint8Array(h)].map(x=>x.toString(16).padStart(2,'0')).join('')}
 const hasPin=()=>!!localStorage.getItem(PIN_KEY);
 const unlocked=()=>sessionStorage.setItem('swOk','1');
-function splashOut(){const sp=$('#splash');if(!sp)return;sp.classList.add('out');setTimeout(()=>{moveScene($('#login'));sp.remove();autoSync()},600)}
+function splashOut(){const sp=$('#splash');if(!sp)return;sp.classList.add('out');setTimeout(()=>{moveScene($('#login'));sp.remove();autoSync()},260)}
 function moveScene(h){const fx=document.querySelector('.fx');if(fx&&h&&fx.parentNode!==h){h.insertBefore(fx,h.firstChild);dispatchEvent(new Event('resize'))}}
 function pinShow(){moveScene($('#splash'));{const em=localStorage.getItem('swEmail');$('#auWho').textContent=em?'Logged in as '+em:''}['.spin','.msg','.bar2'].forEach(c=>{const e=document.querySelector('#splash '+c);if(e)e.style.display='none'});
   $('#auth').style.display='flex';$('#splash').classList.add('au');$('#auT').textContent='Enter your PIN';$('#auU').style.display='none';$('#auP2').style.display='none';
-  const P=$('#auP');P.placeholder='PIN';P.setAttribute('inputmode','numeric');P.maxLength=6;P.value='';$('#auE').textContent='';$('#auGo').textContent='Unlock';$('#auF').textContent='Forgot PIN? Use Google login';$('#auF').style.display='';P.focus()}
+  const P=$('#auP');P.placeholder='PIN';P.setAttribute('inputmode','numeric');P.maxLength=6;P.value='';$('#auE').textContent='';$('#auGo').textContent='Unlock';$('#auF').textContent='Forgot PIN? Sign in with email';$('#auF').style.display='';P.focus()}
 async function gate(){
   if(sessionStorage.getItem('swOk')){splashOut();return}
   if(localStorage.getItem('swSignedIn')&&hasPin()){pinShow();return}
-  show('login');splashOut()}
+  show('login');$('#lgE').value=localStorage.getItem('swEmail')||'';splashOut()}
 $('#auGo').onclick=async()=>{const P=$('#auP'),E=$('#auE');E.textContent='';
-  if(await hp('pin',P.value)===localStorage.getItem(PIN_KEY)){unlocked();pinTry=0;const pp=prepPin();await renderHome();splashOut();await pp}
+  if(await hp('pin',P.value)===localStorage.getItem(PIN_KEY)){unlocked();pinTry=0;await renderHome();splashOut()}
   else{P.value='';if(++pinTry>=5){$('#auF').onclick();return}E.textContent='Wrong PIN ('+pinTry+'/5)'}};
 $('#auP').addEventListener('keydown',e=>{if(e.key==='Enter')$('#auGo').click()});
-$('#auF').onclick=()=>{show('login');splashOut()};
-function pinUi(){$('#pinSm').textContent=hasPin()?'PIN is on. Tap to change or remove':'Use a short PIN instead of Google login every time'}
+$('#auF').onclick=()=>{show('login');$('#lgE').value=localStorage.getItem('swEmail')||'';splashOut()};
+function pinUi(){$('#pinSm').textContent=hasPin()?'PIN is on. Tap to change or remove':'Use a short PIN instead of password every time'}
 $('#btnPin').onclick=async()=>{
-  if(hasPin()&&await askConfirm('PIN login','Remove the PIN? You will need Google login each time. (Cancel to change it instead)','Remove')){localStorage.removeItem(PIN_KEY);pinUi();toast('PIN removed');return}
+  if(hasPin()&&await askConfirm('PIN login','Remove the PIN? You will need your email and password each time. (Cancel to change it instead)','Remove')){localStorage.removeItem(PIN_KEY);pinUi();toast('PIN removed');return}
   const a=prompt('New PIN (4 to 6 digits)');if(a===null)return;
   if(!/^\d{4,6}$/.test(a)){toast('PIN must be 4 to 6 digits');return}
   if(prompt('Confirm PIN')!==a){toast('PINs do not match');return}
@@ -1169,24 +1223,17 @@ $('#zIn').onclick=()=>pvZoom(PZ*1.4);$('#zOut').onclick=()=>pvZoom(PZ/1.4);$('#z
  b.addEventListener('touchend',()=>{d0=0})})();
 
 /* ---------- sync helpers ---------- */
-async function gsiReady(){for(let i=0;i<40;i++){if(window.google&&google.accounts)return;if(i===16){const e=document.createElement('script');e.src='https://accounts.google.com/gsi/client';document.head.appendChild(e)}await new Promise(k=>setTimeout(k,250))}}
 $('#btnDiag').onclick=async()=>{const L=[],t=async(n,f)=>{try{L.push('OK  '+n+': '+await f())}catch(e){L.push('FAIL '+n+': '+(e.message||e))}};
   toast('Checking...');L.push('Browser online: '+navigator.onLine);
   L.push('Service worker: '+(navigator.serviceWorker&&navigator.serviceWorker.controller?navigator.serviceWorker.controller.scriptURL.split('/').pop():'none'));
-  await t('Google reachable',async()=>(await fetch('https://www.googleapis.com/discovery/v1/apis/drive/v3/rest?fields=id')).status);
-  await t('Google login script',async()=>{await gsiReady();return window.google&&google.accounts?'loaded':'NOT loaded'});
-  await t('Sign-in token',async()=>{await getToken();return 'ok'});
-  await t('Drive access',async()=>(await gfetch(API+'?pageSize=1&fields=files(id)')).status);
+  await t('Sync module',async()=>{await fbw();return 'loaded'});
+  await t('Signed in as',async()=>{const F=await fbw();await F.ready();return F.user()?F.user().email:'NOT signed in'});
+  await t('Cloud database',async()=>{const F=await fbw();const r=await F.docsSince(Date.now()+864e5);return 'reachable ('+r.length+')'});
   alert(L.join('\n'))};
 
 /* ---------- login theme docs + sign-in preparing screen ---------- */
-let prepT,prepP=0,prepG=25;const PM=[[0,'Signing you in…'],[30,'Preparing your workspace…'],[60,'Syncing your documents…'],[90,'Almost ready…']],PM2=[[0,'Loading your files…'],[25,'Checking your documents…'],[55,'Syncing your data…'],[85,'Almost ready…']];let PMc=PM;
+let prepT,prepP=0,prepG=25;const PM=[[0,'Signing you in…'],[30,'Preparing your workspace…'],[60,'Syncing your documents…'],[90,'Almost ready…']];let PMc=PM;
 function setWho(){const w=$('#prepWho');if(!w)return;const em=localStorage.getItem('swEmail');w.textContent=em?'Logged in as '+em:''}
-async function saveEmail(){if(localStorage.getItem('swEmail')||!token)return;let em='';const H={headers:{Authorization:'Bearer '+token}};
- try{const r=await fetch('https://www.googleapis.com/oauth2/v3/userinfo',H);if(r.ok)em=(await r.json()).email||''}catch(e){}
- if(!em)try{const r=await fetch('https://www.googleapis.com/drive/v3/about?fields=user(emailAddress)',H);if(r.ok)em=((await r.json()).user||{}).emailAddress||''}catch(e){}
- if(em){localStorage.setItem('swEmail',em);setWho()}}
-function prepPin(){PMc=PM2;setWho();setHi(true);const t0=Date.now(),D=5000;prepP=0;prepSet();$('#prep').classList.remove('hidden');clearInterval(prepT);return new Promise(res=>{prepT=setInterval(()=>{prepP=Math.min(100,(Date.now()-t0)/D*100);prepSet();if(prepP>=100){clearInterval(prepT);setTimeout(()=>{$('#prep').classList.add('hidden');res()},350)}},60)})}
 function prepSet(){const v=Math.round(prepP);$('#rp').style.strokeDashoffset=276.5*(1-prepP/100);$('#rpct').textContent=v+'%';let m=PMc[0][1];for(const [t,x] of PMc)if(v>=t)m=x;$('#prepMsg').textContent=m}
 function prepTo(g){prepG=Math.max(prepG,g)}
 function prepShow(){PMc=PM;setWho();setHi(!!(localStorage.getItem('swSeen')||localStorage.getItem('swEmail')||localStorage.getItem('swFolder')));prepP=0;prepG=25;prepSet();$('#prep').classList.remove('hidden');clearInterval(prepT);prepT=setInterval(()=>{prepP+=(prepG-prepP)*.06+.05;if(prepP>prepG)prepP=prepG;if(prepG<95&&prepP>=prepG-1)prepG=Math.min(95,prepG+.3);prepSet()},80)}
@@ -1206,11 +1253,10 @@ setInterval(updGreet,60000);document.addEventListener('visibilitychange',updGree
 $('#btnTheme').onclick=()=>{localStorage.setItem(THK,document.documentElement.dataset.theme==='dark'?'light':'dark');applyTheme()};
 /* ---------- start ---------- */
 (async()=>{
-  const SM=['Loading your data…','Loading your files…','Checking your documents…','Preparing your workspace…','Almost ready…'];let smi=0;
-  const smT=setInterval(()=>{const m=$('#splMsg');if(!m)return clearInterval(smT);m.style.opacity=0;setTimeout(()=>{m.textContent=SM[Math.min(++smi,SM.length-1)];m.style.opacity=1},200)},1000);
-  setTimeout(()=>{clearInterval(smT);gate()},2000);
-  await openDB();
-  if(localStorage.getItem('swSignedIn')){localStorage.setItem('swSeen','1');await renderHome()}else show('login');
+  try{await openDB();
+    if(localStorage.getItem('swSignedIn')){localStorage.setItem('swSeen','1');await renderHome()}else show('login')}
+  catch(e){show('login')}
+  gate();
   if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
   if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();
 })();
