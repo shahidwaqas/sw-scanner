@@ -1031,8 +1031,8 @@ async function patchDoc(id,fn){const d=await dbGet('docs',id);if(!d)return;fn(d)
 async function resetFs(){for(const d of await dbAll('docs')){d.pages.forEach(p=>{delete p.fs});delete d.fsSig;await dbPut('docs',d)}for(const t of await dbAll('tomb'))await dbDel('tomb',t.id)}
 async function sync(manual){
   if(!localStorage.getItem('swSignedIn'))return;
-  if(syncing){again=true;return}
-  syncing=true;$('#btnSync').classList.add('busy');
+  if(syncing&&Date.now()-(window.__syT||0)<90000){again=true;return}
+  syncing=true;window.__syT=Date.now();$('#btnSync').classList.add('busy');
   try{
     if(navigator.onLine===false)throw new Error('No internet connection');
     const F=await fbw();await F.ready();
@@ -1220,7 +1220,7 @@ async function doLogin(){
   const t0=prepShow();
   try{const F=await fbw();const cr=await F.signIn(em,pw);
     localStorage.removeItem(PIN_KEY);localStorage.setItem('swSignedIn','1');localStorage.setItem('swEmail',(cr.user&&cr.user.email)||em);setWho();pinUi();
-    P.value='';unlocked();localStorage.setItem('swSeen','1');await renderHome();await sync(true);
+    P.value='';unlocked();localStorage.setItem('swSeen','1');await renderHome();sync(true);
     const left=5000-(Date.now()-t0);if(left>0)await new Promise(r=>setTimeout(r,left));
     prepHide();setTimeout(splashOut,500)}
   catch(e){prepHide(1);$('#auth').style.display='flex';E.textContent=authMsg(e)}
