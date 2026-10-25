@@ -297,7 +297,6 @@ button{border-radius:18px}.sb{border-radius:16px}
 #nav .on{background:rgba(10,26,92,.09)!important;color:#0f172a!important}
 #main .scroll{padding-bottom:110px}
 
-header #btnSync,header #btnLock{padding:10px 12px!important}
 header{gap:8px!important}
 /* v4 login card: blue folded page */
 #auth{background:none!important;box-shadow:none!important;padding:0!important;border-radius:0!important;filter:drop-shadow(0 18px 26px rgba(4,10,40,.55))}
@@ -350,6 +349,24 @@ html[data-theme=dark] #prepWho{color:#cbd5ff}
 html[data-theme=dark] #prepMsg{color:#94a3b8}
 html[data-theme=dark] #prep .ring b{color:#e5e9f5}
 html[data-theme=dark] #prep .rt{stroke:#2a3454}
+/* v5 main header: blue folded card */
+.hdw{flex:none;filter:drop-shadow(0 8px 14px rgba(10,26,92,.3));position:relative;z-index:5}
+header.hd2{display:block!important;position:relative;padding:calc(env(safe-area-inset-top,0px) + 16px) 16px 16px!important;border-radius:0 0 30px 30px!important;border:0!important;background:linear-gradient(160deg,#2f55c9,#173098 78%)!important;box-shadow:inset 0 -1px 0 rgba(255,255,255,.18)!important;-webkit-mask:linear-gradient(225deg,transparent 0 29px,#000 32px);mask:linear-gradient(225deg,transparent 0 29px,#000 32px)}
+.hfl{position:absolute;top:0;right:0;width:44px;height:44px;border-bottom-left-radius:14px;background:linear-gradient(45deg,#b9c9f0 0,#eef3ff 48%,transparent 50%);filter:drop-shadow(-2px 2px 3px rgba(4,10,40,.35));pointer-events:none}
+.hd2 .hr1{display:flex;align-items:center;gap:12px;padding-right:46px}
+.hd2 .hic{width:46px;height:46px;border-radius:13px;flex:none;box-shadow:0 5px 12px rgba(4,10,40,.35),0 0 0 1px rgba(255,255,255,.5)}
+.hd2 .hbn{min-width:0;font:800 21px/1.05 system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;color:#cfdcff;letter-spacing:-.4px}
+.hd2 .hbn b{color:#fff}
+.hd2 .hbn small{display:block;font:600 9.5px/1 ui-monospace,Menlo,Consolas,monospace;letter-spacing:3px;color:#fb923c;margin-top:5px}
+.hd2 .hr2{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px}
+.hd2 .greet{flex:1;min-width:0;font-weight:700;font-size:16px;line-height:1.25;color:#fff}
+.hd2 .hact{display:flex;gap:6px;flex:none}
+.hd2 .hact button{width:38px;height:38px;padding:0!important;border-radius:12px!important;display:grid;place-items:center;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.28);color:#fff}
+.hd2 .hact .ic{width:20px;height:20px;margin:0}
+.hd2 .hact .busy .ic{animation:pls 1s ease-in-out infinite alternate}
+@keyframes pls{to{opacity:.3}}
+#prepHi{font:800 26px/1.2 system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;color:#0a1a5c;text-align:center;padding:0 20px}
+html[data-theme=dark] #prepHi{color:#e5e9f5}
 </style>
 </head>
 <body>
@@ -364,7 +381,7 @@ html[data-theme=dark] #prep .rt{stroke:#2a3454}
 </div>
 
 <div id="main" class="screen">
-  <header><img class="hlogo" src="mark.png" alt=""><h1>SW Scanner</h1><button id="btnSync">Sync</button><button id="btnLock" data-ic="out" aria-label="Lock and close app"></button></header>
+  <div class="hdw"><header class="hd2"><i class="hfl"></i><div class="hr1"><svg class="hic" viewBox="0 0 100 100" role="img" aria-label="SW Scanner"><rect width="100" height="100" rx="26" fill="#fff"/><text x="50" y="63" text-anchor="middle" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="46" font-weight="800" letter-spacing="-2"><tspan fill="#12297d">S</tspan><tspan fill="#f97316">W</tspan></text><rect x="22" y="75" width="56" height="5" rx="2.5" fill="#e2e8f0"/><rect x="22" y="75" width="26" height="5" rx="2.5" fill="#f97316"/></svg><div class="hbn"><span><b>SW</b> Scanner</span><small>DOCUMENTS SCANNER</small></div></div><div class="hr2"><div id="greet" class="greet"></div><div class="hact"><button id="btnSync" data-ic="sync" aria-label="Sync"></button><button id="btnTheme" aria-label="Change theme"></button><button id="btnOutH" data-ic="out" aria-label="Log out"></button><button id="btnLock" data-ic="power" aria-label="Lock and close app"></button></div></div></header></div>
   <div id="status"></div>
   <div class="scroll tab" id="t-home"><div class="qa"><button class="pri" data-go="scan" data-ic="cam">Scan document</button><button data-go="id" data-ic="id">ID card</button></div><div class="row"><h3>Last 30 days</h3><button class="sb" data-sel>Select</button></div><div id="list"></div></div>
   <div class="scroll tab hidden" id="t-docs"><input id="q" class="inp" placeholder="Search documents"><div class="row"><h3>All documents</h3><button class="sb" data-sel>Select</button></div><div id="listAll"></div></div>
@@ -433,7 +450,7 @@ html[data-theme=dark] #prep .rt{stroke:#2a3454}
 <div id="bin" class="screen hidden"><header><button id="bBack">←</button><h1>Recycle bin</h1><button id="bEmpty">Empty</button></header><div class="scroll"><p class="hint" id="binHint"></p><div id="binList"></div></div></div>
 <div id="dlg" class="sheet hidden"><div><b id="dlgT"></b><p id="dlgM"></p><button id="dlgOk" class="rdb">Delete</button><button id="dlgNo">Cancel</button></div></div>
 <div id="toast"></div>
-<div id="prep" class="hidden"><div id="prepWho"></div><div class="ring"><svg viewBox="0 0 100 100"><defs><linearGradient id="rg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2547b8"/><stop offset="1" stop-color="#ea580c"/></linearGradient></defs><circle cx="50" cy="50" r="44" class="rt"/><circle cx="50" cy="50" r="44" class="rp" id="rp"/></svg><b id="rpct">0%</b></div><div id="prepMsg"></div></div>
+<div id="prep" class="hidden"><div id="prepWho"></div><div id="prepHi"></div><div class="ring"><svg viewBox="0 0 100 100"><defs><linearGradient id="rg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2547b8"/><stop offset="1" stop-color="#ea580c"/></linearGradient></defs><circle cx="50" cy="50" r="44" class="rt"/><circle cx="50" cy="50" r="44" class="rp" id="rp"/></svg><b id="rpct">0%</b></div><div id="prepMsg"></div></div>
 
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script>
@@ -584,7 +601,7 @@ async function wmBlob(b,t){const im=await loadImg(b),c=document.createElement('c
   return new Promise(r=>c.toBlob(r,'image/jpeg',.9))}
 async function wmDoc(d,t){if(!t)return d;return{...d,pages:await Promise.all(d.pages.map(async p=>({...p,blob:await wmBlob(p.blob,t)})))}}
 
-const ICO={home:'<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/>',docs:'<path d="M15 3H8a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V8z"/><path d="M15 3v5h5M4 7v13a2 2 0 0 0 2 2h9"/>',imp:'<path d="M12 3v12M7 10l5 5 5-5M4 19h16"/>',tools:'<rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/>',user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',cam:'<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',img:'<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="M21 16l-5-5-9 9"/>',folder:'<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',id:'<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2"/><path d="M6 16c.5-2 5.5-2 6 0M14 10h4M14 14h4"/>',share:'<circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.2 10.8l7.6-3.6M8.2 13.2l7.6 3.6"/>',edit:'<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/>',trash:'<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',rot:'<path d="M20 12a8 8 0 1 1-2.5-5.8"/><path d="M20 4v5h-5"/>',crop:'<path d="M7 3v14h14"/><path d="M3 7h14v14"/>',sync:'<path d="M7 18a4 4 0 0 1-.5-8A6 6 0 0 1 18 9a4.5 4.5 0 0 1 0 9z"/>',backup:'<path d="M12 4v11M7 11l5 5 5-5M5 20h14"/>',restore:'<path d="M12 16V5M7 9l5-5 5 5M5 20h14"/>',out:'<path d="M9 4H5v16h4M16 8l4 4-4 4M20 12H9"/>',filt:'<circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 0 0 16z"/>',adj:'<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>',retake:'<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><path d="M14.5 12.5a2.7 2.7 0 1 0-.6 2.2"/><path d="M14.8 10.6v2h-2"/>'};
+const ICO={sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>',moon:'<path d="M21 13a9 9 0 1 1-10-10 7 7 0 0 0 10 10z"/>',power:'<path d="M12 3v9"/><path d="M6.4 6.4a8 8 0 1 0 11.2 0"/>',home:'<path d="M3 11l9-8 9 8"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/>',docs:'<path d="M15 3H8a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h9a2 2 0 0 0 2-2V8z"/><path d="M15 3v5h5M4 7v13a2 2 0 0 0 2 2h9"/>',imp:'<path d="M12 3v12M7 10l5 5 5-5M4 19h16"/>',tools:'<rect x="4" y="4" width="6" height="6" rx="1"/><rect x="14" y="4" width="6" height="6" rx="1"/><rect x="4" y="14" width="6" height="6" rx="1"/><rect x="14" y="14" width="6" height="6" rx="1"/>',user:'<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>',cam:'<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',img:'<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.5"/><path d="M21 16l-5-5-9 9"/>',folder:'<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',id:'<rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2"/><path d="M6 16c.5-2 5.5-2 6 0M14 10h4M14 14h4"/>',share:'<circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="6" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M8.2 10.8l7.6-3.6M8.2 13.2l7.6 3.6"/>',edit:'<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/>',trash:'<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',rot:'<path d="M20 12a8 8 0 1 1-2.5-5.8"/><path d="M20 4v5h-5"/>',crop:'<path d="M7 3v14h14"/><path d="M3 7h14v14"/>',sync:'<path d="M7 18a4 4 0 0 1-.5-8A6 6 0 0 1 18 9a4.5 4.5 0 0 1 0 9z"/>',backup:'<path d="M12 4v11M7 11l5 5 5-5M5 20h14"/>',restore:'<path d="M12 16V5M7 9l5-5 5 5M5 20h14"/>',out:'<path d="M9 4H5v16h4M16 8l4 4-4 4M20 12H9"/>',filt:'<circle cx="12" cy="12" r="8"/><path d="M12 4a8 8 0 0 0 0 16z"/>',adj:'<path d="M4 7h9M17 7h3M4 17h3M11 17h9"/><circle cx="15" cy="7" r="2"/><circle cx="9" cy="17" r="2"/>',retake:'<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><path d="M14.5 12.5a2.7 2.7 0 1 0-.6 2.2"/><path d="M14.8 10.6v2h-2"/>'};
 const ico=n=>`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${ICO[n]||''}</svg>`;
 document.querySelectorAll('[data-ic]').forEach(e=>e.insertAdjacentHTML('afterbegin',ico(e.dataset.ic)));
 async function renameDoc(d){const n=prompt('New name',d.name);if(!n||!n.trim())return;d.name=n.trim();d.nameDirty=true;await dbPut('docs',d);await renderHome();autoSync()}
@@ -633,7 +650,7 @@ async function renderHome(){
   visIds=curTab==='docs'?rb:ra;
   $('#main').classList.toggle('selmode',selMode);$('#selBar').classList.toggle('hidden',!selMode);$('#nav').classList.toggle('hidden',selMode);
   $('#selDel').textContent=`Delete (${sel.size})`;document.querySelectorAll('[data-sel]').forEach(b=>b.classList.toggle('hidden',selMode));
-  show('main');showTab(curTab)}
+  updGreet();show('main');showTab(curTab)}
 $('#q').oninput=renderHome;
 document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
 document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(!g)return;const v=g.dataset.go;
@@ -645,7 +662,7 @@ async function renderMe(){const p=prof(),docs=(await dbAll('docs')).filter(d=>!d
 let pEd=false;
 function lockP(){const p=prof(),has=!!(p.n||p.e||p.p),ro=has&&!pEd;['pn','pe','pp'].forEach(i=>{const e=$('#'+i);e.readOnly=ro;e.style.background=ro?'#f1f5f9':'#fff';e.style.borderColor=ro?'transparent':''});$('#pEdit').textContent=ro?'Edit profile':'Save profile'}
 $('#pEdit').onclick=()=>{const p=prof(),has=!!(p.n||p.e||p.p);if(has&&!pEd){pEd=true;lockP();return}
- localStorage.setItem('swProfile',JSON.stringify({n:$('#pn').value.trim(),e:$('#pe').value.trim(),p:$('#pp').value.trim()}));pEd=false;renderMe();toast('Profile saved')};
+ localStorage.setItem('swProfile',JSON.stringify({n:$('#pn').value.trim(),e:$('#pe').value.trim(),p:$('#pp').value.trim()}));pEd=false;renderMe();updGreet();toast('Profile saved')};
 $('#btnBackup').onclick=async()=>{
   toast('Creating backup...');const docs=(await dbAll('docs')).filter(d=>!d.deleted);
   const b64=b=>new Promise(r=>{const f=new FileReader();f.onload=()=>r(f.result);f.readAsDataURL(b)});
@@ -979,7 +996,7 @@ async function upload(fid,d,p,idx){
 const JSONH={'Content-Type':'application/json'};
 function setStatus(s,err){const e=$('#status');e.textContent=s;e.classList.toggle('err',!!err)}
 async function sync(){
-  if(syncing){again=true;return}syncing=true;$('#btnSync').textContent='Syncing...';
+  if(syncing){again=true;return}syncing=true;$('#btnSync').classList.add('busy');
   try{
     await getToken();setStatus('Syncing...');
     const fid=await folderId();
@@ -1017,18 +1034,18 @@ async function sync(){
         if(!p.driveId){p.driveId=await upload(fid,d,p,i);ch=true;await dbPut('docs',d)}}
       if(d.nameDirty){for(const p of d.pages)await gfetch(`${API}/${p.driveId}`,{method:'PATCH',headers:JSONH,body:JSON.stringify({appProperties:{docName:d.name.slice(0,50),idScale:String(d.idScale||100)}})});d.nameDirty=false;ch=true}
       if(ch)await dbPut('docs',d)}
-    setStatus('Synced ✓ '+new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}));
+    setStatus('Synced ✓ '+new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}));saveEmail();
     if(!$('#main').classList.contains('hidden'))renderHome();
     else if(!$('#docv').classList.contains('hidden')&&cur)openDoc(cur.id,true);
   }catch(e){const m=e.message||String(e),f=/Network error reaching/.test(m)?(navigator.onLine===false?'No internet connection':'Could not reach Google Drive'):/popup|cancel|blocked|access_denied|immediate_failed/i.test(m)?'Google login was blocked or cancelled. Tap here to retry':/Drive 40[13]/.test(m)?'Google Drive permission problem. Log out and log in again':m;
     setStatus('⚠ Sync failed: '+f+(f===m?'':' ('+m.slice(0,160)+')'),1);toast('Sync failed: '+f)}
-  finally{syncing=false;$('#btnSync').textContent='Sync';if(again){again=false;setTimeout(sync,800)}}}
+  finally{syncing=false;$('#btnSync').classList.remove('busy');if(again){again=false;setTimeout(sync,800)}}}
 function autoSync(){if($('#splash')||!localStorage.getItem('swSignedIn'))return;sync()}
 $('#btnSync').onclick=sync;
 $('#btnLock').onclick=async()=>{if(!await askConfirm('Close app?',hasPin()?'The app will lock. You will need your PIN to open it again.':'The app will lock and show the login screen.','Close',false))return;sessionStorage.removeItem('swOk');location.reload()};
 $('#btnLogin').onclick=async()=>{
   $('#loginErr').textContent='';
-  prepShow();try{await getToken();unlocked();prepTo(50);await renderHome();prepTo(70);await sync();prepHide()}
+  prepShow();try{await getToken();unlocked();localStorage.setItem('swSeen','1');prepTo(50);await renderHome();prepTo(70);await sync();prepHide()}
   catch(e){prepHide(1);$('#loginErr').textContent=e.message}};
 $('#btnOut').onclick=async()=>{
   if(!await askConfirm('Log out?','Scanned documents will stay on this phone.','Log out',false))return;
@@ -1118,26 +1135,36 @@ $('#btnDiag').onclick=async()=>{const L=[],t=async(n,f)=>{try{L.push('OK  '+n+':
 /* ---------- login theme docs + sign-in preparing screen ---------- */
 let prepT,prepP=0,prepG=25;const PM=[[0,'Signing you in…'],[30,'Preparing your workspace…'],[60,'Syncing your documents…'],[90,'Almost ready…']],PM2=[[0,'Loading your files…'],[25,'Checking your documents…'],[55,'Syncing your data…'],[85,'Almost ready…']];let PMc=PM;
 function setWho(){const w=$('#prepWho');if(!w)return;const em=localStorage.getItem('swEmail');w.textContent=em?'Logged in as '+em:''}
-async function saveEmail(){if(localStorage.getItem('swEmail')||!token)return;try{const r=await fetch('https://www.googleapis.com/oauth2/v3/userinfo',{headers:{Authorization:'Bearer '+token}});if(!r.ok)return;const j=await r.json();if(j.email){localStorage.setItem('swEmail',j.email);setWho()}}catch(e){}}
-function prepPin(){PMc=PM2;setWho();const t0=Date.now(),D=5000;prepP=0;prepSet();$('#prep').classList.remove('hidden');clearInterval(prepT);return new Promise(res=>{prepT=setInterval(()=>{prepP=Math.min(100,(Date.now()-t0)/D*100);prepSet();if(prepP>=100){clearInterval(prepT);setTimeout(()=>{$('#prep').classList.add('hidden');res()},350)}},60)})}
+async function saveEmail(){if(localStorage.getItem('swEmail')||!token)return;let em='';const H={headers:{Authorization:'Bearer '+token}};
+ try{const r=await fetch('https://www.googleapis.com/oauth2/v3/userinfo',H);if(r.ok)em=(await r.json()).email||''}catch(e){}
+ if(!em)try{const r=await fetch('https://www.googleapis.com/drive/v3/about?fields=user(emailAddress)',H);if(r.ok)em=((await r.json()).user||{}).emailAddress||''}catch(e){}
+ if(em){localStorage.setItem('swEmail',em);setWho()}}
+function prepPin(){PMc=PM2;setWho();setHi(true);const t0=Date.now(),D=5000;prepP=0;prepSet();$('#prep').classList.remove('hidden');clearInterval(prepT);return new Promise(res=>{prepT=setInterval(()=>{prepP=Math.min(100,(Date.now()-t0)/D*100);prepSet();if(prepP>=100){clearInterval(prepT);setTimeout(()=>{$('#prep').classList.add('hidden');res()},350)}},60)})}
 function prepSet(){const v=Math.round(prepP);$('#rp').style.strokeDashoffset=276.5*(1-prepP/100);$('#rpct').textContent=v+'%';let m=PMc[0][1];for(const [t,x] of PMc)if(v>=t)m=x;$('#prepMsg').textContent=m}
 function prepTo(g){prepG=Math.max(prepG,g)}
-function prepShow(){PMc=PM;setWho();prepP=0;prepG=25;prepSet();$('#prep').classList.remove('hidden');clearInterval(prepT);prepT=setInterval(()=>{prepP+=(prepG-prepP)*.06+.05;if(prepP>prepG)prepP=prepG;if(prepG<95&&prepP>=prepG-1)prepG=Math.min(95,prepG+.3);prepSet()},80)}
+function prepShow(){PMc=PM;setWho();setHi(!!(localStorage.getItem('swSeen')||localStorage.getItem('swEmail')||localStorage.getItem('swFolder')));prepP=0;prepG=25;prepSet();$('#prep').classList.remove('hidden');clearInterval(prepT);prepT=setInterval(()=>{prepP+=(prepG-prepP)*.06+.05;if(prepP>prepG)prepP=prepG;if(prepG<95&&prepP>=prepG-1)prepG=Math.min(95,prepG+.3);prepSet()},80)}
 function prepHide(now){if(now){clearInterval(prepT);$('#prep').classList.add('hidden');return}prepG=100;const f=setInterval(()=>{prepP+=(100-prepP)*.3+.5;if(prepP>=100){prepP=100;prepSet();clearInterval(f);clearInterval(prepT);setTimeout(()=>$('#prep').classList.add('hidden'),350)}else prepSet()},40)}
 
 /* ---------- theme ---------- */
 const THK='swTheme',mqD=matchMedia('(prefers-color-scheme: dark)');
-function applyTheme(){const m=localStorage.getItem(THK)||'auto',d=m==='dark'||(m==='auto'&&mqD.matches);document.documentElement.dataset.theme=d?'dark':'light';document.querySelectorAll('#thSeg button').forEach(b=>b.classList.toggle('on',b.dataset.th===m))}
+function applyTheme(){const m=localStorage.getItem(THK)||'auto',d=m==='dark'||(m==='auto'&&mqD.matches);document.documentElement.dataset.theme=d?'dark':'light';{const b=$('#btnTheme');if(b){b.innerHTML=ico(d?'sun':'moon');b.title=d?'Switch to light':'Switch to dark'}}document.querySelectorAll('#thSeg button').forEach(b=>b.classList.toggle('on',b.dataset.th===m))}
 document.querySelectorAll('#thSeg button').forEach(b=>b.onclick=()=>{localStorage.setItem(THK,b.dataset.th);applyTheme()});
 if(mqD.addEventListener)mqD.addEventListener('change',applyTheme);else mqD.addListener(applyTheme);
 applyTheme();
+/* ---------- greeting + header buttons ---------- */
+function firstName(){return((prof().n||'').trim().split(/\s+/)[0]||'')}
+function setHi(back){const n=firstName();$('#prepHi').textContent=(back?'Welcome back':'Welcome')+(n?', '+n:'')+'!'}
+function updGreet(){const h=new Date().getHours(),g=h>=5&&h<12?'Morning':h>=12&&h<17?'Afternoon':h>=17&&h<21?'Evening':'Night',n=firstName(),e=$('#greet');if(e)e.textContent='Good '+g+(n?', '+n:'')+'!'}
+setInterval(updGreet,60000);document.addEventListener('visibilitychange',updGreet);
+$('#btnTheme').onclick=()=>{localStorage.setItem(THK,document.documentElement.dataset.theme==='dark'?'light':'dark');applyTheme()};
+$('#btnOutH').onclick=()=>$('#btnOut').click();
 /* ---------- start ---------- */
 (async()=>{
   const SM=['Loading your data…','Loading your files…','Checking your documents…','Preparing your workspace…','Almost ready…'];let smi=0;
   const smT=setInterval(()=>{const m=$('#splMsg');if(!m)return clearInterval(smT);m.style.opacity=0;setTimeout(()=>{m.textContent=SM[Math.min(++smi,SM.length-1)];m.style.opacity=1},200)},1000);
   setTimeout(()=>{clearInterval(smT);gate()},2000);
   await openDB();
-  if(localStorage.getItem('swSignedIn')){await renderHome()}else show('login');
+  if(localStorage.getItem('swSignedIn')){localStorage.setItem('swSeen','1');await renderHome()}else show('login');
   if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
   if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();
 })();
