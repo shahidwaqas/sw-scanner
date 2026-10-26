@@ -864,8 +864,8 @@ function proc(cv,o){
     if(m==='magic'){const px=i%w,py=(i/w)|0,fx=Math.min(gw-1,Math.max(0,px/bs-.5)),fy=Math.min(gh-1,Math.max(0,py/bs-.5)),x0=fx|0,y0=fy|0,x1=Math.min(gw-1,x0+1),y1=Math.min(gh-1,y0+1),ax=fx-x0,ay=fy-y0;
       const bl=ch=>(BG[(y0*gw+x0)*3+ch]*(1-ax)+BG[(y0*gw+x1)*3+ch]*ax)*(1-ay)+(BG[(y1*gw+x0)*3+ch]*(1-ax)+BG[(y1*gw+x1)*3+ch]*ax)*ay;
       r=r*255/bl(0)*1.09;g=g*255/bl(1)*1.09;b=b*255/bl(2)*1.09;
-      let y=r*.299+g*.587+b*.114;if(y<170){const k2=Math.pow(Math.max(y,1)/170,.55);r*=k2;g*=k2;b*=k2;y*=k2}
-      if(y>215){r=g=b=255}else if(y>170){const t=(y-170)/45;r+=(255-r)*t;g+=(255-g)*t;b+=(255-b)*t}}
+      let y=r*.299+g*.587+b*.114;if(y<190){const k2=Math.pow(Math.max(y,1)/190,2.1);r*=k2;g*=k2;b*=k2;y*=k2}
+      if(y>215){r=g=b=255}else if(y>190){const t=(y-190)/25;r+=(255-r)*t;g+=(255-g)*t;b+=(255-b)*t}}
     else if(m!=='color'){let y=r*.299+g*.587+b*.114;if(m!=='gray')y=(y-lo)*k;if(m==='hc')y=(y-128)*1.7+128;r=g=b=y}
     d[j]=lut[q(r)];d[j+1]=lut[q(g)];d[j+2]=lut[q(b)]}
   if(o.s>0){const a=o.s/100*1.2,src=new Uint8ClampedArray(d);
