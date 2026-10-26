@@ -396,9 +396,14 @@ html[data-theme=dark] #prep.scn .rt{stroke:#2a3454}
 html[data-theme=dark] #nav{background:rgba(28,36,64,.38)!important;border:.5px solid rgba(255,255,255,.14)!important;box-shadow:0 8px 28px rgba(0,0,0,.35),inset 0 .5px 0 rgba(255,255,255,.12)!important}
 /* iOS style page transition */
 @keyframes scIn{from{opacity:0;transform:translateX(34px);box-shadow:-14px 0 34px rgba(10,26,92,.16)}to{opacity:1;transform:none;box-shadow:-14px 0 34px rgba(10,26,92,0)}}
-@keyframes scBack{from{opacity:0;transform:translateX(-34px);box-shadow:14px 0 34px rgba(10,26,92,.16)}to{opacity:1;transform:none;box-shadow:14px 0 34px rgba(10,26,92,0)}}
+@keyframes scBack{0%{opacity:.15;transform:perspective(1100px) rotateY(-78deg);filter:brightness(.7)}60%{opacity:1}100%{opacity:1;transform:perspective(1100px) rotateY(0);filter:none}}
 .screen.go-in{animation:scIn .34s cubic-bezier(.22,.8,.3,1) both}
-.screen.go-back{animation:scBack .34s cubic-bezier(.22,.8,.3,1) both}
+.screen.go-back{transform-origin:0 50%;animation:scBack .45s cubic-bezier(.2,.7,.25,1) both}
+body{overflow-x:hidden}
+@keyframes slL{from{opacity:0;translate:46px 0}to{opacity:1;translate:0 0}}@keyframes slR{from{opacity:0;translate:-46px 0}to{opacity:1;translate:0 0}}
+#viewImg.sl-l{animation:slL .28s ease-out}#viewImg.sl-r{animation:slR .28s ease-out}
+#edit .stage,#rvPager.zm{touch-action:none}#rvPager.zm{overflow-x:hidden}
+#dGrid{touch-action:pan-y}
 </style>
 </head>
 <body>
@@ -859,7 +864,8 @@ function proc(cv,o){
     if(m==='magic'){const px=i%w,py=(i/w)|0,fx=Math.min(gw-1,Math.max(0,px/bs-.5)),fy=Math.min(gh-1,Math.max(0,py/bs-.5)),x0=fx|0,y0=fy|0,x1=Math.min(gw-1,x0+1),y1=Math.min(gh-1,y0+1),ax=fx-x0,ay=fy-y0;
       const bl=ch=>(BG[(y0*gw+x0)*3+ch]*(1-ax)+BG[(y0*gw+x1)*3+ch]*ax)*(1-ay)+(BG[(y1*gw+x0)*3+ch]*(1-ax)+BG[(y1*gw+x1)*3+ch]*ax)*ay;
       r=r*255/bl(0)*1.09;g=g*255/bl(1)*1.09;b=b*255/bl(2)*1.09;
-      const y=r*.299+g*.587+b*.114;if(y>215){r=g=b=255}else if(y>170){const t=(y-170)/45;r+=(255-r)*t;g+=(255-g)*t;b+=(255-b)*t}}
+      let y=r*.299+g*.587+b*.114;if(y<170){const k2=Math.pow(Math.max(y,1)/170,.55);r*=k2;g*=k2;b*=k2;y*=k2}
+      if(y>215){r=g=b=255}else if(y>170){const t=(y-170)/45;r+=(255-r)*t;g+=(255-g)*t;b+=(255-b)*t}}
     else if(m!=='color'){let y=r*.299+g*.587+b*.114;if(m!=='gray')y=(y-lo)*k;if(m==='hc')y=(y-128)*1.7+128;r=g=b=y}
     d[j]=lut[q(r)];d[j+1]=lut[q(g)];d[j+2]=lut[q(b)]}
   if(o.s>0){const a=o.s/100*1.2,src=new Uint8ClampedArray(d);
@@ -1335,8 +1341,31 @@ function goBack(){
   const mo=new MutationObserver(ms=>{for(const m of ms){const el=m.target;if(!el.classList||!el.classList.contains('screen'))continue;
     const was=(m.oldValue||'').split(/\s+/).includes('hidden');if(was&&!el.classList.contains('hidden')){
       const b=Date.now()-back<700;el.classList.remove('go-in','go-back');void el.offsetWidth;el.classList.add(b?'go-back':'go-in');
-      setTimeout(()=>el.classList.remove('go-in','go-back'),420)}}});
+      setTimeout(()=>el.classList.remove('go-in','go-back'),520)}}});
   document.querySelectorAll('.screen').forEach(s=>mo.observe(s,{attributes:true,attributeFilter:['class'],attributeOldValue:true}))})();
+
+/* ---------- viewer swipe between pages, pinch zoom in edit/review, pinch grid zoom ---------- */
+(()=>{const st=$('#viewer .stage');let sx=0,sy=0,multi=false,on=false;
+  st.addEventListener('touchstart',e=>{if(e.touches.length>1)multi=true;else{multi=false;sx=e.touches[0].clientX;sy=e.touches[0].clientY;on=sx>30}},{passive:true});
+  st.addEventListener('touchend',e=>{if(!on||multi||e.touches.length)return;on=false;const c=e.changedTouches[0],dx=c.clientX-sx,dy=c.clientY-sy;
+    if(Z.s>1.05||Math.abs(dx)<60||Math.abs(dx)<Math.abs(dy)*1.5||!cur)return;
+    const ni=vi+(dx<0?1:-1);if(ni<0||ni>=cur.pages.length)return;openPage(ni);const im=$('#viewImg');im.classList.remove('sl-l','sl-r');void im.offsetWidth;im.classList.add(dx<0?'sl-l':'sl-r')},{passive:true})})();
+function pinchZoom(stage,getT,onZ){const S={s:1,x:0,y:0},T={d:0,s0:1,mx:0,my:0,tap:0};
+  const ap=()=>{const t=getT();if(t){t.style.transformOrigin='center';t.style.transform=S.s===1?'':`translate(${S.x}px,${S.y}px) scale(${S.s})`}if(onZ)onZ(S.s>1)};
+  const dist=e=>Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+  stage.addEventListener('touchstart',e=>{if(e.touches.length===2){T.d=dist(e)||1;T.s0=S.s}else if(e.touches.length===1){T.mx=e.touches[0].clientX;T.my=e.touches[0].clientY;const n=Date.now();if(n-T.tap<280){S.s=S.s>1?1:2.5;S.x=S.y=0;ap()}T.tap=n}},{passive:true});
+  stage.addEventListener('touchmove',e=>{if(e.touches.length===2){e.preventDefault();S.s=Math.max(1,Math.min(8,T.s0*dist(e)/T.d));if(S.s===1)S.x=S.y=0;ap()}
+    else if(e.touches.length===1&&S.s>1){e.preventDefault();const c=e.touches[0];S.x+=c.clientX-T.mx;S.y+=c.clientY-T.my;T.mx=c.clientX;T.my=c.clientY;ap()}},{passive:false});
+  return{reset(){S.s=1;S.x=S.y=0;ap()}}}
+const zEdit=pinchZoom($('#edit .stage'),()=>$('#editCv'));
+const rvp=$('#rvPager'),zRev=pinchZoom(rvp,()=>{const d=rvp.children[ctx&&ctx.ri||0];return d&&d.querySelector('img')},z=>rvp.classList.toggle('zm',z));
+new MutationObserver(()=>{zEdit.reset()}).observe($('#edit'),{attributes:true,attributeFilter:['class']});
+new MutationObserver(()=>{zRev.reset()}).observe($('#rev'),{attributes:true,attributeFilter:['class']});
+rvp.addEventListener('scroll',()=>zRev.reset());
+(()=>{const g=$('#dGrid');let d0=0,c0=2;const dist=e=>Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+  g.addEventListener('touchstart',e=>{if(e.touches.length===2){d0=dist(e)||1;c0=parseInt(getComputedStyle(g).gridTemplateColumns.split(' ').length)||2}},{passive:true});
+  g.addEventListener('touchmove',e=>{if(e.touches.length===2&&d0){e.preventDefault();const c=Math.max(1,Math.min(4,Math.round(c0*d0/dist(e))));g.style.gridTemplateColumns=`repeat(${c},1fr)`}},{passive:false});
+  g.addEventListener('touchend',()=>{d0=0})})();
 /* ---------- start ---------- */
 (async()=>{
   try{await openDB();
