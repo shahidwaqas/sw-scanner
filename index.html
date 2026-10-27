@@ -670,7 +670,7 @@ async function makePDF(pages,d){
   if(d&&d.sheet){const o=d.sheet;imgs.slice(0,2).forEach((_,k)=>{const it=sheetPos(o,k).map(q=>({i:k,x:q.x*MM,y:PH-(q.y+53.98)*MM,w:85.6*MM,h:53.98*MM}));
     if(k===0&&o.marks){const sg=[];sheetPos(o,0).forEach(q=>sg.push(...ticks(q.x,q.y)));it.ln='0.4 w 0.4 G\n'+sg.map(a=>`${(a[0]*MM).toFixed(2)} ${(PH-a[1]*MM).toFixed(2)} m ${(a[2]*MM).toFixed(2)} ${(PH-a[3]*MM).toFixed(2)} l S`).join('\n')}
     pgs.push(it)})}
-  else if(isId){const s=(d.idScale||100)/100,w=85.6*MM*s;let y=PH-20*MM;pgs.push(imgs.map((im,i)=>{const h=w*im.h/im.w;y-=h;const t={i,x:(PW-w)/2,y,w,h};y-=12*MM;return t}))}
+  else if(isId){const s=(d.idScale||100)/100,o=SH();imgs.forEach((im,i)=>{const w=Math.min(85.6*s,190),h=w*im.h/im.w;let x=(210-w)/2,y=20;if(i){if(o.flip==='short')y=297-20-h;x+=o.ox;y+=o.oy}pgs.push([{i,x:x*MM,y:PH-(y+h)*MM,w:w*MM,h:h*MM}])})}
   else imgs.forEach((im,i)=>pgs.push([{i,x:0,y:0,w:595,h:Math.round(595*im.h/im.w)}]));
   const N=2+n+2*pgs.length;
   push('%PDF-1.4\n');
@@ -694,7 +694,7 @@ async function shareFiles(files,title){
   files.forEach(dl);toast('Sharing is not supported here, files downloaded')}
 async function sharePDF(d){toast('Creating PDF...');const b=await makePDF(d.pages,d);shareFiles([new File([b],safe(d.name)+'.pdf',{type:'application/pdf'})],d.name)}
 const imgFiles=d=>d.pages.map((p,i)=>new File([p.blob],safe(d.name)+'_'+(i+1)+'.jpg',{type:'image/jpeg'}));
-const SH=()=>({n:8,gap:5,flip:'long',ox:0,oy:0,marks:1,...JSON.parse(localStorage.getItem('swSheet')||'{}')});
+const SH=()=>({n:8,gap:8,flip:'long',ox:0,oy:0,marks:1,...JSON.parse(localStorage.getItem('swSheet')||'{}')});
 function sheetPos(o,k){const W=85.6,H=53.98,r=o.n/2,g=Math.max(1,Math.min(o.gap,(287-r*H)/(r-1))),gx=(210-(2*W+g))/2,gy=(297-(r*H+(r-1)*g))/2,a=[];
   for(let rr=0;rr<r;rr++)for(let c=0;c<2;c++){let cc=c,r2=rr;if(k){if(o.flip==='long')cc=1-c;else r2=r-1-rr}
     a.push({x:gx+cc*(W+g)+(k?o.ox:0),y:gy+r2*(H+g)+(k?o.oy:0)})}return a}
@@ -704,11 +704,18 @@ function runPrint(css,body,u){const f=document.createElement('iframe');f.style.c
   const go=()=>{try{f.contentWindow.focus();f.contentWindow.print()}catch(e){}};
   Promise.race([Promise.all([...f.contentDocument.images].map(im=>im.complete?1:new Promise(r=>{im.onload=im.onerror=r}))),new Promise(r=>setTimeout(r,6000))]).then(()=>setTimeout(go,150));setTimeout(()=>{f.remove();u.forEach(x=>URL.revokeObjectURL(x))},120000)}
 function printDoc(d){const u=d.pages.map(p=>URL.createObjectURL(p.blob));
-  if(d.kind==='id'){const s=(d.idScale||100)/100;runPrint(`body{padding-top:20mm}img{display:block;margin:0 auto 12mm;width:${(85.6*s).toFixed(2)}mm;height:auto}`,u.map(x=>`<img src="${x}">`).join(''),u)}
+  if(d.kind==='id'){printIdDup(d,u);return}
   else runPrint('img{display:block;width:210mm;max-height:297mm;object-fit:contain;page-break-after:always}',u.map(x=>`<img src="${x}">`).join(''),u)}
+async function idLay(d,o,s){const r=[];for(let k=0;k<d.pages.length;k++){const im=await loadImg(d.pages[k].blob),w=Math.min(85.6*s,190),h=w*im.naturalHeight/im.naturalWidth;let x=(210-w)/2,y=20;if(k){if(o.flip==='short')y=297-20-h;x+=o.ox;y+=o.oy}r.push({x,y,w,h})}return r}
+async function twoStep(htm,css,u){let ok=true;for(let i=0;i<htm.length;i++){
+  if(i>0&&!await askConfirm('Print back side','Front side is printed. Put the same paper back in the printer, then tap Print for the back side.','Print',false)){ok=false;break}
+  runPrint(css,htm[i],i<htm.length-1?[]:u)}
+  if(!ok)u.forEach(x=>URL.revokeObjectURL(x))}
+async function printIdDup(d,u){const o=SH(),L=await idLay(d,o,(d.idScale||100)/100);
+  twoStep(u.map((x,k)=>`<div class="pg"><img src="${x}" style="left:${L[k].x.toFixed(2)}mm;top:${L[k].y.toFixed(2)}mm;width:${L[k].w.toFixed(2)}mm;height:${L[k].h.toFixed(2)}mm"></div>`),'.pg{position:relative;width:210mm;height:297mm;overflow:hidden}img{position:absolute}',u)}
 function printSheet(d,o){const u=d.pages.slice(0,2).map(p=>URL.createObjectURL(p.blob));
-  const body=u.map((x,k)=>'<div class="pg">'+sheetPos(o,k).map(q=>`<img src="${x}" style="left:${q.x.toFixed(2)}mm;top:${q.y.toFixed(2)}mm">`+(k===0&&o.marks?ticks(q.x,q.y).map(t=>`<i style="left:${Math.min(t[0],t[2]).toFixed(2)}mm;top:${Math.min(t[1],t[3]).toFixed(2)}mm;width:${Math.max(.2,Math.abs(t[2]-t[0])).toFixed(2)}mm;height:${Math.max(.2,Math.abs(t[3]-t[1])).toFixed(2)}mm"></i>`).join(''):'')).join('')+'</div>').join('');
-  runPrint('.pg{position:relative;width:210mm;height:297mm;overflow:hidden;page-break-after:always}img{position:absolute;width:85.6mm;height:53.98mm}i{position:absolute;background:#666}',body,u)}
+  const htm=u.map((x,k)=>'<div class="pg">'+sheetPos(o,k).map(q=>`<img src="${x}" style="left:${q.x.toFixed(2)}mm;top:${q.y.toFixed(2)}mm">`+(k===0&&o.marks?ticks(q.x,q.y).map(t=>`<i style="left:${Math.min(t[0],t[2]).toFixed(2)}mm;top:${Math.min(t[1],t[3]).toFixed(2)}mm;width:${Math.max(.2,Math.abs(t[2]-t[0])).toFixed(2)}mm;height:${Math.max(.2,Math.abs(t[3]-t[1])).toFixed(2)}mm"></i>`).join(''):'')).join('')+'</div>');
+  twoStep(htm,'.pg{position:relative;width:210mm;height:297mm;overflow:hidden}img{position:absolute;width:85.6mm;height:53.98mm}i{position:absolute;background:#666}',u)}
 function askWm(){const t=prompt('Purpose text to print on this copy, e.g. "Only for bank account opening" (leave empty for none)',localStorage.getItem('swWm')||'');if(t===null)return null;localStorage.setItem('swWm',t.trim());return t.trim()}
 async function wmBlob(b,t){const im=await loadImg(b),c=document.createElement('canvas');c.width=im.naturalWidth;c.height=im.naturalHeight;const x=c.getContext('2d');x.drawImage(im,0,0);
   x.save();x.translate(c.width/2,c.height/2);x.rotate(-Math.atan2(c.height,c.width)*.6);let fs=c.height*.11;x.font=`bold ${fs}px sans-serif`;
@@ -829,7 +836,7 @@ $('#shr').onclick=async e=>{const s=e.target.dataset.s;if(!s&&e.target.id!=='shr
   if(s==='pdf')sharePDF(d);else if(s==='img')shareFiles(imgFiles(d),cur.name);else if(s==='print')printDoc(d);else if(s==='dl'){toast('Creating PDF...');dl(new File([await makePDF(d.pages,d)],safe(cur.name)+'.pdf',{type:'application/pdf'}))}};
 $('#shs').onclick=async e=>{const s=e.target.dataset.s;if(!s&&e.target.id!=='shs')return;if(!s||s==='x'){$('#shs').classList.add('hidden');return}
   const o={n:+$('#shN').value,gap:+$('#shG').value||5,flip:$('#shF').value,ox:+$('#shX').value||0,oy:+$('#shY').value||0,marks:$('#shM').checked?1:0};
-  localStorage.setItem('swSheet',JSON.stringify(o));$('#shs').classList.add('hidden');if(s==='prev'){openPrev(cur,o);return}
+  localStorage.setItem('swSheet',JSON.stringify(o));$('#shs').classList.add('hidden');if(cur.pages.length<2){toast('Add the back side first');return}if(s==='prev'){openPrev(cur,o);return}
   const t=askWm();if(t===null)return;const d=await wmDoc(cur,t);
   if(s==='spdf'){toast('Creating PDF...');const b=await makePDF(d.pages,{...d,sheet:o});shareFiles([new File([b],safe(cur.name)+'-sheet.pdf',{type:'application/pdf'})],cur.name)}
   else printSheet(d,o)};
@@ -876,7 +883,7 @@ function loadCV(){if(window.cv&&window.cv.Mat)return Promise.resolve(window.cv);
 function grabSmall(c,max){const sc=Math.min(1,max/Math.max(c.width,c.height)),w=Math.max(1,Math.round(c.width*sc)),h=Math.max(1,Math.round(c.height*sc)),t=document.createElement('canvas');t.width=w;t.height=h;
   const x=t.getContext('2d');x.drawImage(c,0,0,w,h);return{sc,w,h,d:x.getImageData(0,0,w,h).data}}
 async function autoQuadX(c,fast){
-  if(fast&&!(window.cv&&window.cv.Mat))return autoQuad(c);
+  if(fast&&!(window.cv&&window.cv.Mat)){if(!CVP)return autoQuad(c);try{await Promise.race([CVP,new Promise((_,no)=>setTimeout(()=>no(new Error('slow')),3000))])}catch(e){return autoQuad(c)}}
   try{const cv=await Promise.race([loadCV(),new Promise((_,no)=>setTimeout(()=>no(new Error('slow')),6000))]);
     const g=grabSmall(c,640),r=cvDetect(cv,g.d,g.w,g.h);
     if(r&&r.q)return r.q.map(p=>({x:p.x/g.sc,y:p.y/g.sc}))}catch(e){}
@@ -1132,6 +1139,8 @@ async function openPrev(d,o){let dd=d;
   PV={d:dd,o};clearUrls();const box=$('#pvBox');box.innerHTML='';$('#pvT').textContent=d.name;
   if(o){dd.pages.slice(0,2).forEach((p,k)=>{const u=mkUrl(p.blob),pg=document.createElement('div');pg.className='a4';
     pg.innerHTML=sheetPos(o,k).map(q=>`<img src="${u}" style="left:${q.x/2.1}%;top:${q.y/2.97}%;width:${85.6/2.1}%;height:${53.98/2.97}%">`+(k===0&&o.marks?ticks(q.x,q.y).map(t=>`<i style="left:${Math.min(t[0],t[2])/2.1}%;top:${Math.min(t[1],t[3])/2.97}%;width:${Math.max(.2,Math.abs(t[2]-t[0]))/2.1}%;height:${Math.max(.2,Math.abs(t[3]-t[1]))/2.97}%"></i>`).join(''):'')).join('');box.appendChild(pg)})}
+  else if(dd.kind==='id'){const L=await idLay(dd,SH(),(dd.idScale||100)/100),gp=8;let tw=L.reduce((a,t)=>a+t.w,0)+gp*(L.length-1);const f=tw>196?196/tw:1;tw*=f;let x=(210-tw)/2;
+    const pg=document.createElement('div');pg.className='a4';pg.innerHTML=dd.pages.map((p,k)=>{const t=L[k],h=`<img src="${mkUrl(p.blob)}" style="left:${(x/2.1).toFixed(3)}%;top:${(20/2.97).toFixed(3)}%;width:${(t.w*f/2.1).toFixed(3)}%;height:${(t.h*f/2.97).toFixed(3)}%">`;x+=(t.w+gp)*f;return h}).join('');box.appendChild(pg)}
   else dd.pages.forEach(p=>{const im=document.createElement('img');im.src=mkUrl(p.blob);im.className='pvi';box.appendChild(im)});
   PZ=1;show('prev')}
 async function pvPdf(share){const d=PV.d,o=PV.o;toast('Creating PDF...');
@@ -1329,7 +1338,7 @@ function startOv(){ovOn=true;const v=$('#camVid'),o=$('#camOv'),t=document.creat
      q.forEach(p=>{x.beginPath();x.arc(p.x,p.y,6,0,7);x.fillStyle='#fff';x.fill()})}else ovQ=null}}catch(e){}
   if(ovOn)setTimeout(tick,800)};setTimeout(tick,600)}
 const camBack=()=>ctx.draft.length?openRev():(ctx.mode==='add'||ctx.mode==='edit')?openDoc(ctx.docId):renderHome();
-async function openCam(){try{const st=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:4096},height:{ideal:2160}},audio:false});$('#camVid').srcObject=st;show('camv');startOv()}
+async function openCam(){try{const st=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:4096},height:{ideal:2160}},audio:false});$('#camVid').srcObject=st;show('camv');loadCV().catch(()=>{});startOv()}
   catch(e){toast('In-app camera not available, using phone camera');$('#inCam').click()}}
 $('#camX').onclick=()=>{stopCam();camBack()};
 $('#camGal').onclick=()=>$('#inGal').click();
@@ -1481,6 +1490,7 @@ rvp.addEventListener('scroll',()=>zRev.reset());
 async function fixBroken(){try{for(const d of await dbAll('docs')){const all=d.pages||[],ok=all.filter(p=>p&&p.blob);if(ok.length===all.length)continue;if(ok.length){d.pages=ok;await dbPut('docs',d)}else await dbDel('docs',d.id)}}catch(e){}}
 (async()=>{
   if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>r.update().catch(()=>{})).catch(()=>{});
+setTimeout(()=>{if(navigator.onLine!==false)loadCV().catch(()=>{})},3000);
   try{await openDB();await fixBroken();
     if(localStorage.getItem('swSignedIn')){localStorage.setItem('swSeen','1');await renderHome()}else show('login')}
   catch(e){show('login')}
