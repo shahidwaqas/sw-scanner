@@ -760,7 +760,7 @@ async function renderHome(){
   $('#selDel').textContent=`Delete (${sel.size})`;document.querySelectorAll('[data-sel]').forEach(b=>b.classList.toggle('hidden',selMode));
   updGreet();show('main');showTab(curTab)}
 $('#q').oninput=renderHome;
-document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>{if(b.dataset.tab==='import'){begin('new',null,'cam');return}showTab(b.dataset.tab)});
+document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>{if(b.dataset.tab==='import'){begin('new',null,null);return}showTab(b.dataset.tab)});
 document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(!g)return;const v=g.dataset.go;
   if(v==='tab-import')showTab('import');else if(v==='id')begin('id',null,null);else if(v==='sync')sync(true);else if(v==='bin')openBin();else begin('new',null,v==='scan'?null:v)});
 const prof=()=>JSON.parse(localStorage.getItem('swProfile')||'{}');
