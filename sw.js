@@ -1,9 +1,44 @@
-const C='sw-scanner-v12';
-const A=['./','./index.html','./manifest.json','./icon-192.png','./icon-512.png','./icon-180.png','./logo.png','./mark.png','./fb.js'];
-self.addEventListener('install',e=>{e.waitUntil(caches.open(C).then(c=>c.addAll(A)));self.skipWaiting()});
-self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(k=>Promise.all(k.filter(x=>x!==C).map(x=>caches.delete(x)))));self.clients.claim()});
-self.addEventListener('fetch',e=>{
-  const u=new URL(e.request.url);
-  if(e.request.method!=='GET'||u.origin!==location.origin)return;
-  e.respondWith(fetch(e.request,{cache:'reload'}).then(r=>{const cp=r.clone();caches.open(C).then(c=>c.put(e.request,cp));return r}).catch(()=>caches.match(e.request)))
+/* SW Scanner service worker. Change VER whenever you upload a new version. */
+const VER = 'swscanner-2026-10-27-a';
+const SHELL = ['./', 'index.html', 'manifest.json', 'icon-180.png', 'icon-192.png', 'icon-512.png', 'logo.png', 'fb.js'];
+
+self.addEventListener('install', e => {
+  self.skipWaiting();
+  e.waitUntil(caches.open(VER).then(c =>
+    Promise.all(SHELL.map(u => c.add(new Request(u, { cache: 'reload' })).catch(() => {})))));
+});
+
+self.addEventListener('activate', e => {
+  e.waitUntil((async () => {
+    for (const k of await caches.keys()) if (k !== VER) await caches.delete(k);
+    await self.clients.claim();
+  })());
+});
+
+/* Network first (so updates always arrive), cache as the offline fallback.
+   Only our own files are handled; Firebase, Google and CDN requests go straight to the network. */
+self.addEventListener('fetch', e => {
+  const r = e.request;
+  if (r.method !== 'GET') return;
+  const u = new URL(r.url);
+  if (u.origin !== self.location.origin) return;
+  e.respondWith((async () => {
+    try {
+      const timeout = new Promise((_, no) => setTimeout(() => no(new Error('timeout')), 5000));
+      const res = await Promise.race([fetch(r), timeout]);
+      if (res && res.ok && res.type === 'basic') {
+        const copy = res.clone();
+        caches.open(VER).then(c => c.put(r, copy)).catch(() => {});
+      }
+      return res;
+    } catch (err) {
+      const hit = await caches.match(r, { ignoreSearch: true });
+      if (hit) return hit;
+      if (r.mode === 'navigate') {
+        const home = (await caches.match('index.html')) || (await caches.match('./'));
+        if (home) return home;
+      }
+      return Response.error();
+    }
+  })());
 });

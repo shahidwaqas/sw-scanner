@@ -496,6 +496,7 @@ body{overflow-x:hidden}
 
 <script src="fb.js" defer></script>
 <script>
+const APP_VER='2026-10-27-a';
 const CLIENT_ID='682622042304-3iivfit3fccho5a7vpeu6jdj90kdkjl0.apps.googleusercontent.com';
 const SCOPE='https://www.googleapis.com/auth/drive.file openid email';
 const $=s=>document.querySelector(s);
@@ -504,6 +505,9 @@ const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
 const fmt=d=>d.toLocaleDateString('en-GB')+' '+d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
 let toastT;function toast(m,ms){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),ms||2600)}
 const busy=m=>{$('#busyM').textContent=m;$('#busy').classList.remove('hidden')},busyOff=()=>$('#busy').classList.add('hidden');
+let BL='';
+addEventListener('error',e=>{if((e.target&&e.target!==window)||!e.message||e.message==='Script error.'||/ResizeObserver/.test(e.message))return;busyOff();toast('Error: '+e.message,8000)});
+addEventListener('unhandledrejection',e=>{const r=e.reason;busyOff();toast('Error: '+((r&&(r.message||r.name))||r),8000)});
 function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('hidden',s.id!==id))}
 
 /* ---------- IndexedDB ---------- */
@@ -521,7 +525,7 @@ function loadImg(blob){return new Promise((res,rej)=>{const u=URL.createObjectUR
 function warp(src,q,fw,fh){
   const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
   let W=(dist(q[0],q[1])+dist(q[3],q[2]))/2,H=(dist(q[0],q[3])+dist(q[1],q[2]))/2;
-  if(fw){W=fw;H=fh}else{const m=Math.min(1,2000/Math.max(W,H));W=Math.max(40,Math.round(W*m));H=Math.max(40,Math.round(H*m))}
+  if(fw){W=fw;H=fh}else{const m=Math.min(1,1800/Math.max(W,H));W=Math.max(40,Math.round(W*m));H=Math.max(40,Math.round(H*m))}
   const sw=src.width,sh=src.height,sd=src.getContext('2d').getImageData(0,0,sw,sh).data;
   const [p0,p1,p2,p3]=q;
   const dx1=p1.x-p2.x,dx2=p3.x-p2.x,dx3=p0.x-p1.x+p2.x-p3.x,dy1=p1.y-p2.y,dy2=p3.y-p2.y,dy3=p0.y-p1.y+p2.y-p3.y;
@@ -732,7 +736,7 @@ $('#pkGo').onclick=async()=>{const d=PK.d,pages=d.pages.filter((_,i)=>PK.sel.has
   let dd={...d,pages};if(d.kind==='id'){const t=askWm();if(t===null)return;dd=await wmDoc(dd,t)}
   const f=PK.f;pkClose();if(f==='pdf')sharePDF(dd);else shareFiles(imgFiles(dd),d.name)};
 const NAMES=[[/national identity|cnic|nadra|identity card/,'CNIC'],[/driving licen[cs]e/,'Driving Licence'],[/passport/,'Passport'],[/invoice/,'Invoice'],[/receipt/,'Receipt'],[/quotation|estimate/,'Quotation'],[/challan/,'Challan'],[/certificate/,'Certificate'],[/agreement|contract/,'Agreement'],[/statement/,'Statement'],[/electricity|utility|\bbill\b/,'Bill'],[/application/,'Application']];
-async function autoName(id,def){try{if(!navigator.onLine)return;const d=await dbGet('docs',id);if(!d||d.name!==def)return;
+async function autoName(id,def){try{if(!navigator.onLine||localStorage.getItem('swAutoName')!=='1')return;const d=await dbGet('docs',id);if(!d||d.name!==def)return;
   if(!window.Tesseract)await new Promise((r,j)=>{const s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js';s.onload=r;s.onerror=j;document.head.appendChild(s)});
   const im=await loadImg(d.pages[0].blob),k=Math.min(1,1600/Math.max(im.naturalWidth,im.naturalHeight)),c=document.createElement('canvas');c.width=im.naturalWidth*k|0;c.height=im.naturalHeight*k|0;c.getContext('2d').drawImage(im,0,0,c.width,c.height);
   const r=await Tesseract.recognize(c,'eng'),t=r.data.text.toLowerCase(),m=NAMES.find(n=>n[0].test(t));if(!m)return;
@@ -740,7 +744,7 @@ async function autoName(id,def){try{if(!navigator.onLine)return;const d=await db
   if(!$('#docv').classList.contains('hidden')&&cur&&cur.id===id)openDoc(id);else if(!$('#main').classList.contains('hidden'))renderHome();autoSync()}catch(e){}}
 
 /* ---------- tabs / lists ---------- */
-let urls=[];const urlBlob=new Map();const mkUrl=bl=>{const u=URL.createObjectURL(bl);urls.push(u);urlBlob.set(u,bl);return u};
+let urls=[];const urlBlob=new Map();const mkUrl=bl=>{if(!bl)return '';const u=URL.createObjectURL(bl);urls.push(u);urlBlob.set(u,bl);return u};
 const clearUrls=()=>{const o=urls;urls=[];setTimeout(()=>o.forEach(u=>{URL.revokeObjectURL(u);urlBlob.delete(u)}),30000)};
 document.addEventListener('error',e=>{const i=e.target;if(!i||i.tagName!=='IMG'||i.dataset.re)return;const bl=urlBlob.get(i.src);if(!bl)return;i.dataset.re=1;const f=new FileReader();f.onload=()=>{i.src=f.result};f.readAsDataURL(bl)},true);
 let cur=null,curTab='home';
@@ -750,7 +754,7 @@ async function renderHome(){
   let all=await dbAll('docs');const old=all.filter(d=>d.deleted&&Date.now()-d.deleted>BIN_DAYS*864e5);
   if(old.length){await purge(old);all=all.filter(d=>!old.includes(d))}
   const nb=all.filter(d=>d.deleted).length;$('#binN').textContent=nb?nb+' in bin':'Restore deleted documents';
-  const docs=all.filter(d=>!d.deleted&&d.pages&&d.pages.length).sort((a,b)=>b.created-a.created);clearUrls();
+  const docs=all.filter(d=>!d.deleted&&d.pages&&d.pages.length&&d.pages[0].blob).sort((a,b)=>b.created-a.created);clearUrls();
   const q=$('#q').value.trim().toLowerCase(),lim=Date.now()-30*864e5;
   const fill=(el,arr,msg)=>{el.innerHTML='';if(!arr.length)el.innerHTML='<p class="empty">'+msg+'</p>';
     for(const d of arr){const c=document.createElement('div');c.className='card'+(selMode&&sel.has(d.id)?' sel':'');const synced=d.pages.every(p=>p.fs);
@@ -846,12 +850,12 @@ $('#dAdd').onclick=()=>begin('add',cur.id,null);
 async function onFiles(e){
   let files=[...e.target.files];e.target.value='';if(!files.length)return;stopCam();
   try{
-    busy('Processing...');await new Promise(r=>setTimeout(r,30));files=await expandPdf(files);if(!files.length)return;if(ctx.mode==='edit'){await startCrop(files[0]);return}
+    BL='';busy('Processing...');await new Promise(r=>setTimeout(r,30));files=await expandPdf(files);if(!files.length)return;if(ctx.mode==='edit'){await startCrop(files[0]);return}
     if(ctx.replace!=null){const i=ctx.replace;ctx.replace=null;toast('Processing...');await new Promise(r=>setTimeout(r,30));ctx.draft[i]=await autoPage(files[0]);ctx.ri=i;openRev();return}
     if(isIdCtx())files=files.slice(0,2-ctx.draft.length);
     if(!files.length){toast('An ID card has only front and back');return}
     const start=ctx.draft.length;
-    for(let k=0;k<files.length;k++){busy(`Processing ${k+1}/${files.length}...`);await new Promise(r=>setTimeout(r,30));ctx.draft.push(await autoPage(files[k]))}
+    for(let k=0;k<files.length;k++){BL=files.length>1?`${k+1}/${files.length} · `:'';busy(BL+'Processing...');await new Promise(r=>setTimeout(r,30));ctx.draft.push(await autoPage(files[k]))}
     ctx.ri=start;openRev()
   }catch(err){toast('Import failed: '+(err&&err.message||err),6000)}
   finally{busyOff();if(!$('#camv').classList.contains('hidden'))camBack()}}
@@ -872,7 +876,7 @@ function loadCV(){if(window.cv&&window.cv.Mat)return Promise.resolve(window.cv);
 function grabSmall(c,max){const sc=Math.min(1,max/Math.max(c.width,c.height)),w=Math.max(1,Math.round(c.width*sc)),h=Math.max(1,Math.round(c.height*sc)),t=document.createElement('canvas');t.width=w;t.height=h;
   const x=t.getContext('2d');x.drawImage(c,0,0,w,h);return{sc,w,h,d:x.getImageData(0,0,w,h).data}}
 async function autoQuadX(c,fast){
-  if(fast&&!(window.cv&&window.cv.Mat)){loadCV().catch(()=>{});return autoQuad(c)}
+  if(fast&&!(window.cv&&window.cv.Mat))return autoQuad(c);
   try{const cv=await Promise.race([loadCV(),new Promise((_,no)=>setTimeout(()=>no(new Error('slow')),6000))]);
     const g=grabSmall(c,640),r=cvDetect(cv,g.d,g.w,g.h);
     if(r&&r.q)return r.q.map(p=>({x:p.x/g.sc,y:p.y/g.sc}))}catch(e){}
@@ -882,10 +886,10 @@ let S={};
 async function startCrop(file){
   toast('Detecting edges...');
   const img=await loadImg(file);
-  const m=Math.min(1,2400/Math.max(img.naturalWidth,img.naturalHeight));
+  const m=Math.min(1,2000/Math.max(img.naturalWidth,img.naturalHeight));
   const c=document.createElement('canvas');c.width=Math.round(img.naturalWidth*m);c.height=Math.round(img.naturalHeight*m);
   c.getContext('2d').drawImage(img,0,0,c.width,c.height);
-  let q=null;try{q=await autoQuadX(c)}catch(e){}
+  let q=null;try{q=await autoQuadX(c,true)}catch(e){}
   S={src:c,q:q||defQuad(c.width,c.height),drag:-1,sc:1};E={};
   await goEdit()}
 function layoutCrop(){
@@ -1048,7 +1052,7 @@ $('#pgDel').onclick=async()=>{const n=pSel.size;if(!n)return toast('Select pages
   await addTomb(cur.pages.filter((p,i)=>pSel.has(i)&&p.fs).map(p=>p.id));
   cur.pages=cur.pages.filter((_,i)=>!pSel.has(i));await dbPut('docs',cur);pSel=null;toast('Deleted');autoSync();openDoc(cur.id)};
 async function openBin(){
-  const ds=(await dbAll('docs')).filter(d=>d.deleted&&d.pages&&d.pages.length).sort((a,b)=>b.deleted-a.deleted);clearUrls();const el=$('#binList');
+  const ds=(await dbAll('docs')).filter(d=>d.deleted&&d.pages&&d.pages.length&&d.pages[0].blob).sort((a,b)=>b.deleted-a.deleted);clearUrls();const el=$('#binList');
   el.innerHTML=ds.length?'':'<p class="empty">Recycle bin is empty.</p>';$('#binHint').textContent=`Deleted documents stay here for ${BIN_DAYS} days.`;
   for(const d of ds){const left=Math.max(0,Math.ceil(BIN_DAYS-(Date.now()-d.deleted)/864e5)),c=document.createElement('div');c.className='card';
     c.innerHTML=`<img src="${mkUrl(d.pages[0].blob)}"><div><b></b><small>${left} day${left===1?'':'s'} left</small></div><div class="acts"><button class="ib" data-a="r" aria-label="Restore">${ico('restore')}</button><button class="ib" data-a="x" aria-label="Delete forever" style="color:#dc2626">${ico('trash')}</button></div>`;
@@ -1088,12 +1092,14 @@ function loupe(){const L=$('#loupe');if(S.drag<0){L.style.display='none';return}
   x.clearRect(0,0,110,110);x.save();x.beginPath();x.arc(55,55,55,0,7);x.clip();x.fillStyle='#fff';x.fillRect(0,0,110,110);x.drawImage(S.src,q.x-r,q.y-r,2*r,2*r,0,0,110,110);
   x.strokeStyle='#22d3ee';x.lineWidth=2;x.beginPath();S.q.forEach((p,i)=>{const px=(p.x-q.x+r)*55/r,py=(p.y-q.y+r)*55/r;i?x.lineTo(px,py):x.moveTo(px,py)});x.closePath();x.stroke();
   x.strokeStyle='#ea580c';x.beginPath();x.moveTo(45,55);x.lineTo(65,55);x.moveTo(55,45);x.lineTo(55,65);x.stroke();x.restore()}
-async function srcCanvas(blob){const img=await loadImg(blob),m=Math.min(1,2400/Math.max(img.naturalWidth,img.naturalHeight)),c=document.createElement('canvas');
+async function srcCanvas(blob){const img=await loadImg(blob),m=Math.min(1,2000/Math.max(img.naturalWidth,img.naturalHeight)),c=document.createElement('canvas');
   c.width=Math.round(img.naturalWidth*m);c.height=Math.round(img.naturalHeight*m);c.getContext('2d').drawImage(img,0,0,c.width,c.height);return c}
 async function autoPage(file){
-  const c=await srcCanvas(file);let q=null;try{if(!file.isPdf)q=await autoQuadX(c,true)}catch(e){}q=q||defQuad(c.width,c.height,file.isPdf?0:.06);
-  const nq=normQuad(q),base=isIdCtx()?warp(c,idOrient(nq),...idDims(idOrient(nq))):warp(c,nq),o={mode:'doc',b:0,c:0,s:0};
+  const tk=()=>new Promise(r=>setTimeout(r,20));busy(BL+'Reading photo...');await tk();
+  const c=await srcCanvas(file);busy(BL+'Finding edges...');await tk();let q=null;try{if(!file.isPdf)q=await autoQuadX(c,true)}catch(e){}q=q||defQuad(c.width,c.height,file.isPdf?0:.06);
+  busy(BL+'Straightening & cleaning...');await tk();const nq=normQuad(q),base=isIdCtx()?warp(c,idOrient(nq),...idDims(idOrient(nq))):warp(c,nq),o={mode:'doc',b:0,c:0,s:0};
   const [blob,orig]=await Promise.all([new Promise(r=>proc(base,o).toBlob(r,'image/jpeg',.88)),new Promise(r=>base.toBlob(r,'image/jpeg',.92))]);
+  if(!blob||!orig)throw new Error('Not enough memory to process this photo');
   return{id:uid(),blob,orig,opts:o,file,q}}
 function openRev(){clearUrls();const pg=$('#rvPager');pg.innerHTML='';ctx.replace=null;
   ctx.draft.forEach(p=>{const d=document.createElement('div');d.innerHTML=`<img src="${mkUrl(p.blob)}">`;pg.appendChild(d)});
@@ -1218,7 +1224,7 @@ async function sync(manual){
 
     /* 3. send new pages and changes made on this phone */
     for(const d0 of await dbAll('docs')){
-      for(const p of d0.pages){if(p.fs)continue;
+      for(const p of d0.pages){if(p.fs||!p.blob)continue;
         await F.putPage(p.id,d0.id,p.blob);
         await patchDoc(d0.id,d=>{const q=d.pages.find(x=>x.id===p.id);if(q)q.fs=true})}
       const d=await dbGet('docs',d0.id);if(!d)continue;
@@ -1243,8 +1249,8 @@ $('#btnSync').onclick=()=>sync(true);
 $('#btnLock').onclick=()=>$('#btnOut').click();
 $('#btnOut').onclick=async()=>{
   if(!await askConfirm('Log out?','Scanned documents will stay on this phone.','Log out',false))return;
-  try{if(window.FB)await FB.signOut()}catch(e){}
-  localStorage.removeItem('swSignedIn');localStorage.removeItem(PIN_KEY);localStorage.removeItem('swEmail');sessionStorage.removeItem('swOk');pinUi();
+  localStorage.removeItem('swSignedIn');localStorage.removeItem(PIN_KEY);localStorage.removeItem('swEmail');sessionStorage.removeItem('swOk');
+  try{if(window.FB)await Promise.race([FB.signOut(),new Promise(r=>setTimeout(r,2500))])}catch(e){}
   location.reload()};
 
 /* ---------- one-time import of old scans from Google Drive ---------- */
@@ -1306,13 +1312,13 @@ function zr(){Z.s=1;Z.x=Z.y=0;Z.p.clear();zap()}
  const up=e=>Z.p.delete(e.pointerId);st.addEventListener('pointerup',up);st.addEventListener('pointercancel',up)})();
 
 /* ---------- auto sync triggers + HD camera ---------- */
-window.addEventListener('online',()=>{autoSync();setTimeout(()=>loadCV().catch(()=>{}),3000)});setTimeout(()=>loadCV().catch(()=>{}),5000);
+window.addEventListener('online',()=>{autoSync()});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)autoSync()});
 setInterval(()=>{if(!document.hidden&&!$('#splash')&&localStorage.getItem('swSignedIn'))sync()},300000);
 $('#status').onclick=()=>{sync(true)};
 let ovOn=false,ovQ=null;
 function stopCam(){ovOn=false;ovQ=null;const o=$('#camOv');if(o){const x=o.getContext('2d');x.clearRect(0,0,o.width,o.height)}const v=$('#camVid');if(v.srcObject){v.srcObject.getTracks().forEach(t=>t.stop());v.srcObject=null}}
-function startOv(){ovOn=true;loadCV().catch(()=>{});const v=$('#camVid'),o=$('#camOv'),t=document.createElement('canvas');
+function startOv(){ovOn=true;const v=$('#camVid'),o=$('#camOv'),t=document.createElement('canvas');
  const tick=async()=>{if(!ovOn)return;
   try{const cv=window.cv;if(cv&&cv.Mat&&v.videoWidth){const vw=v.videoWidth,vh=v.videoHeight,sc=Math.min(1,320/Math.max(vw,vh)),w=Math.round(vw*sc),h=Math.round(vh*sc);t.width=w;t.height=h;
     const tx=t.getContext('2d');tx.drawImage(v,0,0,w,h);const r=cvDetect(cv,tx.getImageData(0,0,w,h).data,w,h);
@@ -1321,7 +1327,7 @@ function startOv(){ovOn=true;loadCV().catch(()=>{});const v=$('#camVid'),o=$('#c
      if(ovQ&&ovQ.every((p,i)=>Math.hypot(p.x-q[i].x,p.y-q[i].y)<.12*Math.max(cw,ch)))q=q.map((p,i)=>({x:ovQ[i].x*.5+p.x*.5,y:ovQ[i].y*.5+p.y*.5}));ovQ=q;
      x.beginPath();q.forEach((p,i)=>i?x.lineTo(p.x,p.y):x.moveTo(p.x,p.y));x.closePath();x.fillStyle='rgba(34,211,238,.18)';x.fill();x.strokeStyle='#22d3ee';x.lineWidth=3;x.stroke();
      q.forEach(p=>{x.beginPath();x.arc(p.x,p.y,6,0,7);x.fillStyle='#fff';x.fill()})}else ovQ=null}}catch(e){}
-  if(ovOn)setTimeout(tick,350)};setTimeout(tick,600)}
+  if(ovOn)setTimeout(tick,800)};setTimeout(tick,600)}
 const camBack=()=>ctx.draft.length?openRev():(ctx.mode==='add'||ctx.mode==='edit')?openDoc(ctx.docId):renderHome();
 async function openCam(){try{const st=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:4096},height:{ideal:2160}},audio:false});$('#camVid').srcObject=st;show('camv');startOv()}
   catch(e){toast('In-app camera not available, using phone camera');$('#inCam').click()}}
@@ -1344,7 +1350,7 @@ function pinShow(){AUM='pin';moveScene($('#splash'));{const em=localStorage.getI
 async function gate(){
   if(sessionStorage.getItem('swOk')){splashOut();return}
   localStorage.removeItem(PIN_KEY);
-  if(localStorage.getItem('swSignedIn')){unlocked();await renderHome();splashOut();return}
+  if(localStorage.getItem('swSignedIn')){unlocked();try{await renderHome()}catch(e){toast('Could not load documents: '+(e&&e.message||e),8000)}splashOut();return}
   loginShow()}
 let AUM='login';
 $('#auEye').onclick=()=>{const P=$('#auP'),s=P.type==='password';P.type=s?'text':'password';$('#eyeOn').style.display=s?'none':'';$('#eyeOff').style.display=s?'':'none'};
@@ -1391,11 +1397,12 @@ $('#zIn').onclick=()=>pvZoom(PZ*1.4);$('#zOut').onclick=()=>pvZoom(PZ/1.4);$('#z
 
 /* ---------- sync helpers ---------- */
 $('#btnDiag').onclick=async()=>{const L=[],t=async(n,f)=>{try{L.push('OK  '+n+': '+await f())}catch(e){L.push('FAIL '+n+': '+(e.message||e))}};
-  toast('Checking...');L.push('Browser online: '+navigator.onLine);
+  toast('Checking...');L.push('App version: '+APP_VER);L.push('Browser online: '+navigator.onLine);
   L.push('Service worker: '+(navigator.serviceWorker&&navigator.serviceWorker.controller?navigator.serviceWorker.controller.scriptURL.split('/').pop():'none'));
   await t('Sync module',async()=>{await fbw();return 'loaded'});
   await t('Signed in as',async()=>{const F=await fbw();await F.ready();return F.user()?F.user().email:'NOT signed in'});
   await t('Cloud database',async()=>{const F=await fbw();const r=await F.docsSince(Date.now()+864e5);return 'reachable ('+r.length+')'});
+  await t('Storage',async()=>{const e=await navigator.storage.estimate();return Math.round(e.usage/1048576)+' MB used of '+Math.round(e.quota/1048576)+' MB allowed for this app'});
   alert(L.join('\n'))};
 
 /* ---------- login theme docs + sign-in preparing screen ---------- */
@@ -1471,12 +1478,13 @@ rvp.addEventListener('scroll',()=>zRev.reset());
   g.addEventListener('touchmove',e=>{if(e.touches.length===2&&d0){e.preventDefault();const c=Math.max(1,Math.min(4,Math.round(c0*d0/dist(e))));g.style.gridTemplateColumns=`repeat(${c},1fr)`}},{passive:false});
   g.addEventListener('touchend',()=>{d0=0})})();
 /* ---------- start ---------- */
+async function fixBroken(){try{for(const d of await dbAll('docs')){const all=d.pages||[],ok=all.filter(p=>p&&p.blob);if(ok.length===all.length)continue;if(ok.length){d.pages=ok;await dbPut('docs',d)}else await dbDel('docs',d.id)}}catch(e){}}
 (async()=>{
-  try{await openDB();
+  if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>r.update().catch(()=>{})).catch(()=>{});
+  try{await openDB();await fixBroken();
     if(localStorage.getItem('swSignedIn')){localStorage.setItem('swSeen','1');await renderHome()}else show('login')}
   catch(e){show('login')}
   gate();
-  if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
   if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();
 })();
 /* ---------- login scene: clutter -> scanned -> sorted piles ---------- */
