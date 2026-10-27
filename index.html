@@ -409,7 +409,7 @@ body{overflow-x:hidden}
 <body>
 
 <div id="splash"><img src="logo.png" alt=""><div id="auth"><div class="ac"><i class="fl"></i><svg class="aic" viewBox="0 0 100 100" role="img" aria-label="SW Scanner"><rect width="100" height="100" rx="26" fill="#fff"/><text x="50" y="63" text-anchor="middle" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif" font-size="46" font-weight="800" letter-spacing="-2"><tspan fill="#12297d">S</tspan><tspan fill="#f97316">W</tspan></text><rect x="22" y="75" width="56" height="5" rx="2.5" fill="#e2e8f0"/><rect x="22" y="75" width="26" height="5" rx="2.5" fill="#f97316"/></svg><div class="abn"><b>SW</b> Scanner</div><div class="atg">DOCUMENTS SCANNER</div><div id="auWho"></div><h2 id="auT"></h2><input class="inp" id="auU" placeholder="Username" autocomplete="username" autocapitalize="none"><div id="auPw" style="position:relative"><input class="inp" id="auP" type="password" placeholder="Password" autocomplete="current-password" style="padding-right:44px"><button type="button" id="auEye" aria-label="Show password" style="position:absolute;right:6px;top:50%;transform:translateY(-50%);background:none;border:0;padding:8px;cursor:pointer;color:#64748b;line-height:0"><svg id="eyeOn" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><svg id="eyeOff" style="display:none" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.9 10.9 0 0 1 12 20C5 20 1 12 1 12a18.5 18.5 0 0 1 5.06-5.94M9.9 4.24A9 9 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19M1 1l22 22"/></svg></button></div><input class="inp" id="auP2" type="password" placeholder="Confirm password" autocomplete="new-password"><div id="auE"></div><button class="pri" id="auGo"></button><button id="auF">Forgot password?</button></div></div></div>
-<div id="camv" class="screen hidden" style="background:#000"><video id="camVid" autoplay playsinline muted style="flex:1;min-height:0;width:100%;object-fit:cover"></video><div class="bar" style="background:#000;padding-top:14px;justify-content:space-around"><button id="camX">Close</button><button id="camSnap" class="ok" style="flex:2;padding:18px;font-size:17px">Capture</button></div></div>
+<div id="camv" class="screen hidden" style="background:#000"><div style="flex:1;min-height:0;position:relative"><video id="camVid" autoplay playsinline muted style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover"></video><canvas id="camOv" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none"></canvas></div><div class="bar" style="background:#000;padding-top:14px;justify-content:space-around;gap:8px"><button id="camX">Close</button><button id="camGal">Gallery</button><button id="camSnap" class="ok" style="flex:2;padding:18px;font-size:17px">Capture</button><button id="camFile">Files</button></div></div>
 <div id="login" class="screen hidden"><div class="fx" aria-hidden="true"></div>
   <img src="logo.png" alt="SW Scanner">
   <p>Scan your important documents and keep them safe</p>
@@ -582,6 +582,74 @@ function detectQuad(g0,w,h){
  let ar=0;for(let i=0;i<4;i++){const a=Q[i],b=Q[(i+1)%4];ar+=a.x*b.y-b.x*a.y;if(Math.hypot(a.x-b.x,a.y-b.y)<.1*Math.min(w,h))return null}
  return Math.abs(ar)/2<.1*N?null:Q}
 /*ENDDETECT*/
+/*CVDETECT*/
+function cvDetect(cv,rgba,w,h){
+  const del=[];const T=m=>{del.push(m);return m};
+  try{
+    const src=T(new cv.Mat(h,w,cv.CV_8UC4));src.data.set(rgba);
+    const rgb=T(new cv.Mat());cv.cvtColor(src,rgb,cv.COLOR_RGBA2RGB);
+    const gray=T(new cv.Mat());cv.cvtColor(rgb,gray,cv.COLOR_RGB2GRAY);
+    const gb=T(new cv.Mat());cv.GaussianBlur(gray,gb,new cv.Size(5,5),0);
+    const masks=[];
+    const K3=T(cv.getStructuringElement(cv.MORPH_RECT,new cv.Size(3,3)));
+    const kc=Math.max(5,Math.round(Math.min(w,h)/40))|1;
+    const KC=T(cv.getStructuringElement(cv.MORPH_RECT,new cv.Size(kc,kc)));
+    const edgeFix=e=>{cv.dilate(e,e,K3,new cv.Point(-1,-1),1);cv.morphologyEx(e,e,cv.MORPH_CLOSE,KC);return e};
+    /* median for auto canny */
+    const hist=new Array(256).fill(0);for(let i=0;i<gb.data.length;i++)hist[gb.data[i]]++;
+    let acc=0,med=128;for(let i=0;i<256;i++){acc+=hist[i];if(acc>=gb.data.length/2){med=i;break}}
+    const lo=Math.max(10,.5*med),hi=Math.max(40,1.2*med);
+    {const e=T(new cv.Mat());cv.Canny(gb,e,lo*.6,Math.min(hi,200)*.6);masks.push(['canny',edgeFix(e)])}
+    {const e=T(new cv.Mat());cv.Canny(gb,e,20,60);masks.push(['canny2',edgeFix(e)])}
+    /* colour edges: strongest edge of any channel */
+    {const ch=new cv.MatVector();cv.split(rgb,ch);const acc2=T(cv.Mat.zeros(h,w,cv.CV_8UC1));
+     for(let i=0;i<3;i++){const c=ch.get(i),b=T(new cv.Mat()),e=T(new cv.Mat());cv.GaussianBlur(c,b,new cv.Size(5,5),0);cv.Canny(b,e,25,70);cv.bitwise_or(acc2,e,acc2);c.delete()}ch.delete();masks.push(['cedge',edgeFix(acc2)])}
+    /* otsu bright / dark */
+    {const t=T(new cv.Mat());cv.threshold(gb,t,0,255,cv.THRESH_BINARY+cv.THRESH_OTSU);
+     const o=T(new cv.Mat());cv.morphologyEx(t,o,cv.MORPH_OPEN,KC);cv.morphologyEx(o,o,cv.MORPH_CLOSE,KC);masks.push(['otsu',o]);
+     const n=T(new cv.Mat());cv.bitwise_not(o,n);masks.push(['otsuinv',n])}
+    /* colour distance from border background */
+    {const lab=T(new cv.Mat());cv.cvtColor(rgb,lab,cv.COLOR_RGB2Lab);const bw=Math.max(3,Math.round(Math.min(w,h)*.03));
+     const sm=[0,0,0],cnt=[0];const S=[[],[],[]];
+     const d=lab.data;const push=(x,y)=>{const i=(y*w+x)*3;S[0].push(d[i]);S[1].push(d[i+1]);S[2].push(d[i+2])};
+     for(let y=0;y<h;y+=2)for(let x=0;x<w;x+=2){if(x<bw||y<bw||x>=w-bw||y>=h-bw)push(x,y)}
+     const mdn=a=>{a.sort((p,q)=>p-q);return a[a.length>>1]};const m0=mdn(S[0]),m1=mdn(S[1]),m2=mdn(S[2]);
+     const dist=T(new cv.Mat(h,w,cv.CV_8UC1));
+     for(let i=0;i<w*h;i++){const a=d[i*3]-m0,b=d[i*3+1]-m1,c=d[i*3+2]-m2;dist.data[i]=Math.min(255,Math.sqrt(a*a+b*b+c*c)*2.2)}
+     const db=T(new cv.Mat());cv.GaussianBlur(dist,db,new cv.Size(7,7),0);
+     const t=T(new cv.Mat());cv.threshold(db,t,0,255,cv.THRESH_BINARY+cv.THRESH_OTSU);
+     const o=T(new cv.Mat());cv.morphologyEx(t,o,cv.MORPH_CLOSE,KC);cv.morphologyEx(o,o,cv.MORPH_OPEN,KC);masks.push(['bgdist',o])}
+    const N=w*h,diag=Math.hypot(w,h),cands=[];
+    const ang=(a,b,c)=>{const v1x=a.x-b.x,v1y=a.y-b.y,v2x=c.x-b.x,v2y=c.y-b.y;const d=(v1x*v2x+v1y*v2y)/(Math.hypot(v1x,v1y)*Math.hypot(v2x,v2y)||1);return Math.acos(Math.max(-1,Math.min(1,d)))*57.2958};
+    for(const [name,m] of masks){
+      const cs=new cv.MatVector(),hh=new cv.Mat();const mm=m.clone();
+      cv.findContours(mm,cs,hh,cv.RETR_LIST,cv.CHAIN_APPROX_SIMPLE);
+      const list=[];for(let i=0;i<cs.size();i++){const c=cs.get(i),a=cv.contourArea(c);if(a>N*.1&&a<N*.995)list.push({c,a});else c.delete()}
+      list.sort((p,q)=>q.a-p.a);
+      for(const it of list.slice(0,6)){
+        const hull=new cv.Mat();cv.convexHull(it.c,hull,false,true);const per=cv.arcLength(hull,true);let q=null;
+        for(const ep of[.012,.018,.025,.035,.05,.07]){const ap=new cv.Mat();cv.approxPolyDP(hull,ap,ep*per,true);
+          if(ap.rows===4){q=[];for(let k=0;k<4;k++)q.push({x:ap.data32S[k*2],y:ap.data32S[k*2+1]});ap.delete();break}ap.delete()}
+        if(!q){const r=cv.minAreaRect(hull),ha=cv.contourArea(hull);if(ha/(r.size.width*r.size.height)>.88){const pts=cv.RotatedRect.points(r);q=pts.map(p=>({x:p.x,y:p.y}))}}
+        hull.delete();
+        if(!q)continue;
+        const cx=q.reduce((s,p)=>s+p.x,0)/4,cy=q.reduce((s,p)=>s+p.y,0)/4;q.sort((a,b)=>Math.atan2(a.y-cy,a.x-cx)-Math.atan2(b.y-cy,b.x-cx));
+        let ar=0;for(let i=0;i<4;i++){const a=q[i],b=q[(i+1)%4];ar+=a.x*b.y-b.x*a.y}ar=Math.abs(ar)/2;if(ar<N*.1)continue;
+        let ok=true,dev=0;for(let i=0;i<4;i++){const A=ang(q[(i+3)%4],q[i],q[(i+1)%4]);if(A<55||A>125)ok=false;dev+=Math.abs(A-90)}
+        if(!ok)continue;
+        const sides=[0,1,2,3].map(i=>Math.hypot(q[i].x-q[(i+1)%4].x,q[i].y-q[(i+1)%4].y));if(Math.min(...sides)<.12*Math.min(w,h))continue;
+        let edge=0;for(const p of q){if(p.x<=2||p.y<=2||p.x>=w-3||p.y>=h-3)edge++}
+        const fill=Math.min(1,it.a/ar);
+        const sc=Math.pow(ar/N,.8)*(1-dev/4/45)*Math.pow(fill,2)*(edge>=3?.55:edge===2?.8:1)*(name==='bgdist'?1.05:1);
+        cands.push({q,sc,name})}
+      list.forEach(it=>it.c.delete());cs.delete();hh.delete();mm.delete()}
+    if(!cands.length)return null;
+    for(const a of cands){let sup=0;for(const b of cands){if(a===b)continue;let m=0;for(const p of a.q)m=Math.max(m,Math.min(...b.q.map(r=>Math.hypot(p.x-r.x,p.y-r.y))));if(m<.04*diag)sup++}a.fs=a.sc*(1+.18*Math.min(sup,6))}
+    cands.sort((a,b)=>b.fs-a.fs);return {q:cands[0].q,name:cands[0].name,n:cands.length}
+  }catch(e){return null}finally{del.forEach(m=>{try{m.delete()}catch(e){}})}
+}
+/*ENDCVDETECT*/
+
 /* ---------- PDF ---------- */
 const safe=n=>n.replace(/[\/\\:*?"<>|]/g,'-');
 async function makePDF(pages,d){
@@ -692,7 +760,7 @@ async function renderHome(){
   $('#selDel').textContent=`Delete (${sel.size})`;document.querySelectorAll('[data-sel]').forEach(b=>b.classList.toggle('hidden',selMode));
   updGreet();show('main');showTab(curTab)}
 $('#q').oninput=renderHome;
-document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>{if(b.dataset.tab==='import'){begin('new',null,'gal');return}showTab(b.dataset.tab)});
+document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>{if(b.dataset.tab==='import'){begin('new',null,'cam');return}showTab(b.dataset.tab)});
 document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(!g)return;const v=g.dataset.go;
   if(v==='tab-import')showTab('import');else if(v==='id')begin('id',null,null);else if(v==='sync')sync(true);else if(v==='bin')openBin();else begin('new',null,v==='scan'?null:v)});
 const prof=()=>JSON.parse(localStorage.getItem('swProfile')||'{}');
@@ -771,7 +839,7 @@ $('#src').onclick=e=>{const s=e.target.dataset.s;if(!s&&e.target.id!=='src')retu
   if(s&&s!=='x')openSrc(s)};
 $('#dAdd').onclick=()=>begin('add',cur.id,null);
 async function onFiles(e){
-  let files=[...e.target.files];e.target.value='';if(!files.length)return;
+  let files=[...e.target.files];e.target.value='';if(!files.length)return;stopCam();
   try{
     toast('Processing...');files=await expandPdf(files);if(!files.length)return;if(ctx.mode==='edit'){await startCrop(files[0]);return}
     if(ctx.replace!=null){const i=ctx.replace;ctx.replace=null;toast('Processing...');await new Promise(r=>setTimeout(r,30));ctx.draft[i]=await autoPage(files[0]);ctx.ri=i;openRev();return}
@@ -787,6 +855,21 @@ function autoQuad(c){const sc=Math.min(1,320/Math.max(c.width,c.height)),w=Math.
   const x=t.getContext('2d');x.drawImage(c,0,0,w,h);const d=x.getImageData(0,0,w,h).data,g=new Uint8Array(w*h);
   for(let i=0;i<g.length;i++)g[i]=d[i*4]*.299+d[i*4+1]*.587+d[i*4+2]*.114;
   const q=detectQuad(g,w,h);return q&&q.map(p=>({x:p.x/sc,y:p.y/sc}))}
+
+let CVP=null;
+function loadCV(){if(window.cv&&window.cv.Mat)return Promise.resolve(window.cv);if(CVP)return CVP;
+ CVP=new Promise((ok,no)=>{if(navigator.onLine===false){CVP=null;no(new Error('offline'));return}
+  const s=document.createElement('script');s.async=true;s.src='https://cdn.jsdelivr.net/npm/@techstark/opencv-js@4.9.0-release.3/dist/opencv.js';
+  s.onerror=()=>{CVP=null;no(new Error('cv load'))};
+  s.onload=()=>{const t0=Date.now(),iv=setInterval(()=>{const c=window.cv;if(c&&c.Mat){clearInterval(iv);ok(c)}else if(Date.now()-t0>90000){clearInterval(iv);CVP=null;no(new Error('cv timeout'))}},150)};
+  document.head.appendChild(s)});return CVP}
+function grabSmall(c,max){const sc=Math.min(1,max/Math.max(c.width,c.height)),w=Math.max(1,Math.round(c.width*sc)),h=Math.max(1,Math.round(c.height*sc)),t=document.createElement('canvas');t.width=w;t.height=h;
+  const x=t.getContext('2d');x.drawImage(c,0,0,w,h);return{sc,w,h,d:x.getImageData(0,0,w,h).data}}
+async function autoQuadX(c){
+  try{const cv=await Promise.race([loadCV(),new Promise((_,no)=>setTimeout(()=>no(new Error('slow')),6000))]);
+    const g=grabSmall(c,640),r=cvDetect(cv,g.d,g.w,g.h);
+    if(r&&r.q)return r.q.map(p=>({x:p.x/g.sc,y:p.y/g.sc}))}catch(e){}
+  return autoQuad(c)}
 const defQuad=(w,h,i=.06)=>[{x:w*i,y:h*i},{x:w*(1-i),y:h*i},{x:w*(1-i),y:h*(1-i)},{x:w*i,y:h*(1-i)}];
 let S={};
 async function startCrop(file){
@@ -795,7 +878,7 @@ async function startCrop(file){
   const m=Math.min(1,2400/Math.max(img.naturalWidth,img.naturalHeight));
   const c=document.createElement('canvas');c.width=Math.round(img.naturalWidth*m);c.height=Math.round(img.naturalHeight*m);
   c.getContext('2d').drawImage(img,0,0,c.width,c.height);
-  let q=null;try{q=autoQuad(c)}catch(e){}
+  let q=null;try{q=await autoQuadX(c)}catch(e){}
   S={src:c,q:q||defQuad(c.width,c.height),drag:-1,sc:1};E={};
   await goEdit()}
 function layoutCrop(){
@@ -821,7 +904,7 @@ function drawCrop(){
   const up=()=>{S.drag=-1;$('#loupe').style.display='none'};cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
   window.addEventListener('resize',()=>{if(!$('#crop').classList.contains('hidden'))layoutCrop()});
 })();
-$('#cAuto').onclick=()=>{const q=autoQuad(S.src);if(q){S.q=q;drawCrop()}else toast('Could not find edges, drag the corners')};
+$('#cAuto').onclick=async()=>{toast('Detecting edges...');const q=await autoQuadX(S.src);if(q){S.q=q;drawCrop()}else toast('Could not find edges, drag the corners')};
 $('#cFull').onclick=()=>{S.q=defQuad(S.src.width,S.src.height,0);drawCrop()};
 $('#cCancel').onclick=()=>show('edit');
 $('#eBack').onclick=async()=>{ctx.queue=[];if(ctx.mode==='edit'){const al=ctx.all;ctx.all=false;await openDoc(ctx.docId);if(!al)openPage(ctx.pi)}else openRev()};
@@ -1001,7 +1084,7 @@ function loupe(){const L=$('#loupe');if(S.drag<0){L.style.display='none';return}
 async function srcCanvas(blob){const img=await loadImg(blob),m=Math.min(1,2400/Math.max(img.naturalWidth,img.naturalHeight)),c=document.createElement('canvas');
   c.width=Math.round(img.naturalWidth*m);c.height=Math.round(img.naturalHeight*m);c.getContext('2d').drawImage(img,0,0,c.width,c.height);return c}
 async function autoPage(file){
-  const c=await srcCanvas(file);let q=null;try{if(!file.isPdf)q=autoQuad(c)}catch(e){}q=q||defQuad(c.width,c.height,file.isPdf?0:.06);
+  const c=await srcCanvas(file);let q=null;try{if(!file.isPdf)q=await autoQuadX(c)}catch(e){}q=q||defQuad(c.width,c.height,file.isPdf?0:.06);
   const nq=normQuad(q),base=isIdCtx()?warp(c,idOrient(nq),...idDims(idOrient(nq))):warp(c,nq),o={mode:'doc',b:0,c:0,s:0};
   const [blob,orig]=await Promise.all([new Promise(r=>proc(base,o).toBlob(r,'image/jpeg',.88)),new Promise(r=>base.toBlob(r,'image/jpeg',.92))]);
   return{id:uid(),blob,orig,opts:o,file,q}}
@@ -1217,15 +1300,28 @@ function zr(){Z.s=1;Z.x=Z.y=0;Z.p.clear();zap()}
  const up=e=>Z.p.delete(e.pointerId);st.addEventListener('pointerup',up);st.addEventListener('pointercancel',up)})();
 
 /* ---------- auto sync triggers + HD camera ---------- */
-window.addEventListener('online',autoSync);
+window.addEventListener('online',()=>{autoSync();setTimeout(()=>loadCV().catch(()=>{}),3000)});setTimeout(()=>loadCV().catch(()=>{}),5000);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)autoSync()});
 setInterval(()=>{if(!document.hidden&&!$('#splash')&&localStorage.getItem('swSignedIn'))sync()},300000);
 $('#status').onclick=()=>{sync(true)};
-function stopCam(){const v=$('#camVid');if(v.srcObject){v.srcObject.getTracks().forEach(t=>t.stop());v.srcObject=null}}
+let ovOn=false,ovQ=null;
+function stopCam(){ovOn=false;ovQ=null;const o=$('#camOv');if(o){const x=o.getContext('2d');x.clearRect(0,0,o.width,o.height)}const v=$('#camVid');if(v.srcObject){v.srcObject.getTracks().forEach(t=>t.stop());v.srcObject=null}}
+function startOv(){ovOn=true;loadCV().catch(()=>{});const v=$('#camVid'),o=$('#camOv'),t=document.createElement('canvas');
+ const tick=async()=>{if(!ovOn)return;
+  try{const cv=window.cv;if(cv&&cv.Mat&&v.videoWidth){const vw=v.videoWidth,vh=v.videoHeight,sc=Math.min(1,320/Math.max(vw,vh)),w=Math.round(vw*sc),h=Math.round(vh*sc);t.width=w;t.height=h;
+    const tx=t.getContext('2d');tx.drawImage(v,0,0,w,h);const r=cvDetect(cv,tx.getImageData(0,0,w,h).data,w,h);
+    const cw=o.clientWidth,ch=o.clientHeight;o.width=cw;o.height=ch;const s=Math.max(cw/vw,ch/vh),ox=(cw-vw*s)/2,oy=(ch-vh*s)/2,x=o.getContext('2d');x.clearRect(0,0,cw,ch);
+    if(r&&r.q){let q=r.q.map(p=>({x:p.x/sc*s+ox,y:p.y/sc*s+oy}));
+     if(ovQ&&ovQ.every((p,i)=>Math.hypot(p.x-q[i].x,p.y-q[i].y)<.12*Math.max(cw,ch)))q=q.map((p,i)=>({x:ovQ[i].x*.5+p.x*.5,y:ovQ[i].y*.5+p.y*.5}));ovQ=q;
+     x.beginPath();q.forEach((p,i)=>i?x.lineTo(p.x,p.y):x.moveTo(p.x,p.y));x.closePath();x.fillStyle='rgba(34,211,238,.18)';x.fill();x.strokeStyle='#22d3ee';x.lineWidth=3;x.stroke();
+     q.forEach(p=>{x.beginPath();x.arc(p.x,p.y,6,0,7);x.fillStyle='#fff';x.fill()})}else ovQ=null}}catch(e){}
+  if(ovOn)setTimeout(tick,350)};setTimeout(tick,600)}
 const camBack=()=>ctx.draft.length?openRev():(ctx.mode==='add'||ctx.mode==='edit')?openDoc(ctx.docId):renderHome();
-async function openCam(){try{const st=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:4096},height:{ideal:2160}},audio:false});$('#camVid').srcObject=st;show('camv')}
+async function openCam(){try{const st=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:4096},height:{ideal:2160}},audio:false});$('#camVid').srcObject=st;show('camv');startOv()}
   catch(e){toast('In-app camera not available, using phone camera');$('#inCam').click()}}
 $('#camX').onclick=()=>{stopCam();camBack()};
+$('#camGal').onclick=()=>$('#inGal').click();
+$('#camFile').onclick=()=>$('#inFile').click();
 $('#camSnap').onclick=()=>{const v=$('#camVid');if(!v.videoWidth)return;const c=document.createElement('canvas');c.width=v.videoWidth;c.height=v.videoHeight;c.getContext('2d').drawImage(v,0,0);stopCam();
   c.toBlob(b=>{ctx.last='cam';onFiles({target:{files:[b],value:''}})},'image/jpeg',.95)};
 
