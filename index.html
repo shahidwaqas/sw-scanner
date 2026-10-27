@@ -489,6 +489,8 @@ body{overflow-x:hidden}
 <div id="prev" class="screen hidden"><div class="zc"><button id="zIn" aria-label="Zoom in">+</button><button id="zOut" aria-label="Zoom out">−</button><button id="zFit" style="font-size:12px">Fit</button></div><header><button id="pvBack">←</button><h1 id="pvT"></h1></header><div class="scroll" id="pvBox" style="background:#e2e8f0;padding-top:12px"></div><div class="bar"><button id="pvPrint" class="pri">Print</button><button id="pvShare">Share PDF</button><button id="pvDl">Download</button></div></div>
 <div id="bin" class="screen hidden"><header><button id="bBack">←</button><h1>Recycle bin</h1><button id="bEmpty">Empty</button></header><div class="scroll"><p class="hint" id="binHint"></p><div id="binList"></div></div></div>
 <div id="dlg" class="sheet hidden"><div><b id="dlgT"></b><p id="dlgM"></p><button id="dlgOk" class="rdb">Delete</button><button id="dlgNo">Cancel</button></div></div>
+<style>#busy{position:fixed;inset:0;z-index:130;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:rgba(245,248,253,.9);color:#0a1a5c;font-size:16px;font-weight:600}#busy .bs{width:52px;height:52px;border-radius:50%;border:5px solid #dbe3f0;border-top-color:#ea580c;animation:rot .9s linear infinite}html[data-theme=dark] #busy{background:rgba(11,16,32,.9);color:#e5e9f5}html[data-theme=dark] #busy .bs{border-color:#2a3454;border-top-color:#ea580c}#toast{z-index:200!important}</style>
+<div id="busy" class="hidden"><div class="bs"></div><span id="busyM">Processing...</span></div>
 <div id="toast"></div>
 <div id="prep" class="hidden"><div id="prepWho"></div><div id="prepHi"></div><div class="ring"><svg viewBox="0 0 100 100"><defs><linearGradient id="rg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2547b8"/><stop offset="1" stop-color="#ea580c"/></linearGradient></defs><circle cx="50" cy="50" r="44" class="rt"/><circle cx="50" cy="50" r="44" class="rp" id="rp"/></svg><b id="rpct">0%</b></div><div id="prepMsg"></div></div>
 
@@ -497,15 +499,17 @@ body{overflow-x:hidden}
 const CLIENT_ID='682622042304-3iivfit3fccho5a7vpeu6jdj90kdkjl0.apps.googleusercontent.com';
 const SCOPE='https://www.googleapis.com/auth/drive.file openid email';
 const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
 const fmt=d=>d.toLocaleDateString('en-GB')+' '+d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
-let toastT;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),2600)}
+let toastT;function toast(m,ms){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),ms||2600)}
+const busy=m=>{$('#busyM').textContent=m;$('#busy').classList.remove('hidden')},busyOff=()=>$('#busy').classList.add('hidden');
 function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('hidden',s.id!==id))}
 
 /* ---------- IndexedDB ---------- */
 let db;
 function openDB(){return new Promise((res,rej)=>{const r=indexedDB.open('swscanner',1);r.onupgradeneeded=()=>{const d=r.result;d.createObjectStore('docs',{keyPath:'id'});d.createObjectStore('tomb',{keyPath:'id'})};r.onsuccess=()=>{db=r.result;res()};r.onerror=()=>rej(r.error)})}
-const tx=(st,mode,fn)=>new Promise((res,rej)=>{const t=db.transaction(st,mode);const rq=fn(t.objectStore(st));t.oncomplete=()=>res(rq&&rq.result);t.onerror=()=>rej(t.error)});
+const tx=(st,mode,fn)=>new Promise((res,rej)=>{const t=db.transaction(st,mode);const rq=fn(t.objectStore(st));t.oncomplete=()=>res(rq&&rq.result);t.onerror=()=>rej(t.error);t.onabort=()=>{const er=t.error||new Error('Database error');try{toast(er.name==='QuotaExceededError'?'Storage is full. Free up space and try again':'Could not save: '+er.message)}catch(_){}rej(er)}});
 const dbAll=st=>tx(st,'readonly',s=>s.getAll());
 const dbGet=(st,k)=>tx(st,'readonly',s=>s.get(k));
 const dbPut=(st,v)=>tx(st,'readwrite',s=>s.put(v));
@@ -693,7 +697,8 @@ function sheetPos(o,k){const W=85.6,H=53.98,r=o.n/2,g=Math.max(1,Math.min(o.gap,
 function ticks(x,y){const s=[];for(const sx of[-1,1])for(const sy of[-1,1]){const cx=sx<0?x:x+85.6,cy=sy<0?y:y+53.98;s.push([cx+sx*.5,cy,cx+sx*2.5,cy],[cx,cy+sy*.5,cx,cy+sy*2.5])}return s}
 function runPrint(css,body,u){const f=document.createElement('iframe');f.style.cssText='position:fixed;width:0;height:0;border:0';document.body.appendChild(f);
   f.contentDocument.write(`<style>@page{size:A4;margin:0}body{margin:0}${css}</style>`+body);f.contentDocument.close();
-  setTimeout(()=>{f.contentWindow.focus();f.contentWindow.print()},500);setTimeout(()=>{f.remove();u.forEach(x=>URL.revokeObjectURL(x))},120000)}
+  const go=()=>{try{f.contentWindow.focus();f.contentWindow.print()}catch(e){}};
+  Promise.race([Promise.all([...f.contentDocument.images].map(im=>im.complete?1:new Promise(r=>{im.onload=im.onerror=r}))),new Promise(r=>setTimeout(r,6000))]).then(()=>setTimeout(go,150));setTimeout(()=>{f.remove();u.forEach(x=>URL.revokeObjectURL(x))},120000)}
 function printDoc(d){const u=d.pages.map(p=>URL.createObjectURL(p.blob));
   if(d.kind==='id'){const s=(d.idScale||100)/100;runPrint(`body{padding-top:20mm}img{display:block;margin:0 auto 12mm;width:${(85.6*s).toFixed(2)}mm;height:auto}`,u.map(x=>`<img src="${x}">`).join(''),u)}
   else runPrint('img{display:block;width:210mm;max-height:297mm;object-fit:contain;page-break-after:always}',u.map(x=>`<img src="${x}">`).join(''),u)}
@@ -714,7 +719,7 @@ const ico=n=>`<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">${ICO[n]||'
 document.querySelectorAll('[data-ic]').forEach(e=>e.insertAdjacentHTML('afterbegin',ico(e.dataset.ic)));
 async function renameDoc(d){const n=prompt('New name',d.name);if(!n||!n.trim())return;d.name=n.trim();d.nameDirty=true;await dbPut('docs',d);await renderHome();autoSync()}
 let PK={};
-function shareFlow(d){PK={d,f:'img',sel:new Set(d.pages.map((_,i)=>i)),u:[]};$('#pkT').textContent='Share · '+d.name;
+function shareFlow(d){PK={d,f:'img',sel:new Set(d.pages.map((_,i)=>i)),u:[]};$('#pkT').textContent='Share · '+d.name;$('#pkAll').textContent='Clear all';
   document.querySelectorAll('#pk .seg button').forEach(b=>b.classList.toggle('on',b.dataset.f==='img'));
   $('#pkG').innerHTML='';d.pages.forEach((p,i)=>{const u=URL.createObjectURL(p.blob);PK.u.push(u);const l=document.createElement('label');l.className='th';
     l.innerHTML=`<img src="${u}"><input type="checkbox" checked>`;l.querySelector('input').onchange=e=>{e.target.checked?PK.sel.add(i):PK.sel.delete(i)};$('#pkG').appendChild(l)});
@@ -745,7 +750,7 @@ async function renderHome(){
   let all=await dbAll('docs');const old=all.filter(d=>d.deleted&&Date.now()-d.deleted>BIN_DAYS*864e5);
   if(old.length){await purge(old);all=all.filter(d=>!old.includes(d))}
   const nb=all.filter(d=>d.deleted).length;$('#binN').textContent=nb?nb+' in bin':'Restore deleted documents';
-  const docs=all.filter(d=>!d.deleted).sort((a,b)=>b.created-a.created);clearUrls();
+  const docs=all.filter(d=>!d.deleted&&d.pages&&d.pages.length).sort((a,b)=>b.created-a.created);clearUrls();
   const q=$('#q').value.trim().toLowerCase(),lim=Date.now()-30*864e5;
   const fill=(el,arr,msg)=>{el.innerHTML='';if(!arr.length)el.innerHTML='<p class="empty">'+msg+'</p>';
     for(const d of arr){const c=document.createElement('div');c.className='card'+(selMode&&sel.has(d.id)?' sel':'');const synced=d.pages.every(p=>p.fs);
@@ -759,14 +764,14 @@ async function renderHome(){
   $('#main').classList.toggle('selmode',selMode);$('#selBar').classList.toggle('hidden',!selMode);$('#nav').classList.toggle('hidden',selMode);
   $('#selDel').textContent=`Delete (${sel.size})`;document.querySelectorAll('[data-sel]').forEach(b=>b.classList.toggle('hidden',selMode));
   updGreet();show('main');showTab(curTab)}
-$('#q').oninput=renderHome;
+let qT;$('#q').oninput=()=>{clearTimeout(qT);qT=setTimeout(renderHome,220)};
 document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>{if(b.dataset.tab==='import'){begin('new',null,null);return}showTab(b.dataset.tab)});
 document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(!g)return;const v=g.dataset.go;
   if(v==='tab-import')showTab('import');else if(v==='id')begin('id',null,null);else if(v==='sync')sync(true);else if(v==='bin')openBin();else begin('new',null,v==='scan'?null:v)});
 const prof=()=>JSON.parse(localStorage.getItem('swProfile')||'{}');
 async function renderMe(){const p=prof(),docs=(await dbAll('docs')).filter(d=>!d.deleted);
   $('#pn').value=p.n||'';$('#pe').value=p.e||'';$('#pp').value=p.p||'';$('#av').textContent=(p.n||'?')[0].toUpperCase();
-  $('#meStat').innerHTML=`<b>${p.n||'Your profile'}</b><br><small>${docs.length} documents · ${docs.reduce((s,d)=>s+d.pages.length,0)} pages</small>`;lockP()}
+  $('#meStat').innerHTML=`<b>${esc(p.n||'Your profile')}</b><br><small>${docs.length} documents · ${docs.reduce((s,d)=>s+d.pages.length,0)} pages</small>`;lockP()}
 let pEd=false;
 function lockP(){const p=prof(),has=!!(p.n||p.e||p.p),ro=has&&!pEd;['pn','pe','pp'].forEach(i=>{const e=$('#'+i);e.readOnly=ro;e.style.background=ro?'#f1f5f9':'#fff';e.style.borderColor=ro?'transparent':''});$('#pEdit').textContent=ro?'Edit profile':'Save profile'}
 $('#pEdit').onclick=()=>{const p=prof(),has=!!(p.n||p.e||p.p);if(has&&!pEd){pEd=true;lockP();return}
@@ -841,14 +846,15 @@ $('#dAdd').onclick=()=>begin('add',cur.id,null);
 async function onFiles(e){
   let files=[...e.target.files];e.target.value='';if(!files.length)return;stopCam();
   try{
-    toast('Processing...');files=await expandPdf(files);if(!files.length)return;if(ctx.mode==='edit'){await startCrop(files[0]);return}
+    busy('Processing...');await new Promise(r=>setTimeout(r,30));files=await expandPdf(files);if(!files.length)return;if(ctx.mode==='edit'){await startCrop(files[0]);return}
     if(ctx.replace!=null){const i=ctx.replace;ctx.replace=null;toast('Processing...');await new Promise(r=>setTimeout(r,30));ctx.draft[i]=await autoPage(files[0]);ctx.ri=i;openRev();return}
     if(isIdCtx())files=files.slice(0,2-ctx.draft.length);
     if(!files.length){toast('An ID card has only front and back');return}
     const start=ctx.draft.length;
-    for(let k=0;k<files.length;k++){toast(`Processing ${k+1}/${files.length}...`);await new Promise(r=>setTimeout(r,30));ctx.draft.push(await autoPage(files[k]))}
+    for(let k=0;k<files.length;k++){busy(`Processing ${k+1}/${files.length}...`);await new Promise(r=>setTimeout(r,30));ctx.draft.push(await autoPage(files[k]))}
     ctx.ri=start;openRev()
-  }catch(err){toast(err.message)}}
+  }catch(err){toast('Import failed: '+(err&&err.message||err),6000)}
+  finally{busyOff();if(!$('#camv').classList.contains('hidden'))camBack()}}
 [['#inCam','cam'],['#inGal','gal'],['#inFile','file']].forEach(([s,k])=>$(s).onchange=e=>{ctx.last=k;onFiles(e)});
 
 function autoQuad(c){const sc=Math.min(1,320/Math.max(c.width,c.height)),w=Math.round(c.width*sc),h=Math.round(c.height*sc),t=document.createElement('canvas');t.width=w;t.height=h;
@@ -865,7 +871,8 @@ function loadCV(){if(window.cv&&window.cv.Mat)return Promise.resolve(window.cv);
   document.head.appendChild(s)});return CVP}
 function grabSmall(c,max){const sc=Math.min(1,max/Math.max(c.width,c.height)),w=Math.max(1,Math.round(c.width*sc)),h=Math.max(1,Math.round(c.height*sc)),t=document.createElement('canvas');t.width=w;t.height=h;
   const x=t.getContext('2d');x.drawImage(c,0,0,w,h);return{sc,w,h,d:x.getImageData(0,0,w,h).data}}
-async function autoQuadX(c){
+async function autoQuadX(c,fast){
+  if(fast&&!(window.cv&&window.cv.Mat)){loadCV().catch(()=>{});return autoQuad(c)}
   try{const cv=await Promise.race([loadCV(),new Promise((_,no)=>setTimeout(()=>no(new Error('slow')),6000))]);
     const g=grabSmall(c,640),r=cvDetect(cv,g.d,g.w,g.h);
     if(r&&r.q)return r.q.map(p=>({x:p.x/g.sc,y:p.y/g.sc}))}catch(e){}
@@ -1041,7 +1048,7 @@ $('#pgDel').onclick=async()=>{const n=pSel.size;if(!n)return toast('Select pages
   await addTomb(cur.pages.filter((p,i)=>pSel.has(i)&&p.fs).map(p=>p.id));
   cur.pages=cur.pages.filter((_,i)=>!pSel.has(i));await dbPut('docs',cur);pSel=null;toast('Deleted');autoSync();openDoc(cur.id)};
 async function openBin(){
-  const ds=(await dbAll('docs')).filter(d=>d.deleted).sort((a,b)=>b.deleted-a.deleted);clearUrls();const el=$('#binList');
+  const ds=(await dbAll('docs')).filter(d=>d.deleted&&d.pages&&d.pages.length).sort((a,b)=>b.deleted-a.deleted);clearUrls();const el=$('#binList');
   el.innerHTML=ds.length?'':'<p class="empty">Recycle bin is empty.</p>';$('#binHint').textContent=`Deleted documents stay here for ${BIN_DAYS} days.`;
   for(const d of ds){const left=Math.max(0,Math.ceil(BIN_DAYS-(Date.now()-d.deleted)/864e5)),c=document.createElement('div');c.className='card';
     c.innerHTML=`<img src="${mkUrl(d.pages[0].blob)}"><div><b></b><small>${left} day${left===1?'':'s'} left</small></div><div class="acts"><button class="ib" data-a="r" aria-label="Restore">${ico('restore')}</button><button class="ib" data-a="x" aria-label="Delete forever" style="color:#dc2626">${ico('trash')}</button></div>`;
@@ -1084,7 +1091,7 @@ function loupe(){const L=$('#loupe');if(S.drag<0){L.style.display='none';return}
 async function srcCanvas(blob){const img=await loadImg(blob),m=Math.min(1,2400/Math.max(img.naturalWidth,img.naturalHeight)),c=document.createElement('canvas');
   c.width=Math.round(img.naturalWidth*m);c.height=Math.round(img.naturalHeight*m);c.getContext('2d').drawImage(img,0,0,c.width,c.height);return c}
 async function autoPage(file){
-  const c=await srcCanvas(file);let q=null;try{if(!file.isPdf)q=await autoQuadX(c)}catch(e){}q=q||defQuad(c.width,c.height,file.isPdf?0:.06);
+  const c=await srcCanvas(file);let q=null;try{if(!file.isPdf)q=await autoQuadX(c,true)}catch(e){}q=q||defQuad(c.width,c.height,file.isPdf?0:.06);
   const nq=normQuad(q),base=isIdCtx()?warp(c,idOrient(nq),...idDims(idOrient(nq))):warp(c,nq),o={mode:'doc',b:0,c:0,s:0};
   const [blob,orig]=await Promise.all([new Promise(r=>proc(base,o).toBlob(r,'image/jpeg',.88)),new Promise(r=>base.toBlob(r,'image/jpeg',.92))]);
   return{id:uid(),blob,orig,opts:o,file,q}}
@@ -1233,8 +1240,7 @@ async function sync(manual){
   finally{syncing=false;$('#btnSync').classList.remove('busy');if(again){again=false;setTimeout(sync,800)}}}
 function autoSync(){if($('#splash')||!localStorage.getItem('swSignedIn'))return;sync()}
 $('#btnSync').onclick=()=>sync(true);
-$('#btnLock').onclick=async()=>{try{if(window.FB)await FB.signOut()}catch(e){}
-  localStorage.removeItem('swSignedIn');localStorage.removeItem(PIN_KEY);sessionStorage.removeItem('swOk');location.reload()};
+$('#btnLock').onclick=()=>$('#btnOut').click();
 $('#btnOut').onclick=async()=>{
   if(!await askConfirm('Log out?','Scanned documents will stay on this phone.','Log out',false))return;
   try{if(window.FB)await FB.signOut()}catch(e){}
@@ -1415,7 +1421,9 @@ $('#btnTheme').onclick=()=>{localStorage.setItem(THK,document.documentElement.da
 /* ---------- left-edge swipe = Back (iPhone) ---------- */
 function goBack(){
   if(!$('#dlg').classList.contains('hidden')){$('#dlgNo').click();return}
-  const sh=$('#shs');if(sh&&!sh.classList.contains('hidden')){$('#shX').click();return}
+  const sh=$('#shs');if(sh&&!sh.classList.contains('hidden')){sh.classList.add('hidden');return}
+  const sr=$('#shr');if(!sr.classList.contains('hidden')){sr.classList.add('hidden');return}
+  if(!$('#pk').classList.contains('hidden')){pkClose();return}
   const ap=$('#aps');if(ap&&!ap.classList.contains('hidden')){ap.click();return}
   if(!$('#src').classList.contains('hidden')){$('#src').classList.add('hidden');return}
   const vis=document.querySelector('.screen:not(.hidden)');if(!vis)return;
