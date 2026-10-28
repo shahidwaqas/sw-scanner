@@ -435,7 +435,7 @@ body{overflow-x:hidden}
     <button class="big" id="btnImport" data-ic="restore">Import from Google Drive<small>One time: bring your old Drive scans here</small></button>
     <button class="big" id="btnOut" data-ic="out">Logout</button></div>
   <div id="selBar" class="selbar hidden"><button id="selCancel">Cancel</button><button id="selAll">Select all</button><button class="rdb" id="selDel">Delete (0)</button></div>
-  <nav id="nav"><button data-tab="home" data-ic="home" class="on" aria-label="Home"><span>Home</span></button><button data-tab="docs" data-ic="docs" aria-label="All docs"><span>All docs</span></button><button data-tab="import" data-ic="scan" aria-label="Import"><span>Import</span></button><button data-tab="tools" data-ic="tools" aria-label="Tools"><span>Tools</span></button><button data-tab="me" data-ic="user" aria-label="Me"><span>Me</span></button></nav>
+  <div class="navFade"></div><nav id="nav"><button data-tab="home" data-ic="home" class="on" aria-label="Home"><span>Home</span></button><button data-tab="docs" data-ic="docs" aria-label="All docs"><span>All docs</span></button><button data-tab="import" data-ic="scan" aria-label="Import"><span>Import</span></button><button data-tab="tools" data-ic="tools" aria-label="Tools"><span>Tools</span></button><button data-tab="me" data-ic="user" aria-label="Me"><span>Me</span></button></nav>
 </div>
 
 <div id="docv" class="screen hidden">
@@ -467,7 +467,7 @@ body{overflow-x:hidden}
 <div id="viewer" class="screen hidden">
   <header><h1 id="vTitle"></h1><button id="vShare">Share</button><button id="vDel" data-ic="trash" aria-label="Delete"></button></header>
   <div class="stage"><img id="viewImg"></div>
-  <div class="bar"><button id="vBack" class="bk" data-ic="back" aria-label="Back"></button><button id="vEdit" data-ic="adj">Edit</button><button id="vRetake" data-ic="retake">Retake</button></div>
+  <nav id="vNav"><button id="vBack" data-ic="back" aria-label="Back"><span>Back</span></button><button id="vPages" data-ic="docs"><span>Pages</span></button><button id="vEdit" data-ic="adj"><span>Edit</span></button><button id="vRetake" data-ic="retake"><span>Retake</span></button><button id="vAdd" data-ic="cam"><span>Add</span></button><button id="vA4" data-ic="id" class="hidden"><span>A4 layout</span></button></nav>
 </div>
 
 <div id="src" class="sheet hidden"><div><b>Choose source</b><button data-s="cam" class="pri">Camera</button><button data-s="gal">Gallery</button><button data-s="file">Files</button><button data-s="x">Cancel</button></div></div>
@@ -495,9 +495,23 @@ body{overflow-x:hidden}
 <div id="toast"></div>
 <div id="prep" class="hidden"><div id="prepWho"></div><div id="prepHi"></div><div class="ring"><svg viewBox="0 0 100 100"><defs><linearGradient id="rg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2547b8"/><stop offset="1" stop-color="#ea580c"/></linearGradient></defs><circle cx="50" cy="50" r="44" class="rt"/><circle cx="50" cy="50" r="44" class="rp" id="rp"/></svg><b id="rpct">0%</b></div><div id="prepMsg"></div></div>
 
+<style id="sw28">
+.navFade{position:fixed;left:0;right:0;bottom:0;height:calc(env(safe-area-inset-bottom,0px) + 108px);background:linear-gradient(to top,var(--bg) 40%,transparent);pointer-events:none;z-index:20}
+#main.selmode .navFade{display:none}
+#nav{background:rgba(255,255,255,.84)!important}
+html[data-theme=dark] #nav{background:rgba(28,36,64,.86)!important}
+#main .tab .card{will-change:transform,opacity;backface-visibility:hidden}
+#vNav{display:flex;justify-content:space-around;gap:2px;padding:8px 8px calc(env(safe-area-inset-bottom,0px) + 8px);background:rgba(255,255,255,.92);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);border-top:1px solid #e6ebf5}
+#vNav button{flex:1;min-width:0;display:flex;flex-direction:column;align-items:center;gap:3px;background:none!important;border:0!important;box-shadow:none!important;color:#475569!important;font-size:11px;font-weight:600;padding:5px 0!important;border-radius:14px!important}
+#vNav button:active{background:rgba(10,26,92,.08)!important}
+#vNav .ic{width:24px;height:24px;margin:0;padding:0;background:none}
+#vNav .ic svg{width:24px;height:24px}
+html[data-theme=dark] #vNav{background:rgba(21,28,51,.92);border-color:rgba(255,255,255,.12)}
+html[data-theme=dark] #vNav button{color:#cbd5e1!important}
+</style>
 <script src="fb.js" defer></script>
 <script>
-const APP_VER='2026-10-27-a';
+const APP_VER='2026-10-28-a';
 const CLIENT_ID='682622042304-3iivfit3fccho5a7vpeu6jdj90kdkjl0.apps.googleusercontent.com';
 const SCOPE='https://www.googleapis.com/auth/drive.file openid email';
 const $=s=>document.querySelector(s);
@@ -727,7 +741,7 @@ async function renderHome(){
     for(const d of arr){const c=document.createElement('div');c.className='card'+(selMode&&sel.has(d.id)?' sel':'');const synced=d.pages.every(p=>p.fs);
       c.innerHTML=(selMode?`<input type="checkbox" class="ck" ${sel.has(d.id)?'checked':''}>`:'')+`<img src="${mkUrl(thOf(d.pages[0]))}"><div><b></b><small>${d.pages.length} page${d.pages.length>1?'s':''} · ${fmt(new Date(d.created))} · ${synced?'Synced':'Not synced'}</small></div>`+(selMode?'':`<div class="acts"><button class="ib" data-a="s" aria-label="Share">${ico('share')}</button><button class="ib" data-a="r" aria-label="Rename">${ico('edit')}</button><button class="ib" data-a="d" aria-label="Delete" style="color:#dc2626">${ico('trash')}</button></div>`);
       c.querySelector('b').textContent=d.name;if(d.kind==='id')c.querySelector('b').insertAdjacentHTML('beforeend','<span class="tag">ID</span>');
-      c.onclick=e=>{if(selMode){toggleSel(d.id);return}const a=e.target.closest('[data-a]');if(!a)return openDoc(d.id);const k=a.dataset.a;if(k==='s')shareFlow(d);else if(k==='r')renameDoc(d);else delDocs([d])};el.appendChild(c)}
+      c.onclick=e=>{if(selMode){toggleSel(d.id);return}const a=e.target.closest('[data-a]');if(!a)return openDocView(d.id);const k=a.dataset.a;if(k==='s')shareFlow(d);else if(k==='r')renameDoc(d);else delDocs([d])};el.appendChild(c)}
     return arr.map(d=>d.id)};
   const ra=fill($('#list'),docs.filter(d=>d.created>=lim),'No documents in the last 30 days.<br>Tap Scan to start.');
   const rb=fill($('#listAll'),docs.filter(d=>!q||d.name.toLowerCase().includes(q)),'No documents found.');
@@ -784,9 +798,10 @@ async function openDoc0(id,keep){
     if(on)w.classList.add('sel');
     w.onclick=()=>{if(pSel){on?pSel.delete(i):pSel.add(i);openDoc(cur.id,true)}else openPage(i)};g.appendChild(w)});
   show('docv')}
+async function openDocView(id){await openDoc(id);if(cur&&cur.id===id&&cur.pages.length&&!$('#docv').classList.contains('hidden'))openPage(0)}
 let vi=0;
-function openPage(i){vi=i;zr();$('#viewImg').src=mkUrl(cur.pages[i].blob);$('#vTitle').textContent=`${cur.name} · ${i+1}/${cur.pages.length}`;show('viewer')}
-$('#vBack').onclick=()=>openDoc(cur.id);
+function openPage(i){vi=i;zr();$('#vA4').classList.toggle('hidden',cur.kind!=='id');$('#vAdd').classList.toggle('hidden',cur.kind==='id'&&cur.pages.length>=2);$('#viewImg').src=mkUrl(cur.pages[i].blob);$('#vTitle').textContent=`${cur.name} · ${i+1}/${cur.pages.length}`;show('viewer')}
+$('#vBack').onclick=renderHome;$('#vPages').onclick=()=>openDoc(cur.id);$('#vAdd').onclick=()=>$('#dAdd').click();$('#vA4').onclick=()=>$('#idView').click();
 $('#vShare').onclick=async()=>{let d=cur;if(cur.kind==='id'){const t=askWm();if(t===null)return;d=await wmDoc(cur,t)}shareFiles([imgFiles(d)[vi]],cur.name)};
 $('#vDel').onclick=async()=>{
   if(cur.pages.length===1)return delDocs([cur]);if(!await askConfirm('Delete this page?',"This can't be undone. It will also be removed from your other phones."))return;
@@ -830,7 +845,7 @@ async function onFiles(e){
     if(!files.length){toast('An ID card has only front and back');return}
     const start=ctx.draft.length;
     for(let k=0;k<files.length;k++){BL=files.length>1?`${k+1}/${files.length} · `:'';busy(BL+'Processing...');await new Promise(r=>setTimeout(r,30));ctx.draft.push(await autoPage(files[k]))}
-    ctx.ri=start;openRev()
+    if(files.length>1&&!isIdCtx()){ctx.seq=files.map((_,k)=>start+k);ctx.seqOn=true;busyOff();await seqNext()}else{ctx.ri=start;openRev()}
   }catch(err){toast('Import failed: '+(err&&err.message||err),6000)}
   finally{busyOff();if(!$('#camv').classList.contains('hidden'))camBack()}}
 [['#inCam','cam'],['#inGal','gal'],['#inFile','file']].forEach(([s,k])=>$(s).onchange=e=>{ctx.last=k;onFiles(e)});
@@ -877,7 +892,7 @@ function drawCrop(){
 $('#cAuto').onclick=async()=>{toast('Detecting edges...');let q=null;try{q=autoQuad(S.src)}catch(e){}if(q){S.q=q;drawCrop()}else toast('Could not find edges, drag the corners')};
 $('#cFull').onclick=()=>{S.q=defQuad(S.src.width,S.src.height,0);drawCrop()};
 $('#cCancel').onclick=()=>show('edit');
-$('#eBack').onclick=async()=>{ctx.queue=[];if(ctx.mode==='edit'){const al=ctx.all;ctx.all=false;await openDoc(ctx.docId);if(!al)openPage(ctx.pi)}else openRev()};
+$('#eBack').onclick=async()=>{ctx.queue=[];ctx.seq=null;ctx.seqOn=false;$('#crop h1').textContent='Adjust corners';if(ctx.mode==='edit'){const al=ctx.all;ctx.all=false;await openDoc(ctx.docId);if(!al)openPage(ctx.pi)}else openRev()};
 $('#eCrop').onclick=()=>{show('crop');requestAnimationFrame(layoutCrop)};
 $('#cNext').onclick=()=>goEdit();
 function idDims(q){const d=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y),k=Math.max(.3,d(q[0],q[1])/Math.max(1,d(q[1],q[2])));return Math.abs(k/1.586-1)<.3?[ID_W,ID_H]:[ID_W,Math.round(ID_W/k)]}
@@ -949,7 +964,7 @@ let rq=0;
 function renderEdit(){
   if(!rq)rq=requestAnimationFrame(()=>{rq=0;const out=proc(E.small,E.o),cv=$('#editCv');cv.width=out.width;cv.height=out.height;cv.getContext('2d').drawImage(out,0,0)});
   document.querySelectorAll('#fBar button').forEach(b=>b.classList.toggle('on',b.dataset.m===E.o.mode));
-  const id=ctx.mode==='id';$('#edit').classList.toggle('bulk',!!ctx.all);$('#edit h1').textContent=ctx.all?'Edit all pages':'Edit page';$('#eNext').classList.add('hidden');$('#eSave').textContent=ctx.mode==='edit'?'Save':'Done';
+  const id=ctx.mode==='id';$('#edit').classList.toggle('bulk',!!ctx.all);$('#edit h1').textContent=ctx.all?'Edit all pages':'Edit page';$('#eNext').classList.add('hidden');$('#eSave').textContent=ctx.mode==='edit'?'Save':(ctx.seqOn&&ctx.seq&&ctx.seq.length?'Next photo ›':'Done');
   $('#eNext').textContent=id?'Add back side':ctx.queue.length?'Next photo':'Add page'}
 $('#fBar').innerHTML=FILTERS.map(f=>`<button data-m="${f[0]}">${f[1]}</button>`).join('');
 document.querySelectorAll('#fBar button').forEach(b=>b.onclick=()=>{E.o.mode=b.dataset.m;renderEdit()});
@@ -974,11 +989,11 @@ $('#eSave').onclick=async()=>{
     if(d0&&d0.pages.length>1&&optsChanged(d0.pages[ctx.pi],E.o)){ex=await askScope(d0.pages.map(q=>q.blob),ctx.pi);if(!ex)return}
     await commit();ctx.queue=[];if(ex.size)await applyDocPages(ctx.docId,ex,E.o);await saveDraft();return}
   const p=ctx.draft[E.bi];let ex=new Set();
-  if(ctx.draft.length>1&&optsChanged(p,E.o)){ex=await askScope(ctx.draft.map(q=>q.blob),E.bi);if(!ex)return}
+  if(!ctx.seqOn&&ctx.draft.length>1&&optsChanged(p,E.o)){ex=await askScope(ctx.draft.map(q=>q.blob),E.bi);if(!ex)return}
   toast('Processing...');const b=await new Promise(r=>proc(E.base,E.o).toBlob(r,'image/jpeg',.88)),ob=await new Promise(r=>E.base.toBlob(r,'image/jpeg',.92));
   p.blob=b;p.orig=ob;p.opts={...E.o};p.q=S.q;
   let n=0;for(const i of ex){const q=ctx.draft[i];if(!q)continue;toast(`Applying ${++n}/${ex.size}...`);await new Promise(r=>setTimeout(r,20));q.blob=await applyOpts(q.orig||q.blob,E.o);q.opts={...E.o}}
-  openRev()};
+  if(ctx.seq&&ctx.seq.length){await seqNext();return}ctx.seq=null;ctx.seqOn=false;$('#crop h1').textContent='Adjust corners';openRev()};
 async function saveDraft(){
   if(!ctx.draft.length){renderHome();return}
   await addTh(ctx.draft);
@@ -1071,6 +1086,7 @@ function updRev(){const n=ctx.draft.length,id=isIdCtx(),off=(ctx.mode==='add'&&c
   $('#rvSave').textContent=n>1?`Save (${n} pages)`:'Save';
   $('#rvHint').textContent=id&&n+off<2?'Now add the back side with Camera, Gallery or Files.':'Swipe to see all pages. Tap Edit to change crop or filter.'}
 $('#rvPager').addEventListener('scroll',()=>{const pg=$('#rvPager'),i=Math.round(pg.scrollLeft/(pg.clientWidth||1));if(i!==ctx.ri&&i<ctx.draft.length){ctx.ri=i;updRev()}});
+async function seqNext(){const i=ctx.seq.shift();await editBatch(i);$('#crop h1').textContent='Adjust corners · '+(i+1)+'/'+ctx.draft.length;show('crop');requestAnimationFrame(layoutCrop)}
 async function editBatch(i){const p=ctx.draft[i];toast('Opening...');ctx.ri=i;
   const base=await srcCanvas(p.orig),c=p.file?await srcCanvas(p.file):base;
   S={src:c,q:p.file&&p.q?p.q:defQuad(c.width,c.height,0),drag:-1,sc:1};
@@ -1429,6 +1445,19 @@ function goBack(){
       setTimeout(()=>el.classList.remove('go-in','go-back'),520)}}});
   document.querySelectorAll('.screen').forEach(s=>mo.observe(s,{attributes:true,attributeFilter:['class'],attributeOldValue:true}))})();
 
+
+/* ---------- list rows fold/roll at top and above the bottom bar ---------- */
+(()=>{const nav=$('#nav');let raf=0;const B=70,A=80;
+  function fold(){raf=0;const sc=document.querySelector('#main .tab:not(.hidden)');if(!sc)return;
+    const top=sc.getBoundingClientRect().top,nt=(nav.classList.contains('hidden')?innerHeight-10:nav.getBoundingClientRect().top)-4;
+    sc.querySelectorAll('.card').forEach(c=>{const r=c.getBoundingClientRect(),h=r.height||1;let tr='',op='',og='';
+      const p=Math.min(1,Math.max(0,(top+B-r.top)/(B+h*.6))),q=Math.min(1,Math.max(0,(r.bottom-(nt-B))/(B+h*.6)));
+      if(p>0){tr=`perspective(600px) rotateX(${(p*A).toFixed(1)}deg) scale(${(1-p*.06).toFixed(3)})`;op=(1-p*.9).toFixed(2);og='center bottom'}
+      else if(q>0){tr=`perspective(600px) rotateX(${(-q*A).toFixed(1)}deg) scale(${(1-q*.06).toFixed(3)})`;op=(1-q*.92).toFixed(2);og='center top'}
+      if(c._f!==tr){c._f=tr;c.style.transform=tr;c.style.opacity=op;c.style.transformOrigin=og}})}
+  const req=()=>{if(!raf)raf=requestAnimationFrame(fold)};
+  $('#main').addEventListener('scroll',req,true);addEventListener('resize',req);
+  new MutationObserver(req).observe($('#main'),{childList:true,subtree:true,attributes:true,attributeFilter:['class']});req()})();
 /* ---------- viewer swipe between pages, pinch zoom in edit/review, pinch grid zoom ---------- */
 (()=>{const st=$('#viewer .stage');let sx=0,sy=0,multi=false,on=false;
   st.addEventListener('touchstart',e=>{if(e.touches.length>1)multi=true;else{multi=false;sx=e.touches[0].clientX;sy=e.touches[0].clientY;on=sx>30}},{passive:true});
