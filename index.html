@@ -141,7 +141,7 @@ header button{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255
 #splash.out{opacity:0;pointer-events:none}
 #splash img{width:min(55vw,240px);animation:sp 1.6s ease-in-out infinite alternate}
 #splash .bar2{width:min(48vw,200px);height:4px;border-radius:4px;background:#e6ebf5;overflow:hidden}
-#splash .bar2 i{display:block;height:100%;width:0;background:linear-gradient(90deg,#2547b8,#ea580c);animation:ld 5s linear forwards}
+#splash .bar2 i{display:block;height:100%;width:0;background:linear-gradient(90deg,#2547b8,#ea580c);animation:ld 1.5s linear forwards}
 @keyframes ld{to{width:100%}}@keyframes sp{from{transform:scale(.96);opacity:.85}to{transform:scale(1);opacity:1}}
 #viewer .stage{touch-action:none;overflow:hidden}#viewImg{transform-origin:center;will-change:transform;user-select:none;-webkit-user-drag:none}
 
@@ -504,7 +504,8 @@ const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,8);
 const fmt=d=>d.toLocaleDateString('en-GB')+' '+d.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
 let toastT;function toast(m,ms){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),ms||2600)}
-const busy=m=>{$('#busyM').textContent=m;$('#busy').classList.remove('hidden')},busyOff=()=>$('#busy').classList.add('hidden');
+let busyT;
+const busy=m=>{$('#busyM').textContent=m;$('#busy').classList.remove('hidden');clearTimeout(busyT);busyT=setTimeout(()=>{$('#busy').classList.add('hidden');toast('Taking too long. Try again with fewer or smaller photos',6000)},60000)},busyOff=()=>{clearTimeout(busyT);$('#busy').classList.add('hidden')};
 let BL='';
 addEventListener('error',e=>{if((e.target&&e.target!==window)||!e.message||e.message==='Script error.'||/ResizeObserver/.test(e.message))return;busyOff();toast('Error: '+e.message,8000)});
 addEventListener('unhandledrejection',e=>{const r=e.reason;busyOff();toast('Error: '+((r&&(r.message||r.name))||r),8000)});
@@ -512,8 +513,16 @@ function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.to
 
 /* ---------- IndexedDB ---------- */
 let db;
-function openDB(){return new Promise((res,rej)=>{const r=indexedDB.open('swscanner',1);r.onupgradeneeded=()=>{const d=r.result;d.createObjectStore('docs',{keyPath:'id'});d.createObjectStore('tomb',{keyPath:'id'})};r.onsuccess=()=>{db=r.result;res()};r.onerror=()=>rej(r.error)})}
-const tx=(st,mode,fn)=>new Promise((res,rej)=>{const t=db.transaction(st,mode);const rq=fn(t.objectStore(st));t.oncomplete=()=>res(rq&&rq.result);t.onerror=()=>rej(t.error);t.onabort=()=>{const er=t.error||new Error('Database error');try{toast(er.name==='QuotaExceededError'?'Storage is full. Free up space and try again':'Could not save: '+er.message)}catch(_){}rej(er)}});
+function openDB1(){return new Promise((res,rej)=>{const r=indexedDB.open('swscanner',1);r.onupgradeneeded=()=>{const d=r.result;d.createObjectStore('docs',{keyPath:'id'});d.createObjectStore('tomb',{keyPath:'id'})};r.onsuccess=()=>{db=r.result;db.onversionchange=()=>{try{db.close()}catch(e){}};db.onclose=()=>{db=null};res()};r.onerror=()=>rej(r.error);r.onblocked=()=>rej(new Error('Database blocked'))})}
+/* iPhone can leave indexedDB.open pending forever after the app was in background: give up after 6s and retry */
+async function openDB(){for(let i=0;i<3;i++){try{await Promise.race([openDB1(),new Promise((_,no)=>setTimeout(()=>no(new Error('Database timeout')),4000))]);return}catch(e){if(i===2)throw e;await new Promise(r=>setTimeout(r,400))}}}
+/* reopen the database if iOS closed it while the app slept */
+const _tx0=null;
+async function dbReady(){if(!db){await openDB()}}
+const tx0=(st,mode,fn)=>(db?Promise.resolve():openDB()).then(()=>new Promise((res,rej)=>{let t;try{t=db.transaction(st,mode)}catch(e){db=null;return openDB().then(()=>{const t2=db.transaction(st,mode);const rq2=fn(t2.objectStore(st));t2.oncomplete=()=>res(rq2&&rq2.result);t2.onerror=()=>rej(t2.error);t2.onabort=()=>rej(t2.error||new Error('Database error'))}).catch(rej)}const rq=fn(t.objectStore(st));t.oncomplete=()=>res(rq&&rq.result);t.onerror=()=>rej(t.error);t.onabort=()=>{const er=t.error||new Error('Database error');try{toast(er.name==='QuotaExceededError'?'Storage is full. Free up space and try again':'Could not save: '+er.message)}catch(_){}rej(er)}}));
+const withTO=(p,ms,msg)=>{let t;return Promise.race([Promise.resolve(p),new Promise((_,no)=>{t=setTimeout(()=>no(new Error(msg||'Timeout')),ms)})]).finally(()=>clearTimeout(t))};
+/* every database call gives up after 8s (25s for writes) so a stuck database can never freeze Back and the other buttons */
+const tx=(st,mode,fn)=>withTO(tx0(st,mode,fn),mode==='readonly'?8000:25000,'Database timeout').catch(e=>{if(e&&e.message==='Database timeout'){try{db&&db.close()}catch(_){}db=null}throw e});
 const dbAll=st=>tx(st,'readonly',s=>s.getAll());
 const dbGet=(st,k)=>tx(st,'readonly',s=>s.get(k));
 const dbPut=(st,v)=>tx(st,'readwrite',s=>s.put(v));
@@ -525,7 +534,7 @@ function loadImg(blob){return new Promise((res,rej)=>{const u=URL.createObjectUR
 function warp(src,q,fw,fh){
   const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
   let W=(dist(q[0],q[1])+dist(q[3],q[2]))/2,H=(dist(q[0],q[3])+dist(q[1],q[2]))/2;
-  if(fw){W=fw;H=fh}else{const m=Math.min(1,1800/Math.max(W,H));W=Math.max(40,Math.round(W*m));H=Math.max(40,Math.round(H*m))}
+  if(fw){W=fw;H=fh}else{const m=Math.min(1,1500/Math.max(W,H));W=Math.max(40,Math.round(W*m));H=Math.max(40,Math.round(H*m))}
   const sw=src.width,sh=src.height,sd=src.getContext('2d').getImageData(0,0,sw,sh).data;
   const [p0,p1,p2,p3]=q;
   const dx1=p1.x-p2.x,dx2=p3.x-p2.x,dx3=p0.x-p1.x+p2.x-p3.x,dy1=p1.y-p2.y,dy2=p3.y-p2.y,dy3=p0.y-p1.y+p2.y-p3.y;
@@ -590,74 +599,6 @@ function detectQuad(g0,w,h){
  let ar=0;for(let i=0;i<4;i++){const a=Q[i],b=Q[(i+1)%4];ar+=a.x*b.y-b.x*a.y;if(Math.hypot(a.x-b.x,a.y-b.y)<.1*Math.min(w,h))return null}
  return Math.abs(ar)/2<.1*N?null:Q}
 /*ENDDETECT*/
-/*CVDETECT*/
-function cvDetect(cv,rgba,w,h){
-  const del=[];const T=m=>{del.push(m);return m};
-  try{
-    const src=T(new cv.Mat(h,w,cv.CV_8UC4));src.data.set(rgba);
-    const rgb=T(new cv.Mat());cv.cvtColor(src,rgb,cv.COLOR_RGBA2RGB);
-    const gray=T(new cv.Mat());cv.cvtColor(rgb,gray,cv.COLOR_RGB2GRAY);
-    const gb=T(new cv.Mat());cv.GaussianBlur(gray,gb,new cv.Size(5,5),0);
-    const masks=[];
-    const K3=T(cv.getStructuringElement(cv.MORPH_RECT,new cv.Size(3,3)));
-    const kc=Math.max(5,Math.round(Math.min(w,h)/40))|1;
-    const KC=T(cv.getStructuringElement(cv.MORPH_RECT,new cv.Size(kc,kc)));
-    const edgeFix=e=>{cv.dilate(e,e,K3,new cv.Point(-1,-1),1);cv.morphologyEx(e,e,cv.MORPH_CLOSE,KC);return e};
-    /* median for auto canny */
-    const hist=new Array(256).fill(0);for(let i=0;i<gb.data.length;i++)hist[gb.data[i]]++;
-    let acc=0,med=128;for(let i=0;i<256;i++){acc+=hist[i];if(acc>=gb.data.length/2){med=i;break}}
-    const lo=Math.max(10,.5*med),hi=Math.max(40,1.2*med);
-    {const e=T(new cv.Mat());cv.Canny(gb,e,lo*.6,Math.min(hi,200)*.6);masks.push(['canny',edgeFix(e)])}
-    {const e=T(new cv.Mat());cv.Canny(gb,e,20,60);masks.push(['canny2',edgeFix(e)])}
-    /* colour edges: strongest edge of any channel */
-    {const ch=new cv.MatVector();cv.split(rgb,ch);const acc2=T(cv.Mat.zeros(h,w,cv.CV_8UC1));
-     for(let i=0;i<3;i++){const c=ch.get(i),b=T(new cv.Mat()),e=T(new cv.Mat());cv.GaussianBlur(c,b,new cv.Size(5,5),0);cv.Canny(b,e,25,70);cv.bitwise_or(acc2,e,acc2);c.delete()}ch.delete();masks.push(['cedge',edgeFix(acc2)])}
-    /* otsu bright / dark */
-    {const t=T(new cv.Mat());cv.threshold(gb,t,0,255,cv.THRESH_BINARY+cv.THRESH_OTSU);
-     const o=T(new cv.Mat());cv.morphologyEx(t,o,cv.MORPH_OPEN,KC);cv.morphologyEx(o,o,cv.MORPH_CLOSE,KC);masks.push(['otsu',o]);
-     const n=T(new cv.Mat());cv.bitwise_not(o,n);masks.push(['otsuinv',n])}
-    /* colour distance from border background */
-    {const lab=T(new cv.Mat());cv.cvtColor(rgb,lab,cv.COLOR_RGB2Lab);const bw=Math.max(3,Math.round(Math.min(w,h)*.03));
-     const sm=[0,0,0],cnt=[0];const S=[[],[],[]];
-     const d=lab.data;const push=(x,y)=>{const i=(y*w+x)*3;S[0].push(d[i]);S[1].push(d[i+1]);S[2].push(d[i+2])};
-     for(let y=0;y<h;y+=2)for(let x=0;x<w;x+=2){if(x<bw||y<bw||x>=w-bw||y>=h-bw)push(x,y)}
-     const mdn=a=>{a.sort((p,q)=>p-q);return a[a.length>>1]};const m0=mdn(S[0]),m1=mdn(S[1]),m2=mdn(S[2]);
-     const dist=T(new cv.Mat(h,w,cv.CV_8UC1));
-     for(let i=0;i<w*h;i++){const a=d[i*3]-m0,b=d[i*3+1]-m1,c=d[i*3+2]-m2;dist.data[i]=Math.min(255,Math.sqrt(a*a+b*b+c*c)*2.2)}
-     const db=T(new cv.Mat());cv.GaussianBlur(dist,db,new cv.Size(7,7),0);
-     const t=T(new cv.Mat());cv.threshold(db,t,0,255,cv.THRESH_BINARY+cv.THRESH_OTSU);
-     const o=T(new cv.Mat());cv.morphologyEx(t,o,cv.MORPH_CLOSE,KC);cv.morphologyEx(o,o,cv.MORPH_OPEN,KC);masks.push(['bgdist',o])}
-    const N=w*h,diag=Math.hypot(w,h),cands=[];
-    const ang=(a,b,c)=>{const v1x=a.x-b.x,v1y=a.y-b.y,v2x=c.x-b.x,v2y=c.y-b.y;const d=(v1x*v2x+v1y*v2y)/(Math.hypot(v1x,v1y)*Math.hypot(v2x,v2y)||1);return Math.acos(Math.max(-1,Math.min(1,d)))*57.2958};
-    for(const [name,m] of masks){
-      const cs=new cv.MatVector(),hh=new cv.Mat();const mm=m.clone();
-      cv.findContours(mm,cs,hh,cv.RETR_LIST,cv.CHAIN_APPROX_SIMPLE);
-      const list=[];for(let i=0;i<cs.size();i++){const c=cs.get(i),a=cv.contourArea(c);if(a>N*.1&&a<N*.995)list.push({c,a});else c.delete()}
-      list.sort((p,q)=>q.a-p.a);
-      for(const it of list.slice(0,6)){
-        const hull=new cv.Mat();cv.convexHull(it.c,hull,false,true);const per=cv.arcLength(hull,true);let q=null;
-        for(const ep of[.012,.018,.025,.035,.05,.07]){const ap=new cv.Mat();cv.approxPolyDP(hull,ap,ep*per,true);
-          if(ap.rows===4){q=[];for(let k=0;k<4;k++)q.push({x:ap.data32S[k*2],y:ap.data32S[k*2+1]});ap.delete();break}ap.delete()}
-        if(!q){const r=cv.minAreaRect(hull),ha=cv.contourArea(hull);if(ha/(r.size.width*r.size.height)>.88){const pts=cv.RotatedRect.points(r);q=pts.map(p=>({x:p.x,y:p.y}))}}
-        hull.delete();
-        if(!q)continue;
-        const cx=q.reduce((s,p)=>s+p.x,0)/4,cy=q.reduce((s,p)=>s+p.y,0)/4;q.sort((a,b)=>Math.atan2(a.y-cy,a.x-cx)-Math.atan2(b.y-cy,b.x-cx));
-        let ar=0;for(let i=0;i<4;i++){const a=q[i],b=q[(i+1)%4];ar+=a.x*b.y-b.x*a.y}ar=Math.abs(ar)/2;if(ar<N*.1)continue;
-        let ok=true,dev=0;for(let i=0;i<4;i++){const A=ang(q[(i+3)%4],q[i],q[(i+1)%4]);if(A<55||A>125)ok=false;dev+=Math.abs(A-90)}
-        if(!ok)continue;
-        const sides=[0,1,2,3].map(i=>Math.hypot(q[i].x-q[(i+1)%4].x,q[i].y-q[(i+1)%4].y));if(Math.min(...sides)<.12*Math.min(w,h))continue;
-        let edge=0;for(const p of q){if(p.x<=2||p.y<=2||p.x>=w-3||p.y>=h-3)edge++}
-        const fill=Math.min(1,it.a/ar);
-        const sc=Math.pow(ar/N,.8)*(1-dev/4/45)*Math.pow(fill,2)*(edge>=3?.55:edge===2?.8:1)*(name==='bgdist'?1.05:1);
-        cands.push({q,sc,name})}
-      list.forEach(it=>it.c.delete());cs.delete();hh.delete();mm.delete()}
-    if(!cands.length)return null;
-    for(const a of cands){let sup=0;for(const b of cands){if(a===b)continue;let m=0;for(const p of a.q)m=Math.max(m,Math.min(...b.q.map(r=>Math.hypot(p.x-r.x,p.y-r.y))));if(m<.04*diag)sup++}a.fs=a.sc*(1+.18*Math.min(sup,6))}
-    cands.sort((a,b)=>b.fs-a.fs);return {q:cands[0].q,name:cands[0].name,n:cands.length}
-  }catch(e){return null}finally{del.forEach(m=>{try{m.delete()}catch(e){}})}
-}
-/*ENDCVDETECT*/
-
 /* ---------- PDF ---------- */
 const safe=n=>n.replace(/[\/\\:*?"<>|]/g,'-');
 async function makePDF(pages,d){
@@ -732,7 +673,7 @@ async function renameDoc(d){const n=prompt('New name',d.name);if(!n||!n.trim())r
 let PK={};
 function shareFlow(d){PK={d,f:'img',sel:new Set(d.pages.map((_,i)=>i)),u:[]};$('#pkT').textContent='Share · '+d.name;$('#pkAll').textContent='Clear all';
   document.querySelectorAll('#pk .seg button').forEach(b=>b.classList.toggle('on',b.dataset.f==='img'));
-  $('#pkG').innerHTML='';d.pages.forEach((p,i)=>{const u=URL.createObjectURL(p.blob);PK.u.push(u);const l=document.createElement('label');l.className='th';
+  $('#pkG').innerHTML='';d.pages.forEach((p,i)=>{const u=URL.createObjectURL(thOf(p));PK.u.push(u);const l=document.createElement('label');l.className='th';
     l.innerHTML=`<img src="${u}"><input type="checkbox" checked>`;l.querySelector('input').onchange=e=>{e.target.checked?PK.sel.add(i):PK.sel.delete(i)};$('#pkG').appendChild(l)});
   $('#pk').classList.remove('hidden')}
 const pkClose=()=>{$('#pk').classList.add('hidden');(PK.u||[]).forEach(u=>URL.revokeObjectURL(u));PK.u=[]};
@@ -754,6 +695,21 @@ async function autoName(id,def){try{if(!navigator.onLine||localStorage.getItem('
 let urls=[];const urlBlob=new Map();const mkUrl=bl=>{if(!bl)return '';const u=URL.createObjectURL(bl);urls.push(u);urlBlob.set(u,bl);return u};
 const clearUrls=()=>{const o=urls;urls=[];setTimeout(()=>o.forEach(u=>{URL.revokeObjectURL(u);urlBlob.delete(u)}),30000)};
 document.addEventListener('error',e=>{const i=e.target;if(!i||i.tagName!=='IMG'||i.dataset.re)return;const bl=urlBlob.get(i.src);if(!bl)return;i.dataset.re=1;const f=new FileReader();f.onload=()=>{i.src=f.result};f.readAsDataURL(bl)},true);
+/* small thumbnails (~300px) for the lists and page grids, so opening them never decodes full-size photos */
+function thOf(p){return p.th&&p.thSz===p.blob.size?p.th:p.blob}
+async function mkThumb(blob){const img=await loadImg(blob),k=Math.min(1,300/Math.max(img.naturalWidth,img.naturalHeight)),c=document.createElement('canvas');c.width=Math.max(1,Math.round(img.naturalWidth*k));c.height=Math.max(1,Math.round(img.naturalHeight*k));c.getContext('2d').drawImage(img,0,0,c.width,c.height);const b=await new Promise(r=>c.toBlob(r,'image/jpeg',.7));c.width=c.height=0;return b}
+async function addTh(arr){for(const p of arr){if(!p||!p.blob)continue;try{p.th=await withTO(mkThumb(p.blob),8000,'thumb');p.thSz=p.blob.size}catch(e){}}}
+let thBusy=false;
+async function ensureThumbs(){if(thBusy)return;thBusy=true;let made=0;
+  try{const docs=(await dbAll('docs')).filter(d=>!d.deleted&&d.pages&&d.pages.length).sort((a,b)=>b.created-a.created);
+    for(const d of docs){let ch=false;
+      for(const p of d.pages){if(!p||!p.blob||(p.th&&p.thSz===p.blob.size))continue;
+        try{const t=await withTO(mkThumb(p.blob),8000,'thumb');if(t){p.th=t;p.thSz=p.blob.size;ch=true;made++}}catch(e){}
+        await new Promise(r=>setTimeout(r,40))}
+      if(ch){const f=await dbGet('docs',d.id);if(f){d.pages.forEach(p=>{const q=f.pages.find(x=>x.id===p.id);if(q&&p.th&&q.blob&&q.blob.size===p.thSz){q.th=p.th;q.thSz=p.thSz}});await dbPut('docs',f)}}
+      if(document.hidden)break}
+  }catch(e){}finally{thBusy=false}
+  if(made&&!$('#main').classList.contains('hidden'))renderHome()}
 let cur=null,curTab='home';
 function showTab(t){curTab=t;document.querySelectorAll('.tab').forEach(e=>e.classList.toggle('hidden',e.id!=='t-'+t));document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));if(t==='me'){renderMe();loadGsi()}}
 let selMode=false,sel=new Set(),visIds=[];
@@ -765,7 +721,7 @@ async function renderHome(){
   const q=$('#q').value.trim().toLowerCase(),lim=Date.now()-30*864e5;
   const fill=(el,arr,msg)=>{el.innerHTML='';if(!arr.length)el.innerHTML='<p class="empty">'+msg+'</p>';
     for(const d of arr){const c=document.createElement('div');c.className='card'+(selMode&&sel.has(d.id)?' sel':'');const synced=d.pages.every(p=>p.fs);
-      c.innerHTML=(selMode?`<input type="checkbox" class="ck" ${sel.has(d.id)?'checked':''}>`:'')+`<img src="${mkUrl(d.pages[0].blob)}"><div><b></b><small>${d.pages.length} page${d.pages.length>1?'s':''} · ${fmt(new Date(d.created))} · ${synced?'Synced':'Not synced'}</small></div>`+(selMode?'':`<div class="acts"><button class="ib" data-a="s" aria-label="Share">${ico('share')}</button><button class="ib" data-a="r" aria-label="Rename">${ico('edit')}</button><button class="ib" data-a="d" aria-label="Delete" style="color:#dc2626">${ico('trash')}</button></div>`);
+      c.innerHTML=(selMode?`<input type="checkbox" class="ck" ${sel.has(d.id)?'checked':''}>`:'')+`<img src="${mkUrl(thOf(d.pages[0]))}"><div><b></b><small>${d.pages.length} page${d.pages.length>1?'s':''} · ${fmt(new Date(d.created))} · ${synced?'Synced':'Not synced'}</small></div>`+(selMode?'':`<div class="acts"><button class="ib" data-a="s" aria-label="Share">${ico('share')}</button><button class="ib" data-a="r" aria-label="Rename">${ico('edit')}</button><button class="ib" data-a="d" aria-label="Delete" style="color:#dc2626">${ico('trash')}</button></div>`);
       c.querySelector('b').textContent=d.name;if(d.kind==='id')c.querySelector('b').insertAdjacentHTML('beforeend','<span class="tag">ID</span>');
       c.onclick=e=>{if(selMode){toggleSel(d.id);return}const a=e.target.closest('[data-a]');if(!a)return openDoc(d.id);const k=a.dataset.a;if(k==='s')shareFlow(d);else if(k==='r')renameDoc(d);else delDocs([d])};el.appendChild(c)}
     return arr.map(d=>d.id)};
@@ -774,8 +730,13 @@ async function renderHome(){
   visIds=curTab==='docs'?rb:ra;
   $('#main').classList.toggle('selmode',selMode);$('#selBar').classList.toggle('hidden',!selMode);$('#nav').classList.toggle('hidden',selMode);
   $('#selDel').textContent=`Delete (${sel.size})`;document.querySelectorAll('[data-sel]').forEach(b=>b.classList.toggle('hidden',selMode));
-  updGreet();show('main');showTab(curTab)}
-let qT;$('#q').oninput=()=>{clearTimeout(qT);qT=setTimeout(renderHome,220)};
+  updGreet();show('main');showTab(curTab);setTimeout(ensureThumbs,500)}
+/* one render at a time: sync, search and button taps used to start several full database reads at once */
+const _rh=renderHome;let rhBusy=null,rhAgain=false;
+renderHome=function(){if(rhBusy){rhAgain=true;return rhBusy}
+  rhBusy=withTO(_rh(),12000,'Loading took too long').catch(e=>{toast('Could not load documents: '+(e&&e.message||e),6000)}).finally(()=>{rhBusy=null;if(rhAgain){rhAgain=false;renderHome()}});return rhBusy};
+const rhFast=()=>Promise.race([renderHome(),new Promise(r=>setTimeout(r,2500))]);
+let qT;$('#q').oninput=()=>{clearTimeout(qT);qT=setTimeout(renderHome,350)};
 document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>{if(b.dataset.tab==='import'){begin('new',null,null);return}showTab(b.dataset.tab)});
 document.addEventListener('click',e=>{const g=e.target.closest('[data-go]');if(!g)return;const v=g.dataset.go;
   if(v==='tab-import')showTab('import');else if(v==='id')begin('id',null,null);else if(v==='sync')sync(true);else if(v==='bin')openBin();else begin('new',null,v==='scan'?null:v)});
@@ -805,7 +766,8 @@ $('#inRes').onchange=async e=>{const f=e.target.files[0];e.target.value='';if(!f
 
 /* ---------- document view ---------- */
 let pSel=null;
-async function openDoc(id,keep){
+async function openDoc(id,keep){try{await openDoc0(id,keep)}catch(e){toast('Could not open: '+(e&&e.message||e),5000);try{renderHome()}catch(_){}}}
+async function openDoc0(id,keep){
   cur=await dbGet('docs',id);if(!cur||cur.deleted){renderHome();return}
   if(!keep)pSel=null;
   clearUrls();$('#dTitle').textContent=cur.name;const idd=cur.kind==='id';if(idd)pSel=null;
@@ -814,7 +776,7 @@ async function openDoc(id,keep){
   $('#idV').textContent=(cur.idScale||100)+'%';$('#dBack').classList.toggle('hidden',!!pSel);
   const g=$('#dGrid');g.innerHTML='';
   cur.pages.forEach((p,i)=>{const w=document.createElement('div'),on=pSel&&pSel.has(i);
-    w.innerHTML=(pSel?`<input type="checkbox" class="ck" ${on?'checked':''}>`:'')+`<img src="${mkUrl(p.blob)}"><span>${idd?(i?'Back':'Front'):i+1}</span>`;
+    w.innerHTML=(pSel?`<input type="checkbox" class="ck" ${on?'checked':''}>`:'')+`<img src="${mkUrl(thOf(p))}"><span>${idd?(i?'Back':'Front'):i+1}</span>`;
     if(on)w.classList.add('sel');
     w.onclick=()=>{if(pSel){on?pSel.delete(i):pSel.add(i);openDoc(cur.id,true)}else openPage(i)};g.appendChild(w)});
   show('docv')}
@@ -849,7 +811,8 @@ $('#idSet').onclick=()=>{const o=SH();$('#shN').value=o.n;$('#shG').value=o.gap;
 /* ---------- scan flow ---------- */
 let ctx={mode:'new',docId:null,draft:[],queue:[],side:0};
 const ID_W=1280,ID_H=Math.round(1280*53.98/85.6);
-function begin(mode,docId,src){ctx={mode,docId,draft:[],queue:[],side:0,ri:0,replace:null};openSrc(src)}
+function begin(mode,docId,src){ctx={mode,docId,draft:[],queue:[],side:0,ri:0,replace:null};
+  openSrc(src)}
 function openSrc(s){if(!s){$('#src').classList.remove('hidden');return}if(s==='cam'&&navigator.mediaDevices&&navigator.mediaDevices.getUserMedia){openCam();return}$({cam:'#inCam',gal:'#inGal',file:'#inFile'}[s]).click()}
 $('#src').onclick=e=>{const s=e.target.dataset.s;if(!s&&e.target.id!=='src')return;$('#src').classList.add('hidden');
   if(s&&s!=='x')openSrc(s)};
@@ -873,30 +836,15 @@ function autoQuad(c){const sc=Math.min(1,320/Math.max(c.width,c.height)),w=Math.
   for(let i=0;i<g.length;i++)g[i]=d[i*4]*.299+d[i*4+1]*.587+d[i*4+2]*.114;
   const q=detectQuad(g,w,h);return q&&q.map(p=>({x:p.x/sc,y:p.y/sc}))}
 
-let CVP=null;
-function loadCV(){if(window.cv&&window.cv.Mat)return Promise.resolve(window.cv);if(CVP)return CVP;
- CVP=new Promise((ok,no)=>{if(navigator.onLine===false){CVP=null;no(new Error('offline'));return}
-  const s=document.createElement('script');s.async=true;s.src='https://cdn.jsdelivr.net/npm/@techstark/opencv-js@4.9.0-release.3/dist/opencv.js';
-  s.onerror=()=>{CVP=null;no(new Error('cv load'))};
-  s.onload=()=>{const t0=Date.now(),iv=setInterval(()=>{const c=window.cv;if(c&&c.Mat){clearInterval(iv);ok(c)}else if(Date.now()-t0>90000){clearInterval(iv);CVP=null;no(new Error('cv timeout'))}},150)};
-  document.head.appendChild(s)});return CVP}
-function grabSmall(c,max){const sc=Math.min(1,max/Math.max(c.width,c.height)),w=Math.max(1,Math.round(c.width*sc)),h=Math.max(1,Math.round(c.height*sc)),t=document.createElement('canvas');t.width=w;t.height=h;
-  const x=t.getContext('2d');x.drawImage(c,0,0,w,h);return{sc,w,h,d:x.getImageData(0,0,w,h).data}}
-async function autoQuadX(c,fast){
-  if(fast&&!(window.cv&&window.cv.Mat)){if(!CVP)return autoQuad(c);try{await Promise.race([CVP,new Promise((_,no)=>setTimeout(()=>no(new Error('slow')),3000))])}catch(e){return autoQuad(c)}}
-  try{const cv=await Promise.race([loadCV(),new Promise((_,no)=>setTimeout(()=>no(new Error('slow')),6000))]);
-    const g=grabSmall(c,640),r=cvDetect(cv,g.d,g.w,g.h);
-    if(r&&r.q)return r.q.map(p=>({x:p.x/g.sc,y:p.y/g.sc}))}catch(e){}
-  return autoQuad(c)}
 const defQuad=(w,h,i=.06)=>[{x:w*i,y:h*i},{x:w*(1-i),y:h*i},{x:w*(1-i),y:h*(1-i)},{x:w*i,y:h*(1-i)}];
 let S={};
 async function startCrop(file){
   toast('Detecting edges...');
   const img=await loadImg(file);
-  const m=Math.min(1,2000/Math.max(img.naturalWidth,img.naturalHeight));
+  const m=Math.min(1,1600/Math.max(img.naturalWidth,img.naturalHeight));
   const c=document.createElement('canvas');c.width=Math.round(img.naturalWidth*m);c.height=Math.round(img.naturalHeight*m);
   c.getContext('2d').drawImage(img,0,0,c.width,c.height);
-  let q=null;try{q=await autoQuadX(c,true)}catch(e){}
+  let q=null;try{q=autoQuad(c)}catch(e){}
   S={src:c,q:q||defQuad(c.width,c.height),drag:-1,sc:1};E={};
   await goEdit()}
 function layoutCrop(){
@@ -922,7 +870,7 @@ function drawCrop(){
   const up=()=>{S.drag=-1;$('#loupe').style.display='none'};cv.addEventListener('pointerup',up);cv.addEventListener('pointercancel',up);
   window.addEventListener('resize',()=>{if(!$('#crop').classList.contains('hidden'))layoutCrop()});
 })();
-$('#cAuto').onclick=async()=>{toast('Detecting edges...');const q=await autoQuadX(S.src);if(q){S.q=q;drawCrop()}else toast('Could not find edges, drag the corners')};
+$('#cAuto').onclick=async()=>{toast('Detecting edges...');let q=null;try{q=autoQuad(S.src)}catch(e){}if(q){S.q=q;drawCrop()}else toast('Could not find edges, drag the corners')};
 $('#cFull').onclick=()=>{S.q=defQuad(S.src.width,S.src.height,0);drawCrop()};
 $('#cCancel').onclick=()=>show('edit');
 $('#eBack').onclick=async()=>{ctx.queue=[];if(ctx.mode==='edit'){const al=ctx.all;ctx.all=false;await openDoc(ctx.docId);if(!al)openPage(ctx.pi)}else openRev()};
@@ -1029,10 +977,11 @@ $('#eSave').onclick=async()=>{
   openRev()};
 async function saveDraft(){
   if(!ctx.draft.length){renderHome();return}
+  await addTh(ctx.draft);
   let d;if(ctx.mode==='add'||ctx.mode==='edit')d=await dbGet('docs',ctx.docId);
   if(ctx.mode==='edit'&&d){const old=d.pages[ctx.pi];if(old&&old.fs)await addTomb([old.id]);d.pages[ctx.pi]=ctx.draft[0];ctx.draft=[];await dbPut('docs',d);toast('Saved ✓');await openDoc(d.id);openPage(ctx.pi);autoSync();return}
   if(!d){const id=ctx.mode==='id';d={id:uid(),name:(id?'ID Card ':'Scan ')+fmt(new Date()),created:Date.now(),pages:[]};if(id){d.kind='id';d.idScale=100}}
-  d.pages.push(...ctx.draft.map(p=>({id:p.id,blob:p.blob,orig:p.orig,opts:p.opts})));ctx.draft=[];
+  d.pages.push(...ctx.draft.map(p=>({id:p.id,blob:p.blob,orig:p.orig,opts:p.opts,th:p.th,thSz:p.thSz})));ctx.draft=[];
   await dbPut('docs',d);toast('Saved ✓');openDoc(d.id);autoSync();if(ctx.mode==='new')autoName(d.id,d.name)}
 
 /* ---------- recycle bin, dialogs, selection ---------- */
@@ -1062,7 +1011,7 @@ async function openBin(){
   const ds=(await dbAll('docs')).filter(d=>d.deleted&&d.pages&&d.pages.length&&d.pages[0].blob).sort((a,b)=>b.deleted-a.deleted);clearUrls();const el=$('#binList');
   el.innerHTML=ds.length?'':'<p class="empty">Recycle bin is empty.</p>';$('#binHint').textContent=`Deleted documents stay here for ${BIN_DAYS} days.`;
   for(const d of ds){const left=Math.max(0,Math.ceil(BIN_DAYS-(Date.now()-d.deleted)/864e5)),c=document.createElement('div');c.className='card';
-    c.innerHTML=`<img src="${mkUrl(d.pages[0].blob)}"><div><b></b><small>${left} day${left===1?'':'s'} left</small></div><div class="acts"><button class="ib" data-a="r" aria-label="Restore">${ico('restore')}</button><button class="ib" data-a="x" aria-label="Delete forever" style="color:#dc2626">${ico('trash')}</button></div>`;
+    c.innerHTML=`<img src="${mkUrl(thOf(d.pages[0]))}"><div><b></b><small>${left} day${left===1?'':'s'} left</small></div><div class="acts"><button class="ib" data-a="r" aria-label="Restore">${ico('restore')}</button><button class="ib" data-a="x" aria-label="Delete forever" style="color:#dc2626">${ico('trash')}</button></div>`;
     c.querySelector('b').textContent=d.name;
     c.onclick=async e=>{const a=e.target.closest('[data-a]');if(!a)return;
       if(a.dataset.a==='r'){delete d.deleted;await dbPut('docs',d);toast('Restored');openBin()}
@@ -1099,11 +1048,11 @@ function loupe(){const L=$('#loupe');if(S.drag<0){L.style.display='none';return}
   x.clearRect(0,0,110,110);x.save();x.beginPath();x.arc(55,55,55,0,7);x.clip();x.fillStyle='#fff';x.fillRect(0,0,110,110);x.drawImage(S.src,q.x-r,q.y-r,2*r,2*r,0,0,110,110);
   x.strokeStyle='#22d3ee';x.lineWidth=2;x.beginPath();S.q.forEach((p,i)=>{const px=(p.x-q.x+r)*55/r,py=(p.y-q.y+r)*55/r;i?x.lineTo(px,py):x.moveTo(px,py)});x.closePath();x.stroke();
   x.strokeStyle='#ea580c';x.beginPath();x.moveTo(45,55);x.lineTo(65,55);x.moveTo(55,45);x.lineTo(55,65);x.stroke();x.restore()}
-async function srcCanvas(blob){const img=await loadImg(blob),m=Math.min(1,2000/Math.max(img.naturalWidth,img.naturalHeight)),c=document.createElement('canvas');
+async function srcCanvas(blob){const img=await loadImg(blob),m=Math.min(1,1600/Math.max(img.naturalWidth,img.naturalHeight)),c=document.createElement('canvas');
   c.width=Math.round(img.naturalWidth*m);c.height=Math.round(img.naturalHeight*m);c.getContext('2d').drawImage(img,0,0,c.width,c.height);return c}
 async function autoPage(file){
   const tk=()=>new Promise(r=>setTimeout(r,20));busy(BL+'Reading photo...');await tk();
-  const c=await srcCanvas(file);busy(BL+'Finding edges...');await tk();let q=null;try{if(!file.isPdf)q=await autoQuadX(c,true)}catch(e){}q=q||defQuad(c.width,c.height,file.isPdf?0:.06);
+  const c=await srcCanvas(file);busy(BL+'Finding edges...');await tk();let q=null;try{if(!file.isPdf)q=autoQuad(c)}catch(e){}q=q||defQuad(c.width,c.height,file.isPdf?0:.06);
   busy(BL+'Straightening & cleaning...');await tk();const nq=normQuad(q),base=isIdCtx()?warp(c,idOrient(nq),...idDims(idOrient(nq))):warp(c,nq),o={mode:'doc',b:0,c:0,s:0};
   const [blob,orig]=await Promise.all([new Promise(r=>proc(base,o).toBlob(r,'image/jpeg',.88)),new Promise(r=>base.toBlob(r,'image/jpeg',.92))]);
   if(!blob||!orig)throw new Error('Not enough memory to process this photo');
@@ -1176,7 +1125,7 @@ async function sync(manual){
   syncing=true;window.__syT=Date.now();$('#btnSync').classList.add('busy');
   try{
     if(navigator.onLine===false)throw new Error('No internet connection');
-    const F=await fbw();await F.ready();
+    const F=await fbw();await withTO(F.ready(),15000,'Sync timed out');
     if(!F.user())throw Object.assign(new Error('signed out'),{code:'sw/no-user'});
     setStatus('Syncing...');
     const me=F.user().uid;
@@ -1185,7 +1134,7 @@ async function sync(manual){
 
     /* 1. pull changes made on other phones */
     const since=+localStorage.getItem('swPull')||0;
-    const remote=await F.docsSince(since-2000);
+    const remote=await withTO(F.docsSince(since-2000),25000,'Sync timed out');
     let docs=await dbAll('docs');const byDoc=new Map(docs.map(d=>[d.id,d]));let maxT=since;
     const goneDocs=[],plan=[];let goneP=0;
     for(const r of remote){maxT=Math.max(maxT,r.updatedMs||0);if(td.has(r.id))continue;
@@ -1197,7 +1146,7 @@ async function sync(manual){
       const miss=rp.filter(id=>!have.has(id));
       if(d&&!lc)goneP+=d.pages.filter(p=>p.fs&&!rset.has(p.id)).length;
       plan.push({r,rp,rset,miss,isNew:!d})}
-    let del=false;
+    let del=false,sent=0;const chg=plan.length>0||goneDocs.length>0;
     const total=docs.length&&docs.flatMap(d=>d.pages).length;
     const mass=(goneDocs.length+goneP)>=Math.max(3,Math.round(total*.5));
     if((goneDocs.length||goneP)&&!mass){
@@ -1208,7 +1157,7 @@ async function sync(manual){
       else await patchDoc(d.id,x=>{x.fsSig='';x.pages.forEach(p=>{delete p.fs})})}
     for(const it of plan){const {r,rp,rset,miss,isNew}=it;
       const got=[];
-      for(const pid of miss){const b=await F.getPage(pid);if(b)got.push({id:pid,blob:b,fs:true})}
+      for(const pid of miss){const b=await withTO(F.getPage(pid),40000,'Sync timed out');if(b)got.push({id:pid,blob:b,fs:true})}
       const apply=d=>{
         const lc=isNew?false:(d.fsSig===undefined||dsig(d)!==d.fsSig);
         for(const p of d.pages)if(!p.fs&&rset.has(p.id))p.fs=true;
@@ -1234,7 +1183,7 @@ async function sync(manual){
     /* 3. send new pages and changes made on this phone */
     for(const d0 of await dbAll('docs')){
       for(const p of d0.pages){if(p.fs||!p.blob)continue;
-        await F.putPage(p.id,d0.id,p.blob);
+        await withTO(F.putPage(p.id,d0.id,p.blob),60000,'Sync timed out');sent++;
         await patchDoc(d0.id,d=>{const q=d.pages.find(x=>x.id===p.id);if(q)q.fs=true})}
       const d=await dbGet('docs',d0.id);if(!d)continue;
       const ids=d.pages.filter(p=>p.fs).map(p=>p.id),sg=dsig(d,ids);
@@ -1247,13 +1196,16 @@ async function sync(manual){
       else if(!localStorage.getItem('swProfile')){const rp=await F.getProfile();if(rp){localStorage.setItem('swProfile',JSON.stringify({n:rp.n||'',e:rp.e||'',p:rp.p||''}));updGreet()}}}catch(e){}
 
     setStatus('Synced ✓ '+new Date().toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}));
-    if(!$('#main').classList.contains('hidden'))renderHome();
-    else if(!$('#docv').classList.contains('hidden')&&cur)openDoc(cur.id,true);
+    if(chg||sent){if(!$('#main').classList.contains('hidden'))renderHome();
+    else if(!$('#docv').classList.contains('hidden')&&cur)openDoc(cur.id,true)}
   }catch(e){
     if(e&&e.code==='sw/no-user'){localStorage.removeItem('swSignedIn');sessionStorage.removeItem('swOk');localStorage.setItem('swMsg','Please sign in again to continue syncing');location.reload()}
     else{const m=syncMsg(e);setStatus('⚠ Sync failed: '+m+'. Tap to retry',1);if(manual===true)toast('Sync failed: '+m)}}
-  finally{syncing=false;$('#btnSync').classList.remove('busy');if(again){again=false;setTimeout(sync,800)}}}
-function autoSync(){if($('#splash')||!localStorage.getItem('swSignedIn'))return;sync()}
+  finally{syncing=false;lastSyncEnd=Date.now();$('#btnSync').classList.remove('busy');if(again){again=false;setTimeout(sync,800)}}}
+/* light sync: several saves in a row make one sync (3s wait); coming back to the app syncs at most once a minute */
+let asT=0,lastSyncEnd=0;
+function autoSync(){if($('#splash')||!localStorage.getItem('swSignedIn'))return;clearTimeout(asT);asT=setTimeout(()=>sync(),3000)}
+function softSync(){if(Date.now()-lastSyncEnd<60000)return;autoSync()}
 $('#btnSync').onclick=()=>sync(true);
 $('#btnLock').onclick=()=>$('#btnOut').click();
 $('#btnOut').onclick=async()=>{
@@ -1305,7 +1257,7 @@ async function expandPdf(fs){const out=[];for(const f of fs){if(!(f.type==='appl
   if(!window.pdfjsLib)await new Promise((ok,no)=>{const e=document.createElement('script');e.src='https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js';e.onload=ok;e.onerror=()=>no(new Error('PDF import needs internet'));document.head.appendChild(e)});
   pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
   const pdf=await pdfjsLib.getDocument({data:await f.arrayBuffer()}).promise;
-  for(let i=1;i<=Math.min(pdf.numPages,30);i++){toast(`PDF page ${i}/${pdf.numPages}...`);const pg=await pdf.getPage(i),v0=pg.getViewport({scale:1}),v=pg.getViewport({scale:Math.min(3,2000/Math.max(v0.width,v0.height))}),c=document.createElement('canvas');c.width=v.width|0;c.height=v.height|0;
+  for(let i=1;i<=Math.min(pdf.numPages,30);i++){toast(`PDF page ${i}/${pdf.numPages}...`);const pg=await pdf.getPage(i),v0=pg.getViewport({scale:1}),v=pg.getViewport({scale:Math.min(3,1600/Math.max(v0.width,v0.height))}),c=document.createElement('canvas');c.width=v.width|0;c.height=v.height|0;
     await pg.render({canvasContext:c.getContext('2d'),viewport:v}).promise;const b=await new Promise(ok=>c.toBlob(ok,'image/jpeg',.9));b.isPdf=true;out.push(b)}}
   return out}
 let Z={s:1,x:0,y:0,p:new Map(),d0:1,s0:1,t:0};
@@ -1322,29 +1274,29 @@ function zr(){Z.s=1;Z.x=Z.y=0;Z.p.clear();zap()}
 
 /* ---------- auto sync triggers + HD camera ---------- */
 window.addEventListener('online',()=>{autoSync()});
-document.addEventListener('visibilitychange',()=>{if(!document.hidden)autoSync()});
-setInterval(()=>{if(!document.hidden&&!$('#splash')&&localStorage.getItem('swSignedIn'))sync()},300000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)softSync()});
+setInterval(()=>{if(!document.hidden&&!$('#splash')&&localStorage.getItem('swSignedIn'))sync()},600000);
 $('#status').onclick=()=>{sync(true)};
 let ovOn=false,ovQ=null;
 function stopCam(){ovOn=false;ovQ=null;const o=$('#camOv');if(o){const x=o.getContext('2d');x.clearRect(0,0,o.width,o.height)}const v=$('#camVid');if(v.srcObject){v.srcObject.getTracks().forEach(t=>t.stop());v.srcObject=null}}
 function startOv(){ovOn=true;const v=$('#camVid'),o=$('#camOv'),t=document.createElement('canvas');
  const tick=async()=>{if(!ovOn)return;
-  try{const cv=window.cv;if(cv&&cv.Mat&&v.videoWidth){const vw=v.videoWidth,vh=v.videoHeight,sc=Math.min(1,320/Math.max(vw,vh)),w=Math.round(vw*sc),h=Math.round(vh*sc);t.width=w;t.height=h;
-    const tx=t.getContext('2d');tx.drawImage(v,0,0,w,h);const r=cvDetect(cv,tx.getImageData(0,0,w,h).data,w,h);
+  try{if(!document.hidden&&v.videoWidth){const vw=v.videoWidth,vh=v.videoHeight,sc=Math.min(1,320/Math.max(vw,vh)),w=Math.round(vw*sc),h=Math.round(vh*sc);t.width=w;t.height=h;
+    const tx=t.getContext('2d');tx.drawImage(v,0,0,w,h);const aq=autoQuad(t),r=aq?{q:aq}:null;
     const cw=o.clientWidth,ch=o.clientHeight;o.width=cw;o.height=ch;const s=Math.max(cw/vw,ch/vh),ox=(cw-vw*s)/2,oy=(ch-vh*s)/2,x=o.getContext('2d');x.clearRect(0,0,cw,ch);
     if(r&&r.q){let q=r.q.map(p=>({x:p.x/sc*s+ox,y:p.y/sc*s+oy}));
      if(ovQ&&ovQ.every((p,i)=>Math.hypot(p.x-q[i].x,p.y-q[i].y)<.12*Math.max(cw,ch)))q=q.map((p,i)=>({x:ovQ[i].x*.5+p.x*.5,y:ovQ[i].y*.5+p.y*.5}));ovQ=q;
      x.beginPath();q.forEach((p,i)=>i?x.lineTo(p.x,p.y):x.moveTo(p.x,p.y));x.closePath();x.fillStyle='rgba(34,211,238,.18)';x.fill();x.strokeStyle='#22d3ee';x.lineWidth=3;x.stroke();
      q.forEach(p=>{x.beginPath();x.arc(p.x,p.y,6,0,7);x.fillStyle='#fff';x.fill()})}else ovQ=null}}catch(e){}
-  if(ovOn)setTimeout(tick,800)};setTimeout(tick,600)}
+  if(ovOn)setTimeout(tick,1000)};setTimeout(tick,800)}
 const camBack=()=>ctx.draft.length?openRev():(ctx.mode==='add'||ctx.mode==='edit')?openDoc(ctx.docId):renderHome();
-async function openCam(){try{const st=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:4096},height:{ideal:2160}},audio:false});$('#camVid').srcObject=st;show('camv');loadCV().catch(()=>{});startOv()}
+async function openCam(){try{const st=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'},width:{ideal:1920},height:{ideal:1080}},audio:false});$('#camVid').srcObject=st;show('camv');startOv()}
   catch(e){toast('In-app camera not available, using phone camera');$('#inCam').click()}}
 $('#camX').onclick=()=>{stopCam();camBack()};
 $('#camGal').onclick=()=>$('#inGal').click();
 $('#camFile').onclick=()=>$('#inFile').click();
 $('#camSnap').onclick=()=>{const v=$('#camVid');if(!v.videoWidth)return;const c=document.createElement('canvas');c.width=v.videoWidth;c.height=v.videoHeight;c.getContext('2d').drawImage(v,0,0);stopCam();
-  c.toBlob(b=>{ctx.last='cam';onFiles({target:{files:[b],value:''}})},'image/jpeg',.95)};
+  c.toBlob(b=>{ctx.last='cam';onFiles({target:{files:[b],value:''}})},'image/jpeg',.9)};
 
 /* ---------- app login (username + password), preview zoom ---------- */
 const PIN_KEY='swPin';let pinTry=0;
@@ -1359,7 +1311,7 @@ function pinShow(){AUM='pin';moveScene($('#splash'));{const em=localStorage.getI
 async function gate(){
   if(sessionStorage.getItem('swOk')){splashOut();return}
   localStorage.removeItem(PIN_KEY);
-  if(localStorage.getItem('swSignedIn')){unlocked();try{await renderHome()}catch(e){toast('Could not load documents: '+(e&&e.message||e),8000)}splashOut();return}
+  if(localStorage.getItem('swSignedIn')){unlocked();try{await rhFast()}catch(e){toast('Could not load documents: '+(e&&e.message||e),8000)}splashOut();return}
   loginShow()}
 let AUM='login';
 $('#auEye').onclick=()=>{const P=$('#auP'),s=P.type==='password';P.type=s?'text':'password';$('#eyeOn').style.display=s?'none':'';$('#eyeOff').style.display=s?'':'none'};
@@ -1376,14 +1328,13 @@ async function doLogin(){
   const t0=prepShow();
   try{const F=await fbw();const cr=await F.signIn(em,pw);
     localStorage.removeItem(PIN_KEY);localStorage.setItem('swSignedIn','1');localStorage.setItem('swEmail',(cr.user&&cr.user.email)||em);setWho();pinUi();
-    P.value='';unlocked();localStorage.setItem('swSeen','1');await renderHome();sync(true);
-    const left=5000-(Date.now()-t0);if(left>0)await new Promise(r=>setTimeout(r,left));
-    prepHide();setTimeout(splashOut,500)}
+    P.value='';unlocked();localStorage.setItem('swSeen','1');await rhFast();sync(true);
+    prepHide();setTimeout(splashOut,300)}
   catch(e){prepHide(1);$('#auth').style.display='flex';E.textContent=authMsg(e)}
   finally{gb.disabled=false}}
 $('#auU').addEventListener('keydown',e=>{if(e.key==='Enter')$('#auP').focus()});
 $('#auGo').onclick=async()=>{if(AUM==='login'){doLogin();return}const P=$('#auP'),E=$('#auE');E.textContent='';
-  if(await hp('pin',P.value)===localStorage.getItem(PIN_KEY)){unlocked();pinTry=0;await renderHome();splashOut()}
+  if(await hp('pin',P.value)===localStorage.getItem(PIN_KEY)){unlocked();pinTry=0;await rhFast();splashOut()}
   else{P.value='';if(++pinTry>=5){$('#auF').onclick();return}E.textContent='Wrong PIN ('+pinTry+'/5)'}};
 $('#auP').addEventListener('keydown',e=>{if(e.key==='Enter')$('#auGo').click()});
 $('#auF').onclick=()=>{loginShow()};
@@ -1419,7 +1370,7 @@ let prepT,prepP=0,prepG=25;const PM=[[0,'Signing you in…'],[30,'Preparing your
 function setWho(){const w=$('#prepWho');if(!w)return;const em=localStorage.getItem('swEmail');w.textContent=em?'Logged in as '+em:''}
 function prepSet(){const v=Math.round(prepP);$('#rp').style.strokeDashoffset=276.5*(1-prepP/100);$('#rpct').textContent=v+'%';let m=PMc[0][1];for(const [t,x] of PMc)if(v>=t)m=x;$('#prepMsg').textContent=m}
 function prepTo(g){prepG=Math.max(prepG,g)}
-function prepShow(){PMc=PM;setWho();setHi(!!(localStorage.getItem('swSeen')||localStorage.getItem('swEmail')));const t0=Date.now();prepP=0;prepSet();const pr=$('#prep');pr.classList.add('scn');pr.classList.remove('hidden');clearInterval(prepT);prepT=setInterval(()=>{prepP=Math.min(95,Math.max(prepP,(Date.now()-t0)/5000*95));prepSet()},60);return t0}
+function prepShow(){PMc=PM;setWho();setHi(!!(localStorage.getItem('swSeen')||localStorage.getItem('swEmail')));const t0=Date.now();prepP=0;prepSet();const pr=$('#prep');pr.classList.add('scn');pr.classList.remove('hidden');clearInterval(prepT);prepT=setInterval(()=>{prepP=Math.min(95,Math.max(prepP,(Date.now()-t0)/1500*95));prepSet()},60);return t0}
 function prepHide(now){if(now){clearInterval(prepT);$('#prep').classList.add('hidden');return}clearInterval(prepT);prepG=100;const f=setInterval(()=>{prepP+=(100-prepP)*.3+.5;if(prepP>=100){prepP=100;prepSet();clearInterval(f);clearInterval(prepT);setTimeout(()=>$('#prep').classList.add('hidden'),350)}else prepSet()},40)}
 
 /* ---------- theme ---------- */
@@ -1487,14 +1438,13 @@ rvp.addEventListener('scroll',()=>zRev.reset());
   g.addEventListener('touchmove',e=>{if(e.touches.length===2&&d0){e.preventDefault();const c=Math.max(1,Math.min(4,Math.round(c0*d0/dist(e))));g.style.gridTemplateColumns=`repeat(${c},1fr)`}},{passive:false});
   g.addEventListener('touchend',()=>{d0=0})})();
 /* ---------- start ---------- */
-async function fixBroken(){try{for(const d of await dbAll('docs')){const all=d.pages||[],ok=all.filter(p=>p&&p.blob);if(ok.length===all.length)continue;if(ok.length){d.pages=ok;await dbPut('docs',d)}else await dbDel('docs',d.id)}}catch(e){}}
+async function fixBroken(){try{let ch=false;for(const d of await dbAll('docs')){const all=d.pages||[],ok=all.filter(p=>p&&p.blob);if(ok.length===all.length)continue;ch=true;if(ok.length){d.pages=ok;await dbPut('docs',d)}else await dbDel('docs',d.id)}return ch}catch(e){return false}}
 (async()=>{
   if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(r=>r.update().catch(()=>{})).catch(()=>{});
-setTimeout(()=>{if(navigator.onLine!==false)loadCV().catch(()=>{})},3000);
-  try{await openDB();await fixBroken();
-    if(localStorage.getItem('swSignedIn')){localStorage.setItem('swSeen','1');await renderHome()}else show('login')}
+  try{await openDB();if(localStorage.getItem('swSignedIn'))localStorage.setItem('swSeen','1');else show('login')}
   catch(e){show('login')}
   gate();
+  setTimeout(()=>fixBroken().then(ch=>{if(ch&&!$('#main').classList.contains('hidden'))renderHome()}),2000);
   if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();
 })();
 /* ---------- login scene: clutter -> scanned -> sorted piles ---------- */

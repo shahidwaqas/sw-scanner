@@ -1,5 +1,5 @@
 /* SW Scanner service worker. Change VER whenever you upload a new version. */
-const VER = 'swscanner-2026-10-27-a';
+const VER = 'swscanner-2026-10-28-a';
 const SHELL = ['./', 'index.html', 'manifest.json', 'icon-180.png', 'icon-192.png', 'icon-512.png', 'logo.png', 'fb.js'];
 
 self.addEventListener('install', e => {
@@ -24,7 +24,7 @@ self.addEventListener('fetch', e => {
   if (u.origin !== self.location.origin) return;
   e.respondWith((async () => {
     try {
-      const timeout = new Promise((_, no) => setTimeout(() => no(new Error('timeout')), 5000));
+      const timeout = new Promise((_, no) => setTimeout(() => no(new Error('timeout')), 2000));
       const res = await Promise.race([fetch(r), timeout]);
       if (res && res.ok && res.type === 'basic') {
         const copy = res.clone();
