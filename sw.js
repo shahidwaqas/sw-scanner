@@ -1,5 +1,5 @@
 /* SW Scanner service worker. Change VER whenever you upload a new version. */
-const VER = 'swscanner-2026-10-28-a';
+const VER = 'swscanner-2026-10-28-b';
 const SHELL = ['./', 'index.html', 'manifest.json', 'icon-180.png', 'icon-192.png', 'icon-512.png', 'logo.png', 'fb.js'];
 
 self.addEventListener('install', e => {

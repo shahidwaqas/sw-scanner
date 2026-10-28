@@ -128,6 +128,7 @@ header button{background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255
 #dlg{align-items:center;justify-content:center;padding:24px;z-index:40}
 #dlg>div{border-radius:20px;max-width:340px;margin:0 auto}
 #dlg p{margin:0;color:#475569;font-size:14px}
+.pvl{text-align:center;font-size:12px;font-weight:600;color:#64748b;margin:4px 0}
 .a4{position:relative;width:100%;aspect-ratio:210/297;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.2);margin-bottom:12px;overflow:hidden}
 .a4 img{position:absolute}.a4 i{position:absolute;background:#666}
 .pvi{display:block;width:100%;margin-bottom:12px;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.2)}
@@ -440,7 +441,7 @@ body{overflow-x:hidden}
 <div id="docv" class="screen hidden">
   <header><h1 id="dTitle"></h1><button id="dShare">Share</button><button id="dDel" data-ic="trash" aria-label="Delete"></button></header>
   <div class="scroll"><div class="row"><p class="hint" style="flex:1;text-align:left">Tap the title to rename. Tap a page to open it.</p><button id="dAll" class="sb">Edit all</button><button id="dSel" class="sb">Select</button></div>
-    <div id="idBox" class="idbox hidden"><b>Print size</b><button id="idM">−</button><span id="idV">100%</span><button id="idP">+</button><button id="idR">Actual size</button><button id="idView" class="pri" style="flex:1 0 100%">View A4 copies sheet</button><button id="idSet" style="flex:1 0 100%">Sheet settings (copies, gap, flip)</button></div>
+    <div id="idBox" class="idbox hidden"><b>Print size</b><button id="idM">−</button><span id="idV">100%</span><button id="idP">+</button><button id="idR">Actual size</button><button id="idView" class="pri" style="flex:1 0 100%">View A4 layout (side by side, front/back, copies)</button><button id="idSet" style="flex:1 0 100%">Sheet settings (copies, gap, flip)</button></div>
     <div class="grid" id="dGrid"></div></div>
   <button id="dBack" class="bk bkf" data-ic="back" aria-label="Back"></button>
   <div class="fab" id="dFab"><button class="pri" id="dAdd" data-ic="cam">Add photo</button></div>
@@ -486,7 +487,7 @@ body{overflow-x:hidden}
 <input type="file" id="inFile" accept="application/pdf,.pdf" multiple hidden>
 <input type="file" id="inRes" accept=".json,application/json" hidden>
 <div id="rev" class="screen hidden"><header><button id="rvBack">✕</button><h1 id="rvT">Review</h1></header><div id="rvPager"></div><div class="hint" id="rvHint"></div><div class="tools"><button id="rvEdit" data-ic="adj">Edit</button><button id="rvDel" data-ic="trash">Remove</button><button id="rvCam" data-ic="cam">Camera</button><button id="rvGal" data-ic="img">Gallery</button><button id="rvFile" data-ic="folder">Files</button></div><div class="bar"><button id="rvSave" class="ok">Save</button></div></div>
-<div id="prev" class="screen hidden"><div class="zc"><button id="zIn" aria-label="Zoom in">+</button><button id="zOut" aria-label="Zoom out">−</button><button id="zFit" style="font-size:12px">Fit</button></div><header><button id="pvBack">←</button><h1 id="pvT"></h1></header><div class="scroll" id="pvBox" style="background:#e2e8f0;padding-top:12px"></div><div class="bar"><button id="pvPrint" class="pri">Print</button><button id="pvShare">Share PDF</button><button id="pvDl">Download</button></div></div>
+<div id="prev" class="screen hidden"><div class="zc"><button id="zIn" aria-label="Zoom in">+</button><button id="zOut" aria-label="Zoom out">−</button><button id="zFit" style="font-size:12px">Fit</button></div><header><button id="pvBack">←</button><h1 id="pvT"></h1></header><div id="pvMode" class="seg hidden" style="margin:6px 12px 0"><button data-pm="side">Side by side</button><button data-pm="duplex">Front &amp; back</button><button data-pm="sheet">8 copies</button></div><div id="pvCap" class="hint hidden"></div><div class="scroll" id="pvBox" style="background:#e2e8f0;padding-top:12px"></div><div class="bar"><button id="pvPrint" class="pri">Print</button><button id="pvShare">Share PDF</button><button id="pvDl">Download</button></div></div>
 <div id="bin" class="screen hidden"><header><button id="bBack">←</button><h1>Recycle bin</h1><button id="bEmpty">Empty</button></header><div class="scroll"><p class="hint" id="binHint"></p><div id="binList"></div></div></div>
 <div id="dlg" class="sheet hidden"><div><b id="dlgT"></b><p id="dlgM"></p><button id="dlgOk" class="rdb">Delete</button><button id="dlgNo">Cancel</button></div></div>
 <style>#busy{position:fixed;inset:0;z-index:130;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:rgba(245,248,253,.9);color:#0a1a5c;font-size:16px;font-weight:600}#busy .bs{width:52px;height:52px;border-radius:50%;border:5px solid #dbe3f0;border-top-color:#ea580c;animation:rot .9s linear infinite}html[data-theme=dark] #busy{background:rgba(11,16,32,.9);color:#e5e9f5}html[data-theme=dark] #busy .bs{border-color:#2a3454;border-top-color:#ea580c}#toast{z-index:200!important}</style>
@@ -611,6 +612,7 @@ async function makePDF(pages,d){
   if(d&&d.sheet){const o=d.sheet;imgs.slice(0,2).forEach((_,k)=>{const it=sheetPos(o,k).map(q=>({i:k,x:q.x*MM,y:PH-(q.y+53.98)*MM,w:85.6*MM,h:53.98*MM}));
     if(k===0&&o.marks){const sg=[];sheetPos(o,0).forEach(q=>sg.push(...ticks(q.x,q.y)));it.ln='0.4 w 0.4 G\n'+sg.map(a=>`${(a[0]*MM).toFixed(2)} ${(PH-a[1]*MM).toFixed(2)} m ${(a[2]*MM).toFixed(2)} ${(PH-a[3]*MM).toFixed(2)} l S`).join('\n')}
     pgs.push(it)})}
+  else if(isId&&d.side){const s=(d.idScale||100)/100,gp=8,L=imgs.map(im=>{const w=Math.min(85.6*s,190);return{w,h:w*im.h/im.w}});let tw=L.reduce((a,t)=>a+t.w,0)+gp*(L.length-1);const f=tw>196?196/tw:1;let x=(210-tw*f)/2;pgs.push(L.map((t,i)=>{const it={i,x:x*MM,y:PH-(20+t.h*f)*MM,w:t.w*f*MM,h:t.h*f*MM};x+=(t.w+gp)*f;return it}))}
   else if(isId){const s=(d.idScale||100)/100,o=SH();imgs.forEach((im,i)=>{const w=Math.min(85.6*s,190),h=w*im.h/im.w;let x=(210-w)/2,y=20;if(i){if(o.flip==='short')y=297-20-h;x+=o.ox;y+=o.oy}pgs.push([{i,x:x*MM,y:PH-(y+h)*MM,w:w*MM,h:h*MM}])})}
   else imgs.forEach((im,i)=>pgs.push([{i,x:0,y:0,w:595,h:Math.round(595*im.h/im.w)}]));
   const N=2+n+2*pgs.length;
@@ -657,6 +659,8 @@ async function printIdDup(d,u){const o=SH(),L=await idLay(d,o,(d.idScale||100)/1
 function printSheet(d,o){const u=d.pages.slice(0,2).map(p=>URL.createObjectURL(p.blob));
   const htm=u.map((x,k)=>'<div class="pg">'+sheetPos(o,k).map(q=>`<img src="${x}" style="left:${q.x.toFixed(2)}mm;top:${q.y.toFixed(2)}mm">`+(k===0&&o.marks?ticks(q.x,q.y).map(t=>`<i style="left:${Math.min(t[0],t[2]).toFixed(2)}mm;top:${Math.min(t[1],t[3]).toFixed(2)}mm;width:${Math.max(.2,Math.abs(t[2]-t[0])).toFixed(2)}mm;height:${Math.max(.2,Math.abs(t[3]-t[1])).toFixed(2)}mm"></i>`).join(''):'')).join('')+'</div>');
   twoStep(htm,'.pg{position:relative;width:210mm;height:297mm;overflow:hidden}img{position:absolute;width:85.6mm;height:53.98mm}i{position:absolute;background:#666}',u)}
+async function printSide(d){const u=d.pages.map(p=>URL.createObjectURL(p.blob)),L=await sideLay(d);
+  runPrint('.pg{position:relative;width:210mm;height:297mm;overflow:hidden}img{position:absolute}','<div class="pg">'+u.map((x,k)=>`<img src="${x}" style="left:${L[k].x.toFixed(2)}mm;top:${L[k].y.toFixed(2)}mm;width:${L[k].w.toFixed(2)}mm;height:${L[k].h.toFixed(2)}mm">`).join('')+'</div>',u)}
 function askWm(){const t=prompt('Purpose text to print on this copy, e.g. "Only for bank account opening" (leave empty for none)',localStorage.getItem('swWm')||'');if(t===null)return null;localStorage.setItem('swWm',t.trim());return t.trim()}
 async function wmBlob(b,t){const im=await loadImg(b),c=document.createElement('canvas');c.width=im.naturalWidth;c.height=im.naturalHeight;const x=c.getContext('2d');x.drawImage(im,0,0);
   x.save();x.translate(c.width/2,c.height/2);x.rotate(-Math.atan2(c.height,c.width)*.6);let fs=c.height*.11;x.font=`bold ${fs}px sans-serif`;
@@ -771,7 +775,7 @@ async function openDoc0(id,keep){
   cur=await dbGet('docs',id);if(!cur||cur.deleted){renderHome();return}
   if(!keep)pSel=null;
   clearUrls();$('#dTitle').textContent=cur.name;const idd=cur.kind==='id';if(idd)pSel=null;
-  $('#idBox').classList.toggle('hidden',!idd);$('#dFab').classList.toggle('hidden',idd||!!pSel);$('#dSel').classList.toggle('hidden',idd||!!pSel);$('#dAll').classList.toggle('hidden',idd||!!pSel||cur.pages.length<2);$('#pgBar').classList.toggle('hidden',!pSel);
+  $('#idBox').classList.toggle('hidden',!idd);const needBack=idd&&cur.pages.length<2;$('#dFab').classList.toggle('hidden',(idd&&!needBack)||!!pSel);{const ab=$('#dAdd');if(ab&&ab.lastChild&&ab.lastChild.nodeType===3)ab.lastChild.textContent=needBack?'Add back side':'Add photo'}$('#dSel').classList.toggle('hidden',idd||!!pSel);$('#dAll').classList.toggle('hidden',idd||!!pSel||cur.pages.length<2);$('#pgBar').classList.toggle('hidden',!pSel);
   if(pSel)$('#pgDel').textContent=`Delete (${pSel.size})`;
   $('#idV').textContent=(cur.idScale||100)+'%';$('#dBack').classList.toggle('hidden',!!pSel);
   const g=$('#dGrid');g.innerHTML='';
@@ -805,7 +809,7 @@ $('#shs').onclick=async e=>{const s=e.target.dataset.s;if(!s&&e.target.id!=='shs
 const setScale=async v=>{cur.idScale=Math.max(50,Math.min(200,v));cur.nameDirty=true;await dbPut('docs',cur);$('#idV').textContent=cur.idScale+'%';autoSync()};
 $('#idM').onclick=()=>setScale((cur.idScale||100)-10);$('#idP').onclick=()=>setScale((cur.idScale||100)+10);$('#idR').onclick=()=>setScale(100);
 $('#dDel').onclick=()=>delDocs([cur]);
-$('#idView').onclick=()=>{if(cur.pages.length<2)return toast('Add the back side first');openPrev(cur,SH())};
+$('#idView').onclick=()=>openPrev(cur,null);
 $('#idSet').onclick=()=>{const o=SH();$('#shN').value=o.n;$('#shG').value=o.gap;$('#shF').value=o.flip;$('#shX').value=o.ox;$('#shY').value=o.oy;$('#shM').checked=!!o.marks;$('#shs').classList.remove('hidden')};
 
 /* ---------- scan flow ---------- */
@@ -816,13 +820,13 @@ function begin(mode,docId,src){ctx={mode,docId,draft:[],queue:[],side:0,ri:0,rep
 function openSrc(s){if(!s){$('#src').classList.remove('hidden');return}if(s==='cam'&&navigator.mediaDevices&&navigator.mediaDevices.getUserMedia){openCam();return}$({cam:'#inCam',gal:'#inGal',file:'#inFile'}[s]).click()}
 $('#src').onclick=e=>{const s=e.target.dataset.s;if(!s&&e.target.id!=='src')return;$('#src').classList.add('hidden');
   if(s&&s!=='x')openSrc(s)};
-$('#dAdd').onclick=()=>begin('add',cur.id,null);
+$('#dAdd').onclick=()=>{begin('add',cur.id,null);ctx.isId=cur.kind==='id'};
 async function onFiles(e){
   let files=[...e.target.files];e.target.value='';if(!files.length)return;stopCam();
   try{
     BL='';busy('Processing...');await new Promise(r=>setTimeout(r,30));files=await expandPdf(files);if(!files.length)return;if(ctx.mode==='edit'){await startCrop(files[0]);return}
     if(ctx.replace!=null){const i=ctx.replace;ctx.replace=null;toast('Processing...');await new Promise(r=>setTimeout(r,30));ctx.draft[i]=await autoPage(files[0]);ctx.ri=i;openRev();return}
-    if(isIdCtx())files=files.slice(0,2-ctx.draft.length);
+    if(isIdCtx())files=files.slice(0,Math.max(0,idRoom()));
     if(!files.length){toast('An ID card has only front and back');return}
     const start=ctx.draft.length;
     for(let k=0;k<files.length;k++){BL=files.length>1?`${k+1}/${files.length} · `:'';busy(BL+'Processing...');await new Promise(r=>setTimeout(r,30));ctx.draft.push(await autoPage(files[k]))}
@@ -881,7 +885,7 @@ function idOrient(q){const d=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);return d(q[0],q[
 function shrink(cv,m){const k=Math.min(1,m/Math.max(cv.width,cv.height)),c=document.createElement('canvas');c.width=Math.round(cv.width*k);c.height=Math.round(cv.height*k);c.getContext('2d').drawImage(cv,0,0,c.width,c.height);return c}
 function goEdit(){toast('Processing...');return new Promise(r=>setTimeout(()=>{
   const q=normQuad(S.q),base=isIdCtx()?warp(S.src,idOrient(q),...idDims(idOrient(q))):warp(S.src,q),keep=E&&E.keepO?E:null;
-  E={base,small:shrink(base,900),o:keep?keep.o:{mode:'doc',b:0,c:0,s:0},pushed:false,bi:keep?keep.bi:undefined,keepO:!!keep};
+  E={base,small:shrink(base,900),o:keep?keep.o:{mode:isIdCtx()?'color':'doc',b:0,c:0,s:0},pushed:false,bi:keep?keep.bi:undefined,keepO:!!keep};
   ['sB','sC','sS'].forEach((k,j)=>$('#'+k).value=[E.o.b,E.o.c,E.o.s][j]);renderEdit();show('edit');r()},30))}
 
 /* ---------- edit: filters & adjust ---------- */
@@ -987,6 +991,7 @@ async function saveDraft(){
 /* ---------- recycle bin, dialogs, selection ---------- */
 const BIN_DAYS=30;
 const isIdCtx=()=>ctx.mode==='id'||!!ctx.isId;
+const idRoom=()=>2-ctx.draft.length-(ctx.mode==='add'&&cur&&cur.kind==='id'?cur.pages.length:0);
 function askConfirm(t,m,ok='Delete',danger=true){return new Promise(res=>{$('#dlgT').textContent=t;$('#dlgM').textContent=m;const o=$('#dlgOk');o.textContent=ok;o.className=danger?'rdb':'pri';$('#dlg').classList.remove('hidden');
   const done=v=>{$('#dlg').classList.add('hidden');o.onclick=$('#dlgNo').onclick=null;res(v)};o.onclick=()=>done(true);$('#dlgNo').onclick=()=>done(false)})}
 async function purge(ds){await addTomb(ds.flatMap(d=>d.pages.filter(p=>p.fs).map(p=>p.id)),ds.filter(d=>d.fsSig!==undefined||d.pages.some(p=>p.fs)).map(d=>d.id));for(const d of ds)await dbDel('docs',d.id)}
@@ -1053,7 +1058,7 @@ async function srcCanvas(blob){const img=await loadImg(blob),m=Math.min(1,1600/M
 async function autoPage(file){
   const tk=()=>new Promise(r=>setTimeout(r,20));busy(BL+'Reading photo...');await tk();
   const c=await srcCanvas(file);busy(BL+'Finding edges...');await tk();let q=null;try{if(!file.isPdf)q=autoQuad(c)}catch(e){}q=q||defQuad(c.width,c.height,file.isPdf?0:.06);
-  busy(BL+'Straightening & cleaning...');await tk();const nq=normQuad(q),base=isIdCtx()?warp(c,idOrient(nq),...idDims(idOrient(nq))):warp(c,nq),o={mode:'doc',b:0,c:0,s:0};
+  busy(BL+'Straightening & cleaning...');await tk();const nq=normQuad(q),base=isIdCtx()?warp(c,idOrient(nq),...idDims(idOrient(nq))):warp(c,nq),o={mode:isIdCtx()?'color':'doc',b:0,c:0,s:0};
   const [blob,orig]=await Promise.all([new Promise(r=>proc(base,o).toBlob(r,'image/jpeg',.88)),new Promise(r=>base.toBlob(r,'image/jpeg',.92))]);
   if(!blob||!orig)throw new Error('Not enough memory to process this photo');
   return{id:uid(),blob,orig,opts:o,file,q}}
@@ -1061,10 +1066,10 @@ function openRev(){clearUrls();const pg=$('#rvPager');pg.innerHTML='';ctx.replac
   ctx.draft.forEach(p=>{const d=document.createElement('div');d.innerHTML=`<img src="${mkUrl(p.blob)}">`;pg.appendChild(d)});
   if(ctx.ri>=ctx.draft.length)ctx.ri=ctx.draft.length-1;if(ctx.ri<0)ctx.ri=0;
   show('rev');updRev();requestAnimationFrame(()=>{pg.scrollLeft=ctx.ri*pg.clientWidth})}
-function updRev(){const n=ctx.draft.length,id=isIdCtx();
-  $('#rvT').textContent=n?(id?(ctx.ri?'Back':'Front'):'Page')+` · ${ctx.ri+1}/${n}`:'Review';
+function updRev(){const n=ctx.draft.length,id=isIdCtx(),off=(ctx.mode==='add'&&cur&&cur.kind==='id')?cur.pages.length:0;
+  $('#rvT').textContent=n?(id?(ctx.ri+off?'Back':'Front'):'Page')+` · ${ctx.ri+1}/${n}`:'Review';
   $('#rvSave').textContent=n>1?`Save (${n} pages)`:'Save';
-  $('#rvHint').textContent=id&&n<2?'Now add the back side with Camera, Gallery or Files.':'Swipe to see all pages. Tap Edit to change crop or filter.'}
+  $('#rvHint').textContent=id&&n+off<2?'Now add the back side with Camera, Gallery or Files.':'Swipe to see all pages. Tap Edit to change crop or filter.'}
 $('#rvPager').addEventListener('scroll',()=>{const pg=$('#rvPager'),i=Math.round(pg.scrollLeft/(pg.clientWidth||1));if(i!==ctx.ri&&i<ctx.draft.length){ctx.ri=i;updRev()}});
 async function editBatch(i){const p=ctx.draft[i];toast('Opening...');ctx.ri=i;
   const base=await srcCanvas(p.orig),c=p.file?await srcCanvas(p.file):base;
@@ -1074,7 +1079,7 @@ async function editBatch(i){const p=ctx.draft[i];toast('Opening...');ctx.ri=i;
 $('#rvEdit').onclick=()=>{if(ctx.draft.length)editBatch(ctx.ri)};
 $('#rvDel').onclick=async()=>{if(!ctx.draft.length)return;if(!await askConfirm('Remove this page?','It will be removed from this scan.','Remove'))return;
   ctx.draft.splice(ctx.ri,1);if(ctx.draft.length)openRev();else ctx.mode==='add'?openDoc(ctx.docId):renderHome()};
-const rvAdd=k=>{if(isIdCtx()&&ctx.draft.length>=2)return toast('An ID card has only front and back');ctx.replace=null;ctx.last=k;openSrc(k)};
+const rvAdd=k=>{if(isIdCtx()&&idRoom()<=0)return toast('An ID card has only front and back');ctx.replace=null;ctx.last=k;openSrc(k)};
 $('#rvCam').onclick=()=>rvAdd('cam');$('#rvGal').onclick=()=>rvAdd('gal');$('#rvFile').onclick=()=>rvAdd('file');
 $('#rvSave').onclick=()=>{if(!ctx.draft.length)return toast('Add a page first');saveDraft()};
 $('#rvBack').onclick=async()=>{const n=ctx.draft.length;
@@ -1083,19 +1088,28 @@ $('#rvBack').onclick=async()=>{const n=ctx.draft.length;
 
 /* ---------- view / preview ---------- */
 let PV=null;
-async function openPrev(d,o){let dd=d;
-  if(d.kind==='id'){const t=askWm();if(t===null)return;dd=await wmDoc(d,t)}
-  PV={d:dd,o};clearUrls();const box=$('#pvBox');box.innerHTML='';$('#pvT').textContent=d.name;
+async function sideLay(d){const L=await idLay(d,{flip:'long',ox:0,oy:0},(d.idScale||100)/100),gp=8;let tw=L.reduce((a,t)=>a+t.w,0)+gp*(L.length-1);const f=tw>196?196/tw:1;let x=(210-tw*f)/2;return L.map(t=>{const r={x,y:20,w:t.w*f,h:t.h*f};x+=(t.w+gp)*f;return r})}
+const pvImg=(u,t)=>`<img src="${u}" style="left:${(t.x/2.1).toFixed(3)}%;top:${(t.y/2.97).toFixed(3)}%;width:${(t.w/2.1).toFixed(3)}%;height:${(t.h/2.97).toFixed(3)}%">`;
+/* mode (ID cards only): 'side' front and back on one page, 'duplex' front page then back page, 'sheet' many copies */
+async function openPrev(d,o,mode,wmDone){let dd=d;const isId=d.kind==='id';
+  if(isId&&!wmDone){const t=askWm();if(t===null)return;dd=await wmDoc(d,t)}
+  if(isId){mode=mode||(o?'sheet':'side');if(mode==='sheet'){if(dd.pages.length<2){toast('Add the back side first');return}o=o||SH()}else o=null}else mode=null;
+  PV={d:dd,o,mode};clearUrls();const box=$('#pvBox');box.innerHTML='';$('#pvT').textContent=d.name;
+  const bar=$('#pvMode'),cap=$('#pvCap');bar.classList.toggle('hidden',!isId);cap.classList.toggle('hidden',!isId);
+  const add=(el,label)=>{if(label){const l=document.createElement('div');l.className='pvl';l.textContent=label;box.appendChild(l)}box.appendChild(el)};
+  if(isId){const sh=SH(),fl=sh.flip==='long'?'long edge':'short edge';bar.querySelector('[data-pm=sheet]').textContent=sh.n+' copies';bar.querySelectorAll('[data-pm]').forEach(b=>b.classList.toggle('on',b.dataset.pm===mode));
+    cap.textContent=mode==='side'?'Front and back next to each other on one A4 page.':mode==='duplex'?`Page 1 is the front. Print it, turn the same paper over on the ${fl}, then print page 2 (the back) on the other side.`:`Page 1 has ${sh.n} fronts. Turn the paper over on the ${fl} and print page 2 with the ${sh.n} backs.`}
   if(o){dd.pages.slice(0,2).forEach((p,k)=>{const u=mkUrl(p.blob),pg=document.createElement('div');pg.className='a4';
-    pg.innerHTML=sheetPos(o,k).map(q=>`<img src="${u}" style="left:${q.x/2.1}%;top:${q.y/2.97}%;width:${85.6/2.1}%;height:${53.98/2.97}%">`+(k===0&&o.marks?ticks(q.x,q.y).map(t=>`<i style="left:${Math.min(t[0],t[2])/2.1}%;top:${Math.min(t[1],t[3])/2.97}%;width:${Math.max(.2,Math.abs(t[2]-t[0]))/2.1}%;height:${Math.max(.2,Math.abs(t[3]-t[1]))/2.97}%"></i>`).join(''):'')).join('');box.appendChild(pg)})}
-  else if(dd.kind==='id'){const L=await idLay(dd,SH(),(dd.idScale||100)/100),gp=8;let tw=L.reduce((a,t)=>a+t.w,0)+gp*(L.length-1);const f=tw>196?196/tw:1;tw*=f;let x=(210-tw)/2;
-    const pg=document.createElement('div');pg.className='a4';pg.innerHTML=dd.pages.map((p,k)=>{const t=L[k],h=`<img src="${mkUrl(p.blob)}" style="left:${(x/2.1).toFixed(3)}%;top:${(20/2.97).toFixed(3)}%;width:${(t.w*f/2.1).toFixed(3)}%;height:${(t.h*f/2.97).toFixed(3)}%">`;x+=(t.w+gp)*f;return h}).join('');box.appendChild(pg)}
+    pg.innerHTML=sheetPos(o,k).map(q=>`<img src="${u}" style="left:${q.x/2.1}%;top:${q.y/2.97}%;width:${85.6/2.1}%;height:${53.98/2.97}%">`+(k===0&&o.marks?ticks(q.x,q.y).map(t=>`<i style="left:${Math.min(t[0],t[2])/2.1}%;top:${Math.min(t[1],t[3])/2.97}%;width:${Math.max(.2,Math.abs(t[2]-t[0]))/2.1}%;height:${Math.max(.2,Math.abs(t[3]-t[1]))/2.97}%"></i>`).join(''):'')).join('');add(pg,k?'Page 2 · backs (other side of the paper)':'Page 1 · fronts')})}
+  else if(isId&&mode==='duplex'){const L=await idLay(dd,SH(),(dd.idScale||100)/100);dd.pages.slice(0,2).forEach((p,k)=>{const pg=document.createElement('div');pg.className='a4';pg.innerHTML=pvImg(mkUrl(p.blob),L[k]);add(pg,k?'Page 2 · back (other side of the paper)':'Page 1 · front')})}
+  else if(isId){const L=await sideLay(dd),pg=document.createElement('div');pg.className='a4';pg.innerHTML=dd.pages.map((p,k)=>pvImg(mkUrl(p.blob),L[k])).join('');add(pg,'Page 1 · front and back together')}
   else dd.pages.forEach(p=>{const im=document.createElement('img');im.src=mkUrl(p.blob);im.className='pvi';box.appendChild(im)});
   PZ=1;show('prev')}
-async function pvPdf(share){const d=PV.d,o=PV.o;toast('Creating PDF...');
-  const f=new File([await makePDF(d.pages,o?{...d,sheet:o}:d)],safe(d.name)+(o?'-sheet':'')+'.pdf',{type:'application/pdf'});share?shareFiles([f],d.name):dl(f)}
+$('#pvMode').onclick=e=>{const b=e.target.closest('[data-pm]');if(b&&PV)openPrev(PV.d,null,b.dataset.pm,true)};
+async function pvPdf(share){const d=PV.d,o=PV.o,m=PV.mode;toast('Creating PDF...');
+  const f=new File([await makePDF(d.pages,o?{...d,sheet:o}:m==='side'?{...d,side:true}:d)],safe(d.name)+(o?'-sheet':m==='side'?'-side':'')+'.pdf',{type:'application/pdf'});share?shareFiles([f],d.name):dl(f)}
 $('#pvBack').onclick=()=>openDoc(cur.id);
-$('#pvPrint').onclick=()=>PV.o?printSheet(PV.d,PV.o):printDoc(PV.d);
+$('#pvPrint').onclick=()=>PV.o?printSheet(PV.d,PV.o):PV.mode==='side'?printSide(PV.d):printDoc(PV.d);
 $('#pvShare').onclick=()=>pvPdf(1);$('#pvDl').onclick=()=>pvPdf(0);
 
 /* ---------- Firebase sync (login + Firestore) ---------- */
