@@ -4,6 +4,7 @@
 <meta charset="utf-8">
 <script>try{var m=localStorage.getItem("swTheme")||"auto";document.documentElement.dataset.theme=(m==="dark"||(m==="auto"&&matchMedia("(prefers-color-scheme: dark)").matches))?"dark":"light"}catch(e){}</script>
 <style>html,body{background:#f7f3e9!important}html[data-theme=dark],html[data-theme=dark] body{background:#08201a!important}</style>
+<script>try{if(localStorage.getItem("swBuild")!=="b2"&&navigator.onLine&&navigator.serviceWorker){localStorage.setItem("swBuild","b2");navigator.serviceWorker.getRegistrations().then(function(r){return Promise.all(r.map(function(x){return x.unregister()}))}).then(function(){return window.caches?caches.keys().then(function(k){return Promise.all(k.map(function(n){return caches.delete(n)}))}):0}).then(function(){location.reload()})}}catch(e){}</script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <title>SW Scanner</title>
 <link rel="manifest" href="manifest.json">
@@ -12,7 +13,7 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="SW Scanner">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="apple-touch-icon" href="icon-180.png?v=2">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-icon-v2.png">
 <link rel="icon" href="icon-192.png?v=2">
 <style>
 :root{--o:#d4a73f;--bg:#f3eee0}
