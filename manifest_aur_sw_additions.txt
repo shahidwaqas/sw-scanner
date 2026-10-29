@@ -1,0 +1,62 @@
+=====================================================
+1) manifest.json  --  in 2 cheezein add karein (baqi manifest na badlein)
+=====================================================
+(action ko apni start_url jaisa rakhein, agar app root "/" par hai to "./" likhein)
+
+  "share_target": {
+    "action": "./index.html",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "files": [
+        { "name": "files", "accept": ["application/pdf", ".pdf"] }
+      ]
+    }
+  },
+  "file_handlers": [
+    {
+      "action": "./index.html",
+      "accept": { "application/pdf": [".pdf"] }
+    }
+  ]
+
+=====================================================
+2) sw.js  --  fetch listener ke bilkul START mein paste karein
+   (apne maujooda fetch code se pehle)
+=====================================================
+
+self.addEventListener('fetch', event => {
+  const url = new URL(event.request.url);
+  if (event.request.method === 'POST' && /\/(index\.html)?$/.test(url.pathname)) {
+    event.respondWith((async () => {
+      try {
+        const fd = await event.request.formData();
+        const files = fd.getAll('files').filter(f => f && f.name !== undefined);
+        const cache = await caches.open('sw-share');
+        for (const k of await cache.keys()) await cache.delete(k);
+        let i = 0;
+        for (const f of files) {
+          await cache.put('/__shared/' + (i++), new Response(f, {
+            headers: {
+              'content-type': f.type || 'application/pdf',
+              'x-name': encodeURIComponent(f.name || 'Shared.pdf')
+            }
+          }));
+        }
+      } catch (e) {}
+      return Response.redirect(url.pathname + '?shared=1', 303);
+    })());
+    return;
+  }
+  /* ... yahan se aap ka purana fetch code ... */
+});
+
+=====================================================
+3) Zaroori
+=====================================================
+- sw.js / manifest badalne ke baad app ko phone se UNINSTALL karke dobara
+  "Add to Home screen" karein, warna Share menu mein SW Scanner nazar nahi aayega.
+- Android: WhatsApp / Files mein PDF -> Share -> "SW Scanner".
+- Desktop Chrome/Edge: PDF par Open with -> SW Scanner bhi chalega.
+- iPhone: Apple PWA ko Share/Open-with ki ijazat nahi deta, wahan sirf
+  app ke andar "Open PDF" button se khulega.

@@ -454,7 +454,7 @@ html[data-theme=dark] #nav button.on,html[data-theme=dark] #nav button.on span{c
 <div id="main" class="screen">
   <div class="hdw"><header class="hd2"><i class="hfl"></i><div class="hr1"><svg class="hbi" viewBox="0 0 100 100" role="img" aria-label="SW Scanner"><use href="#swem"/></svg><div class="hbw"><div class="hbn2"><b>SW</b> Scanner</div><div class="hbt">SCAN · SAVE · SHARE</div></div></div><div class="hr2"><div id="greet" class="greet"></div><div class="hact"><button id="btnSync" data-ic="sync" aria-label="Sync"></button><button id="btnTheme" aria-label="Change theme"></button><button id="btnLock" data-ic="power" aria-label="Log out"></button></div></div></header></div>
   <div id="status"></div>
-  <div class="scroll tab" id="t-home"><div class="tiles"><button class="tile hot" data-go="scan" data-ic="scan">Scan Document</button><button class="tile" data-go="gal" data-ic="img">Import from Gallery</button><button class="tile" data-go="id" data-ic="id">ID Card Scan</button><button class="tile" data-tool="qr" data-t="QR Code Scan" data-ic="scan">QR Code Scan</button><button class="tile" data-x="pdf" data-ic="docs">PDF Tools</button><button class="tile" data-x="tools" data-ic="tools">More Tools</button></div><div class="row"><h3>Recent Documents</h3><button class="sb" data-x="docs">See All</button></div><div id="list"></div></div>
+  <div class="scroll tab" id="t-home"><div class="tiles"><button class="tile hot" data-go="scan" data-ic="scan">Scan Document</button><button class="tile" data-go="gal" data-ic="img">Import from Gallery</button><button class="tile" data-go="id" data-ic="id">ID Card Scan</button><button class="tile" data-tool="qr" data-t="QR Code Scan" data-ic="scan">QR Code Scan</button><button class="tile" data-tool="viewpdf" data-t="PDF Viewer" data-ic="docs">Open PDF</button><button class="tile" data-x="pdf" data-ic="docs">PDF Tools</button><button class="tile" data-x="tools" data-ic="tools">More Tools</button></div><div class="row"><h3>Recent Documents</h3><button class="sb" data-x="docs">See All</button></div><div id="list"></div></div>
   <div class="scroll tab hidden" id="t-docs"><input id="q" class="inp" placeholder="Search documents"><div class="chips" id="chips"><button class="on" data-f="all">All</button><button data-f="pdf">PDF</button><button data-f="img">Images</button><button data-f="fav">Favourites</button></div><div class="row"><h3>My Documents</h3><button class="sb" data-sel>Select</button></div><div id="listAll"></div></div>
   <div class="scroll tab hidden" id="t-import"><h3>Import</h3><button class="big" data-go="cam" data-ic="cam">Camera<small>Take a photo of a document</small></button><button class="big" data-go="gal" data-ic="img">Gallery<small>Choose one or more photos (iPhone also lists Files here)</small></button><button class="big" data-go="file" data-ic="folder">Files<small>Pick a PDF from your files</small></button></div>
   <div class="scroll tab hidden" id="t-tools"><h3>Files</h3><button class="big" data-go="file" data-ic="folder">Import PDF from files<small>Pick a PDF from your files</small></button><button class="big" data-go="id" data-ic="id">ID Card Scan<small>CNIC / licence, prints at real card size</small></button><button class="big" data-go="tab-import" data-ic="imp">Import<small>Camera, Gallery or Files</small></button><button class="big" data-go="sync" data-ic="sync">Sync to Google Drive<small>Back up and sync your scans</small></button><button class="big" data-go="bin" data-ic="trash">Recycle bin<small id="binN">Restore deleted documents</small></button></div>
@@ -467,7 +467,7 @@ html[data-theme=dark] #nav button.on,html[data-theme=dark] #nav button.on span{c
     <button class="big" id="btnRestore" data-ic="restore">Restore<small>Load documents from a backup file</small></button>
     <button class="big" id="btnImport" data-ic="restore">Import from Google Drive<small>One time: bring your old Drive scans here</small></button>
     <button class="big" id="btnOut" data-ic="out">Logout</button></div>
-  <div class="scroll tab hidden" id="t-pdf"><h3>PDF Tools</h3><div class="tiles"><button class="tile" data-tool="merge" data-t="Merge PDF" data-ic="docs">Merge PDF</button><button class="tile" data-tool="split" data-t="Split PDF" data-ic="tools">Split PDF</button><button class="tile" data-tool="compress" data-t="Compress PDF" data-ic="backup">Compress PDF</button><button class="tile" data-go="gal" data-ic="img">Images to PDF</button><button class="tile" data-tool="toimg" data-t="PDF to image" data-ic="img">PDF to image</button><button class="tile" data-tool="addpw" data-t="Add Password" data-ic="user">Add Password</button><button class="tile" data-tool="rempw" data-t="Remove Password" data-ic="user">Remove Password</button><button class="tile" data-tool="rotate" data-t="Rotate PDF" data-ic="retake">Rotate PDF</button><button class="tile" data-tool="reorder" data-t="Reorder Pages" data-ic="adj">Reorder Pages</button></div><h3>Convert</h3><div class="tiles"><button class="tile" data-tool="p2word" data-t="PDF to Word" data-ic="docs">PDF to Word</button><button class="tile" data-tool="p2xls" data-t="PDF to Excel" data-ic="tools">PDF to Excel</button><button class="tile" data-tool="p2ppt" data-t="PDF to PowerPoint" data-ic="img">PDF to PowerPoint</button><button class="tile" data-tool="p2txt" data-t="PDF to Text" data-ic="edit">PDF to Text</button><button class="tile" data-tool="w2pdf" data-t="Word to PDF" data-ic="docs">Word to PDF</button><button class="tile" data-tool="x2pdf" data-t="Excel to PDF" data-ic="tools">Excel to PDF</button></div><h3>OCR · Text from scans</h3><div class="tiles"><button class="tile" data-tool="ocrp" data-t="OCR Printed" data-ic="scan">OCR Printed text</button><button class="tile" data-tool="ocrh" data-t="OCR Handwritten" data-ic="edit">OCR Handwritten</button></div></div>
+  <div class="scroll tab hidden" id="t-pdf"><h3>PDF Tools</h3><div class="tiles"><button class="tile" data-tool="viewpdf" data-t="PDF Viewer" data-ic="docs">Open / View PDF</button><button class="tile" data-tool="merge" data-t="Merge PDF" data-ic="docs">Merge PDF</button><button class="tile" data-tool="split" data-t="Split PDF" data-ic="tools">Split PDF</button><button class="tile" data-tool="compress" data-t="Compress PDF" data-ic="backup">Compress PDF</button><button class="tile" data-go="gal" data-ic="img">Images to PDF</button><button class="tile" data-tool="toimg" data-t="PDF to image" data-ic="img">PDF to image</button><button class="tile" data-tool="addpw" data-t="Add Password" data-ic="user">Add Password</button><button class="tile" data-tool="rempw" data-t="Remove Password" data-ic="user">Remove Password</button><button class="tile" data-tool="rotate" data-t="Rotate PDF" data-ic="retake">Rotate PDF</button><button class="tile" data-tool="reorder" data-t="Reorder Pages" data-ic="adj">Reorder Pages</button></div><h3>Convert</h3><div class="tiles"><button class="tile" data-tool="p2word" data-t="PDF to Word" data-ic="docs">PDF to Word</button><button class="tile" data-tool="p2xls" data-t="PDF to Excel" data-ic="tools">PDF to Excel</button><button class="tile" data-tool="p2ppt" data-t="PDF to PowerPoint" data-ic="img">PDF to PowerPoint</button><button class="tile" data-tool="p2txt" data-t="PDF to Text" data-ic="edit">PDF to Text</button><button class="tile" data-tool="w2pdf" data-t="Word to PDF" data-ic="docs">Word to PDF</button><button class="tile" data-tool="x2pdf" data-t="Excel to PDF" data-ic="tools">Excel to PDF</button></div><h3>OCR · Text from scans</h3><div class="tiles"><button class="tile" data-tool="ocrp" data-t="OCR Printed" data-ic="scan">OCR Printed text</button><button class="tile" data-tool="ocrh" data-t="OCR Handwritten" data-ic="edit">OCR Handwritten</button></div></div>
   <div id="selBar" class="selbar hidden"><button id="selCancel">Cancel</button><button id="selAll">Select all</button><button class="rdb" id="selDel">Delete (0)</button></div>
   <div class="navFade"></div><nav id="nav"><button data-tab="home" data-ic="home" class="on" aria-label="Home"><span>Home</span></button><button data-tab="docs" data-ic="docs" aria-label="All docs"><span>Documents</span></button><button data-tab="import" data-ic="scan" aria-label="Import"><span>Scan</span></button><button data-tab="tools" data-ic="tools" aria-label="Tools"><span>Files</span></button><button data-tab="me" data-ic="user" aria-label="Me"><span>Settings</span></button></nav>
 </div>
@@ -504,6 +504,27 @@ html[data-theme=dark] #nav button.on,html[data-theme=dark] #nav button.on span{c
   <nav id="vNav"><button id="vBack" data-ic="back" aria-label="Back"><span>Back</span></button><button id="vPages" data-ic="docs"><span>Pages</span></button><button id="vEdit" data-ic="adj"><span>Edit</span></button><button id="vRetake" data-ic="retake"><span>Retake</span></button><button id="vAdd" data-ic="cam"><span>Add</span></button><button id="vA4" data-ic="id" class="hidden"><span>A4 layout</span></button></nav>
 </div>
 
+
+<div id="pdfv" class="screen hidden">
+  <header><button id="pvX" aria-label="Close">←</button><h1 id="pvTt">PDF</h1><button id="pvOcr" aria-label="OCR">OCR</button><button id="pvSv" aria-label="Save">Save</button></header>
+  <div id="pvSc"><div id="pvPg"></div></div>
+  <div id="pvInd"></div>
+  <div class="bar" id="pvBar"><button id="pvZo" aria-label="Zoom out">−</button><button id="pvZf">Fit</button><button id="pvZi" aria-label="Zoom in">+</button><button id="pvSh">Share</button></div>
+</div>
+<div id="pvAsk" class="sheet hidden"><div><b>Save this PDF?</b><p id="pvAskM" style="margin:0;font-size:14px;color:#64748b">Save it in SW Scanner to find it later, or discard it.</p><button class="pri" data-k="save">Save to my documents</button><button class="dng" data-k="discard">Discard</button><button data-k="keep">Keep reading</button></div></div>
+<style>
+#pdfv{background:#e8e4d6;color:#0f172a}
+html[data-theme=dark] #pdfv{background:#0a1a15}
+#pvSc{flex:1;min-height:0;overflow:auto;-webkit-overflow-scrolling:touch;touch-action:pan-x pan-y;padding:10px 0 4px}
+#pvPg{display:flex;flex-direction:column;align-items:center;gap:10px;min-width:100%;width:max-content}
+#pvPg .pp2{position:relative;background:#fff;box-shadow:0 2px 10px rgba(0,0,0,.22);flex:none}
+#pvPg canvas{display:block;width:100%;height:100%}
+#pvInd{position:absolute;right:12px;top:calc(env(safe-area-inset-top,0px) + 92px);background:rgba(11,61,46,.82);color:#fff;font-size:12px;border-radius:12px;padding:3px 10px;pointer-events:none;opacity:0;transition:.25s;z-index:5}
+#pvInd.on{opacity:1}
+#pdfv header button{padding:8px 12px}
+#pvSv{background:#b8892b!important;border-color:transparent!important}
+#pvSv.saved{background:rgba(255,255,255,.16)!important;opacity:.7}
+</style>
 <div id="src" class="sheet hidden"><div><b>Choose source</b><button data-s="cam" class="pri">Camera</button><button data-s="gal">Gallery</button><button data-s="file">Files</button><button data-s="x">Cancel</button></div></div>
 <div id="shr" class="sheet hidden"><div><b>Share</b><button data-s="view" class="pri">View</button><button data-s="pdf">Share as PDF</button><button data-s="dl">Download PDF</button><button data-s="img">Share as Image (JPG)</button><button data-s="png">Share as PNG</button><button data-s="print">Print</button><button data-s="sheet" id="sSheet">A4 sheet of copies (front + back)</button><button data-s="x">Cancel</button></div></div>
 
@@ -1685,8 +1706,8 @@ if(!h)throw new Error('This file has no data.');msg('Making PDF...');result('Exc
 });
 /* ---- OCR ---- */
 const DOCX='application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-function prep(bm,hand){const m=Math.max(bm.width,bm.height),s=m<1600?Math.min(2,1600/m):m>3000?3000/m:1,W=Math.round(bm.width*s),H=Math.round(bm.height*s),c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d',{willReadFrequently:true});x.fillStyle='#fff';x.fillRect(0,0,W,H);x.drawImage(bm,0,0,W,H);const id=x.getImageData(0,0,W,H),d=id.data,N=W*H,g=new Uint8ClampedArray(N);let lo=255,hi=0;for(let i=0,j=0;j<N;i+=4,j++){const v=.299*d[i]+.587*d[i+1]+.114*d[i+2];g[j]=v;if(v<lo)lo=v;if(v>hi)hi=v}
-if(hand){const S=W+1,I=new Uint32Array(S*(H+1));for(let y=0;y<H;y++){let r=0;for(let a=0;a<W;a++){r+=g[y*W+a];I[(y+1)*S+a+1]=I[y*S+a+1]+r}}const k=Math.max(8,W>>5);for(let y=0;y<H;y++){const y0=Math.max(0,y-k),y1=Math.min(H-1,y+k);for(let a=0;a<W;a++){const x0=Math.max(0,a-k),x1=Math.min(W-1,a+k),n=(x1-x0+1)*(y1-y0+1),sm=I[(y1+1)*S+x1+1]-I[y0*S+x1+1]-I[(y1+1)*S+x0]+I[y0*S+x0],v=g[y*W+a]<sm/n*.88?0:255,p=(y*W+a)*4;d[p]=d[p+1]=d[p+2]=v}}}
+function prep(bm,hand){const m=Math.max(bm.width,bm.height),s=hand?(m<2200?Math.min(3,2200/m):m>3200?3200/m:1):(m<1600?Math.min(2,1600/m):m>3000?3000/m:1),W=Math.round(bm.width*s),H=Math.round(bm.height*s),c=document.createElement('canvas');c.width=W;c.height=H;const x=c.getContext('2d',{willReadFrequently:true});x.fillStyle='#fff';x.fillRect(0,0,W,H);x.drawImage(bm,0,0,W,H);const id=x.getImageData(0,0,W,H),d=id.data,N=W*H,g=new Uint8ClampedArray(N);let lo=255,hi=0;for(let i=0,j=0;j<N;i+=4,j++){const v=.299*d[i]+.587*d[i+1]+.114*d[i+2];g[j]=v;if(v<lo)lo=v;if(v>hi)hi=v}
+if(hand){const S=W+1,I=new Uint32Array(S*(H+1));for(let y=0;y<H;y++){let r=0;for(let a=0;a<W;a++){r+=g[y*W+a];I[(y+1)*S+a+1]=I[y*S+a+1]+r}}const k=Math.max(12,W>>4);for(let y=0;y<H;y++){const y0=Math.max(0,y-k),y1=Math.min(H-1,y+k);for(let a=0;a<W;a++){const x0=Math.max(0,a-k),x1=Math.min(W-1,a+k),n=(x1-x0+1)*(y1-y0+1),sm=I[(y1+1)*S+x1+1]-I[y0*S+x1+1]-I[(y1+1)*S+x0]+I[y0*S+x0],bg=Math.max(40,sm/n),r=g[y*W+a]/bg,t=(r-.5)/.42,v=t<=0?0:t>=1?255:Math.round(255*t*t*(3-2*t)),p=(y*W+a)*4;d[p]=d[p+1]=d[p+2]=v}}}
 else{const sc=hi>lo?255/(hi-lo):1;for(let j=0,i=0;j<N;j++,i+=4){const v=(g[j]-lo)*sc;d[i]=d[i+1]=d[i+2]=v}}
 x.putImageData(id,0,0);return c}
 function thumb(bm){const s=Math.min(1,1000/Math.max(bm.width,bm.height)),c=document.createElement('canvas');c.width=Math.round(bm.width*s);c.height=Math.round(bm.height*s);const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);x.drawImage(bm,0,0,c.width,c.height);return c.toDataURL('image/jpeg',.7)}
@@ -1713,11 +1734,91 @@ function ocrStart(h){const t=OCRT(h);show(t,'<div style="font-size:12px;opacity:
 const ds=(await dbAll('docs')).filter(d=>!d.deleted&&d.pages&&d.pages.length&&d.pages[0].blob).sort((x,y)=>y.created-x.created);if(!ds.length)return toast('No documents yet');show(t,ds.map((d,i)=>btn('d',i,esc(d.name)+' · '+d.pages.length+' pages')).join(''));$('#tlB').onclick=e2=>{const i=e2.target.dataset.d;if(i!==undefined)ocrLang(h,{name:ds[+i].name,blobs:ds[+i].pages.map(p=>p.blob)})}}catch(x){err(t,x)}}}
 function ocrLang(h,src){show(OCRT(h),'<div style="font-size:13px">Language of the text</div>'+btn('l','eng','English','pri')+btn('l','urd','Urdu')+btn('l','eng+urd','English + Urdu'));$('#tlB').onclick=e=>{const l=e.target.dataset.l;if(l)ocrRun(h,src,l)}}
 async function ocrRun(h,src,lang){const t=OCRT(h);work(t,'Preparing...');let w;try{await lib('ts');const items=[];if(src.blobs)src.blobs.forEach(b=>items.push(()=>b));else for(const f of src.files){if(f.type==='application/pdf'||/\.pdf$/i.test(f.name)){const pdf=await openPdf(f);for(let i=1;i<=pdf.numPages;i++)items.push(async()=>(await pg(pdf,i,2)).c)}else items.push(()=>f)}
-const lim=items.slice(0,30);let cur=0;w=await Tesseract.createWorker(lang,1,{logger:m=>{if(m.status==='recognizing text')msg('Reading page '+(cur+1)+' of '+lim.length+' · '+Math.round(m.progress*100)+'%');else if(/load|init/.test(m.status))msg('Loading OCR engine... (first time needs internet)')}});
-await w.setParameters({tessedit_pageseg_mode:h?'6':'3',preserve_interword_spaces:'1'});const pages=[];
+const lim=items.slice(0,30);let cur=0;w=await Tesseract.createWorker(lang,1,{langPath:'https://tessdata.projectnaptha.com/4.0.0_best',gzip:true,logger:m=>{if(m.status==='recognizing text')msg('Reading page '+(cur+1)+' of '+lim.length+' · '+Math.round(m.progress*100)+'%');else if(/load|init/.test(m.status))msg('Loading OCR engine... (first time needs internet)')}});
+await w.setParameters({tessedit_pageseg_mode:h?'6':'3',preserve_interword_spaces:'1',user_defined_dpi:'300'});const pages=[];
 for(;cur<lim.length;cur++){const bm=await createImageBitmap(await lim[cur]()),img=thumb(bm),r=await w.recognize(prep(bm,h));pages.push({img,text:(r.data.text||'').replace(/\n{3,}/g,'\n\n').trim()})}
 await w.terminate();w=null;edit(src.name,pages,items.length>30)}catch(x){try{w&&await w.terminate()}catch(_){}err(t,x)}}
 Object.assign(T,{ocrp:()=>ocrStart(0),ocrh:()=>ocrStart(1)});
+/* ---- PDF viewer: open from anywhere, ask Save / Discard on exit ---- */
+let V=null,pvPushed=false,pvIgnore=0,pvZ=1,pvIO=null,pvIndT=0,pvCT=0,pvQ=null;
+const pvSc=$('#pvSc'),pvPg=$('#pvPg'),pvInd=$('#pvInd');
+const pvIs=f=>!!f&&(f.type==='application/pdf'||/\.pdf$/i.test(f.name||''));
+const pvBase=()=>Math.max(240,pvSc.clientWidth-16);
+function pvSize(){const bw=pvBase()*pvZ;V.pages.forEach(p=>{p.el.style.width=bw+'px';p.el.style.height=Math.round(bw*p.h/p.w)+'px'})}
+async function pvRender(p){
+  if(p.busy||p.done||!V)return;const v=V;p.busy=1;
+  try{const page=await v.pdf.getPage(p.n),w=p.el.clientWidth,dpr=Math.min(window.devicePixelRatio||1,2.5),vp=page.getViewport({scale:Math.min(w*dpr,3200)/p.w}),c=document.createElement('canvas');c.width=Math.round(vp.width);c.height=Math.round(vp.height);
+    await page.render({canvasContext:c.getContext('2d'),viewport:vp}).promise;
+    if(V===v&&p.vis){p.el.innerHTML='';p.el.appendChild(c);p.done=1;p.rw=w}}
+  catch(e){}finally{p.busy=0}}
+function pvFree(p){if(p.el.firstChild)p.el.innerHTML='';p.done=0}
+function pvBuild(){pvPg.innerHTML='';if(pvIO)pvIO.disconnect();
+  pvIO=new IntersectionObserver(es=>es.forEach(e=>{const p=e.target._p;p.vis=e.isIntersecting;if(p.vis)pvRender(p);else pvFree(p)}),{root:pvSc,rootMargin:'900px 0px'});
+  V.pages.forEach(p=>{const d=document.createElement('div');d.className='pp2';d._p=p;p.el=d;pvPg.appendChild(d)});pvSize();V.pages.forEach(p=>pvIO.observe(p.el))}
+function pvCommit(){clearTimeout(pvCT);pvCT=setTimeout(()=>{if(!V)return;V.pages.forEach(p=>{if(p.done&&Math.abs(p.rw-p.el.clientWidth)>2)p.done=0;if(p.vis&&!p.done)pvRender(p)})},120)}
+function pvZoom(z,cx,cy,live){z=Math.max(1,Math.min(5,z));if(!V||(z===pvZ&&!live))return;
+  const ry=(pvSc.scrollTop+cy)/(pvSc.scrollHeight||1),rx=(pvSc.scrollLeft+cx)/(pvSc.scrollWidth||1);
+  pvZ=z;pvSize();pvSc.scrollTop=ry*pvSc.scrollHeight-cy;pvSc.scrollLeft=rx*pvSc.scrollWidth-cx;if(!live)pvCommit()}
+(()=>{let d0=1,z0=1,pinch=0,last=0;const dist=e=>Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+  pvSc.addEventListener('touchstart',e=>{if(e.touches.length===2){pinch=1;d0=dist(e)||1;z0=pvZ}else if(e.touches.length===1){const n=Date.now();if(n-last<280){const t=e.touches[0],r=pvSc.getBoundingClientRect();pvZoom(pvZ>1.2?1:2.5,t.clientX-r.left,t.clientY-r.top);last=0}else last=n}},{passive:true});
+  pvSc.addEventListener('touchmove',e=>{if(pinch&&e.touches.length===2){e.preventDefault();const r=pvSc.getBoundingClientRect(),a=e.touches[0],b=e.touches[1];pvZoom(z0*dist(e)/d0,(a.clientX+b.clientX)/2-r.left,(a.clientY+b.clientY)/2-r.top,true)}},{passive:false});
+  pvSc.addEventListener('touchend',e=>{if(pinch&&e.touches.length<2){pinch=0;pvCommit()}})})();
+pvSc.addEventListener('scroll',()=>{if(!V)return;const mid=pvSc.getBoundingClientRect().top+pvSc.clientHeight/2;let cur=1;for(const p of V.pages){if(p.el.getBoundingClientRect().top<=mid)cur=p.n;else break}
+  pvInd.textContent=cur+' / '+V.pages.length;pvInd.classList.add('on');clearTimeout(pvIndT);pvIndT=setTimeout(()=>pvInd.classList.remove('on'),1100)},{passive:true});
+$('#pvZi').onclick=()=>pvZoom(pvZ*1.35,pvSc.clientWidth/2,pvSc.clientHeight/2);
+$('#pvZo').onclick=()=>pvZoom(pvZ/1.35,pvSc.clientWidth/2,pvSc.clientHeight/2);
+$('#pvZf').onclick=()=>pvZoom(1,pvSc.clientWidth/2,pvSc.clientHeight/2);
+$('#pvSh').onclick=()=>{if(V)shareFiles([V.file],V.name)};
+$('#pvOcr').onclick=()=>{if(!V)return;const f=V.file,n=V.name;show('OCR',btn('m',0,'Printed text','pri')+btn('m',1,'Handwritten'));$('#tlB').onclick=e=>{const m=e.target.dataset.m;if(m!==undefined)ocrLang(m==='1',{name:n,files:[f]})}};
+$('#pvSv').onclick=()=>{if(V&&!V.saved)pvSave()};
+async function pvSave(){
+  if(!V)return false;const v=V;busy('Saving PDF...');
+  try{const n=Math.min(v.pdf.numPages,30),pages=[];
+    for(let i=1;i<=n;i++){const q=v.pages[i-1],p=await pg(v.pdf,i,Math.min(3,1600/Math.max(q.w,q.h))),b=await new Promise(r=>p.c.toBlob(r,'image/jpeg',.9));p.c.width=1;pages.push({id:uid(),blob:b});await new Promise(r=>setTimeout(r))}
+    await addTh(pages);await dbPut('docs',{id:uid(),name:v.name,created:Date.now(),pages});
+    v.saved=1;$('#pvSv').classList.add('saved');$('#pvSv').textContent='Saved ✓';busyOff();toast(n<v.pdf.numPages?'Saved (first 30 pages)':'Saved ✓');autoSync();return true}
+  catch(e){busyOff();toast('Could not save: '+(e&&e.message||e),6000);return false}}
+function pvFinish(after){
+  const prev=V&&V.prev;if(pvIO)pvIO.disconnect();pvPg.innerHTML='';try{V.pdf.destroy()}catch(e){}V=null;
+  if(pvPushed){pvPushed=false;pvIgnore=1;setTimeout(()=>{pvIgnore=0},800);history.back()}
+  window.show(prev&&document.getElementById(prev)?prev:'main');try{renderHome()}catch(e){}
+  if(after)setTimeout(after,60)}
+function pvAsk(after){
+  if(!V)return after&&after();
+  if(V.saved)return pvFinish(after);
+  $('#pvAskM').textContent=V.pdf.numPages>30?'Only the first 30 pages can be saved in SW Scanner.':'Save it in SW Scanner to find it later, or discard it.';
+  V.after=after;$('#pvAsk').classList.remove('hidden')}
+$('#pvAsk').addEventListener('click',async e=>{
+  if(e.target.id==='pvAsk'){$('#pvAsk').classList.add('hidden');return}
+  const k=e.target.dataset.k;if(!k||!V)return;$('#pvAsk').classList.add('hidden');
+  if(k==='keep'){V.after=null;return}
+  if(k==='save'&&!await pvSave())return;
+  pvFinish(V&&V.after)});
+$('#pvX').onclick=()=>pvAsk();
+addEventListener('popstate',()=>{if(pvIgnore){pvIgnore=0;return}if(V&&!$('#pdfv').classList.contains('hidden')){history.pushState({pv:1},'');pvPushed=true;pvAsk()}});
+async function pvOpen(file){
+  if(V)return pvAsk(()=>pvOpen(file));
+  if(!pvIs(file))return toast('This is not a PDF file');
+  busy('Opening PDF...');
+  try{const pdf=await openPdf(file),pages=[];
+    for(let i=1;i<=pdf.numPages;i++){const vp=(await pdf.getPage(i)).getViewport({scale:1});pages.push({n:i,w:vp.width,h:vp.height});if(i%25===0)await new Promise(r=>setTimeout(r))}
+    const cur=[...document.querySelectorAll('.screen:not(.hidden)')].map(x=>x.id).find(x=>x&&!/^(pdfv|login|splash)$/.test(x));
+    V={file,pdf,pages,name:nm(file)||'PDF',saved:0,prev:cur||'main'};pvZ=1;
+    $('#pvTt').textContent=V.name;$('#pvSv').classList.remove('saved');$('#pvSv').textContent='Save';
+    window.show('pdfv');pvBuild();pvSc.scrollTop=0;pvSc.scrollLeft=0;
+    history.pushState({pv:1},'');pvPushed=true;busyOff()}
+  catch(e){busyOff();if(!e||e.message!=='Cancelled')toast('Could not open PDF: '+(e&&e.message||e),6000)}}
+/* a file arrives from outside (Share menu, "Open with", file handler): wait until the app is unlocked, then open it */
+function pvTry(){if(!pvQ)return;if(document.getElementById('splash')||!sessionStorage.getItem('swOk')){setTimeout(pvTry,400);return}const f=pvQ;pvQ=null;pvOpen(f)}
+function pvIncoming(f){pvQ=f;pvTry()}
+async function pvReadShared(){try{if(!window.caches)return;const c=await caches.open('sw-share'),ks=await c.keys();if(!ks.length)return;const fs=[];
+  for(const k of ks){const r=await c.match(k);if(!r)continue;const b=await r.blob();fs.push(new File([b],decodeURIComponent(r.headers.get('x-name')||'Shared.pdf'),{type:b.type||'application/pdf'}));await c.delete(k)}
+  const f=fs.find(pvIs);if(f)pvIncoming(f);else if(fs.length)toast('Only PDF files can be opened here')}catch(e){}}
+if(/[?&]shared=/.test(location.search))history.replaceState(null,'',location.pathname);
+pvReadShared();
+if(navigator.serviceWorker)navigator.serviceWorker.addEventListener('message',e=>{if(e.data&&e.data.type==='sw-shared')pvReadShared()});
+if('launchQueue'in window)launchQueue.setConsumer(async p=>{try{for(const h of (p.files||[])){const f=await h.getFile();if(pvIs(f)){pvIncoming(f);break}}}catch(e){}});
+Object.assign(T,{async viewpdf(){const[f]=await pick();if(f)pvOpen(f)}});
 /* QR */
 let qs=null,qc;
 async function decode(src,w,h,full){if('BarcodeDetector' in window){try{const r=await new BarcodeDetector({formats:['qr_code']}).detect(src);if(r[0])return r[0].rawValue}catch(e){}if(!full)return null}await lib('jq');const c=qc||(qc=document.createElement('canvas'));c.width=w;c.height=h;const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(src,0,0,w,h);const r=jsQR(x.getImageData(0,0,w,h).data,w,h);return r?r.data:null}
